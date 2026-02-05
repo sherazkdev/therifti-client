@@ -1,0 +1,224 @@
+
+/* ---------- HEADER WRAPPER ---------- */
+
+.header {
+  position: relative;
+  width: 100%;
+}
+
+/* =====================================================
+   TOP WHITE BAR (LOGO + SEARCH + ACTIONS)
+===================================================== */
+
+.topBar {
+  background-color: white;
+  padding: 14px 3%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 50;
+  border-bottom: 1px solid #eee;
+}
+
+/* Left side of top bar */
+
+.topLeft {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+/* Logo */
+
+.logo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+/* ---------- SEARCH AREA ---------- */
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  max-width: 720px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  opacity: 0.6;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 11px 16px 11px 44px;
+  border-radius: 14px;
+  font-size: 15px;
+  border: 1px solid #d0d0d0;
+  background-color: #fafafa;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.searchInput:focus {
+  background-color: white;
+  
+}
+
+/* ---------- RIGHT SIDE ACTIONS ---------- */
+
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.signIn {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.startSelling {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* =====================================================
+   OVERLAY AREA (CATEGORY BAR + HERO)
+===================================================== */
+
+.overlayArea {
+  position: relative;
+  width: 100%;
+}
+
+
+/* =====================================================
+   CATEGORY BAR (TRANSPARENT OVER HERO)
+===================================================== */
+
+.categoryBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 14px 3%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 30;
+
+}
+
+/* LEFT SIDE LIST */
+
+.categoryList {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  list-style: none; /* remove dots */
+  padding: 0;
+  margin: 0;
+  font-size: 15px;
+}
+
+.categoryItem {
+  cursor: pointer;
+  color: white;
+  opacity: 0.9;
+  white-space: nowrap;
+  
+  
+}
+
+.categoryItem:hover {
+  opacity: 1;
+}
+
+/* RIGHT SIDE */
+
+.categoryRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+}
+
+/* ICON BUTTON */
+
+.iconBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+
+
+/* =====================================================
+   RESPONSIVE HOOKS (EXPAND LATER)
+===================================================== */
+
+@media (max-width: 1024px) {
+  .searchWrapper {
+    max-width: 520px;
+  }
+
+  .heroOverlay h1 {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .topBar {
+    padding: 12px 4%;
+  }
+
+  .searchWrapper {
+    max-width: 100%;
+  }
+
+  .categoryBar {
+    display: none;
+  }
+
+  .heroOverlay h1 {
+    font-size: 32px;
+  }
+}
