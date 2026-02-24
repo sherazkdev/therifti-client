@@ -1,0 +1,587 @@
+/* ================================
+   SellItem.module.css (FULL FILE)
+   - Desktop + Mobile Responsive
+   - Image grid fix for mobile
+   - Buttons stacking on mobile
+   - CKEditor global styles included
+================================== */
+
+/* ================================
+   LAYOUT
+================================== */
+.container {
+  max-width: 1240px;
+  margin: 40px auto;
+  padding: 0 32px;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 26px;
+}
+
+/* ================================
+   UPLOAD WRAPPER
+================================== */
+.uploadWrapper {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 30px;
+}
+
+/* Upload box when no images yet */
+.uploadBox {
+  padding: 48px 20px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+/* drag visual */
+.dragging {
+  border-color: #000;
+}
+
+/* ================================
+   IMAGE LIST (DESKTOP)
+================================== */
+.imageList {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* each image card */
+.imageItem {
+  width: 170px;
+  height: 160px;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* thumbnail */
+.imageItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Add image box */
+.addImage {
+  width: 170px;
+  height: 160px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* remove X icon */
+.removeIcon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 50%;
+  padding: 4px;
+  cursor: pointer;
+  z-index: 7;
+}
+
+/* set main image button */
+.setMainBtn {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  z-index: 6;
+  border: none;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.setMainBtn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* rotate button */
+.rotateBtn {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 6;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rotateBtn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* optional drag handle (if you use it later) */
+.dragHandle {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 5;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: grab;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+
+
+.imageErrorOutside {
+  margin-top: -18px;  /* so it sits close to wrapper */
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  border: 1px solid #fda29b;
+  background: #fff1f1;
+  color: #b42318;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+
+
+/* ================================
+   FORM LAYOUT
+================================== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* Two column rows on desktop */
+.row {
+  display: flex;
+  gap: 20px;
+}
+
+/* Shared form group */
+.formGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* NOTE: This "label" is global within module scope.
+   If you want safer scope, use .formGroup label {} */
+label {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+input,
+textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 16px;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+textarea {
+  min-height: 140px;
+  resize: none;
+}
+
+/* ================================
+   DROPDOWN
+================================== */
+.dropdownDisplay {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+/* dropdown menu */
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* each option */
+.dropdownOption {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dropdownSearch {
+  padding: 10px;
+}
+
+.brandSearchInput {
+  background-color: #edf2f2;
+  border: none;
+  width: 100%;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+/* check circle */
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  position: relative;
+}
+
+/* checked ring */
+.checked::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: #000;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* checked white dot */
+.checked::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ================================
+   ERROR MESSAGE
+================================== */
+.error {
+  font-size: 13px;
+  color: #d92d20;
+  margin-top: 4px;
+}
+
+/* ================================
+   ACTION BUTTONS (Upload + Draft)
+================================== */
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* publish/upload */
+.submitBtn {
+  padding: 12px 22px;
+  background: #000;
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+/* draft */
+.draftBtn {
+  padding: 12px 22px;
+  background: #fff;
+  color: #000;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* ================================
+   PHOTO TIP SECTION
+================================== */
+.photoTip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f4f4f4;
+  border-radius: 8px;
+  padding: 17px 14px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.learnMore {
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ================================
+   MODAL
+================================== */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  width: 400px;
+  max-width: 90%;
+  border-radius: 10px;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.closeIcon {
+  cursor: pointer;
+}
+
+.tipList {
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ================================
+   PARCEL SIZE UI
+================================== */
+.parcelList {
+  margin-top: 8px;
+  border-top: 1px solid #ddd;
+}
+
+.parcelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 0;
+  border-bottom: 1px solid #ddd;
+
+  background: transparent;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.parcelRow span {
+  font-size: 16px;
+}
+
+.parcelRow input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #000;
+}
+
+/* ================================
+   CKEditor (CSS Modules safe)
+================================== */
+:global(.ck-editor__editable) {
+  min-height: 280px;
+}
+
+/* lists */
+:global(.ck-editor__editable ul) {
+  list-style: disc;
+  padding-left: 22px;
+}
+
+:global(.ck-editor__editable ol) {
+  list-style: decimal;
+  padding-left: 22px;
+}
+
+:global(.ck-editor__editable li) {
+  margin: 4px 0;
+}
+
+/* remove blue focus */
+:global(.ck.ck-editor__main > .ck-editor__editable) {
+  border-color: #ccc !important;
+  box-shadow: none !important;
+}
+
+:global(.ck.ck-editor__main > .ck-editor__editable.ck-focused) {
+  border-color: #ccc !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* ================================
+   RESPONSIVE (TABLET)
+   - Form rows stacked
+================================== */
+@media (max-width: 900px) {
+  .row {
+    flex-direction: column;
+  }
+}
+
+/* ================================
+   RESPONSIVE (MOBILE FIX)
+   - Image grid 2 columns
+   - Buttons full width stack
+================================== */
+@media (max-width: 600px) {
+  .container {
+    margin: 18px auto;
+    padding: 0 14px;
+  }
+
+  .title {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .uploadWrapper {
+    padding: 12px;
+    margin-bottom: 18px;
+  }
+
+  .uploadBox {
+    padding: 28px 14px;
+  }
+
+  /* ✅ MAIN FIX: images become grid (2 columns) */
+  .imageList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  /* ✅ remove fixed width/height, keep square via aspect-ratio */
+  .imageItem,
+  .addImage {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .imageItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* make overlay controls smaller */
+  .setMainBtn {
+    font-size: 11px;
+    padding: 3px 7px;
+    border-radius: 6px;
+  }
+
+  .rotateBtn {
+    padding: 3px;
+    border-radius: 6px;
+  }
+
+  .removeIcon {
+    padding: 3px;
+  }
+
+  /* photo tip compact */
+  .photoTip {
+    padding: 12px 12px;
+    font-size: 13px;
+  }
+
+  /* ✅ Buttons stack */
+  .actions {
+    flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
+  }
+
+  .draftBtn,
+  .submitBtn {
+    width: 100%;
+    padding: 12px 14px;
+  }
+}
+
+/* ================================
+   RESPONSIVE (TABLET GRID OPTIONAL)
+   - 3 columns between 601-900
+================================== */
+@media (max-width: 900px) and (min-width: 601px) {
+  .imageList {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .imageItem,
+  .addImage {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+  }
+}

@@ -3,8 +3,12 @@
 import styles from "./Header.module.css";
 import LogoIcon from "../../assets/icons/logo.png";
 import SearchIcon from "../../assets/icons/search.png";
+import { useNavigate } from "react-router-dom";
 
 const TopBar = () => {
+
+  const navigate = useNavigate();
+
   return (
     <div className={styles.topBar}>
       {/* LEFT SIDE */}
@@ -33,7 +37,10 @@ const TopBar = () => {
 
       {/* RIGHT SIDE */}
       <div className={styles.topRight}>
-        <button className={styles.signIn}>Sign in →</button>
+        <button 
+        className={styles.signIn}
+        onClick={() => navigate("/login")}
+        >Sign in →</button>
         <button className={styles.startSelling}>Start Selling</button>
       </div>
     </div>
@@ -41,3 +48,4 @@ const TopBar = () => {
 };
 
 export default TopBar;
+
