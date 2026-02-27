@@ -1,5 +1,5 @@
 //category bar option 
-import styles from "./Header.module.css";
+import styles from "./CategoryBar.module.css";
 import { MapPin, Globe, ChevronDown } from "../../components/icons";
 
 const categories = [

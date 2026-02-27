@@ -1,7 +1,7 @@
 //wrapper for the whole navbar 
 
 import CategoryBar from "./CategoryBar";
-import styles from "./Header.module.css";
+import styles from "./Topbar.module.css";
 import Hero from "./Hero";
 import TopBar from "./TopBar";
 

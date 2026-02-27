@@ -1,0 +1,88 @@
+/* =====================================================
+   CATEGORY BAR
+   Transparent bar displayed over hero section
+===================================================== */
+
+.categoryBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 14px 3%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 30;
+}
+
+/* =====================================================
+   LEFT SIDE: CATEGORY LIST
+===================================================== */
+
+.categoryList {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+}
+
+.categoryItem {
+  cursor: pointer;
+  color: white;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+.categoryItem:hover {
+  opacity: 1;
+}
+
+/* =====================================================
+   RIGHT SIDE: LOCATION + ICON
+===================================================== */
+
+.categoryRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: white;
+  cursor: pointer;
+}
+
+/* Globe icon button */
+
+.iconBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+  .categoryBar {
+    display: none;
+  }
+}
