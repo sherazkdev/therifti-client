@@ -38,6 +38,7 @@
   position: relative;
 }
 
+/* ✅ Make all pills same height (All button issue fix) */
 .pill {
   background: #f3f3f3;
   border: 1px solid #ededed;
@@ -54,6 +55,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-height: 36px; /* ✅ same visual height */
 }
 
 .pillActive {
@@ -116,6 +118,7 @@
   font-size: 12px;
   padding: 7px 12px;
   cursor: pointer;
+  min-height: 32px; /* ✅ consistent */
 }
 
 /* Menu list */
@@ -196,6 +199,7 @@
   font-size: 14px;
 }
 
+/* ✅ Apply button size same as others */
 .applyBtn {
   border: 1px solid #111;
   background: #111;
@@ -204,6 +208,7 @@
   font-size: 12px;
   padding: 7px 12px;
   cursor: pointer;
+  min-height: 32px; /* ✅ consistent with Done */
 }
 
 /* Checkbox list */
@@ -212,19 +217,24 @@
   overflow: auto;
 }
 
+/* ✅ NOW checkRow behaves like sizeRow (button, right box) */
 .checkRow {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 12px 12px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 12px;
-  border-bottom: 1px solid #f3f3f3;
+  justify-content: space-between;
   cursor: pointer;
+  border-bottom: 1px solid #f3f3f3;
 }
 
 .checkRow:hover {
   background: #f7f7f7;
 }
 
+/* keep this class (even if not used now) */
 .checkInput {
   width: 18px;
   height: 18px;
@@ -235,9 +245,13 @@
   color: #111;
 }
 
+/* .checkRow, .menuItem, .sizeRow { -webkit-tap-highlight-color: transparent; } */
+
+
+
 /* Price */
 .priceBox {
-  padding: 12px;
+  padding: 10px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -246,7 +260,7 @@
 .priceField {
   border: 1px solid #ededed;
   border-radius: 12px;
-  padding: 10px 10px;
+  padding: 5px;
   background: #fff;
 }
 
@@ -337,6 +351,12 @@
   cursor: not-allowed;
 }
 
+.allPill {
+  padding: 9px 16px;   /* bigger padding */
+  font-size: 13px;      /* slightly bigger text */
+  min-height: 19px;     /* taller */
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .grid {
@@ -347,15 +367,71 @@
   }
 }
 
-@media (max-width: 600px) {
-  .wrapper {
-    padding: 24px 4%;
+/* ✅ Mobile improved: filters scroll horizontally (better UX) */
+/* @media (max-width: 600px) {
+  .filters {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 8px;
   }
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
+
+  .pill {
+    min-height: 38px;
   }
+
+  .dropWrap {
+    width: auto;
+  }
+
   .dropdown {
-    width: min(92vw, 340px);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(92vw, 360px);
+    max-width: 92vw;
+    top: calc(100% + 8px);
+  }
+
+  .wrapper {
+    overflow-x: hidden;
+  }
+} */
+
+
+@media (max-width: 600px) {
+  .filters {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 8px;
+    position: relative; /* keep this */
+  }
+
+  .pill {
+    min-height: 38px;
+  }
+
+  .dropWrap {
+    width: auto;
+    position: static; /* ✅ key fix */
+  }
+
+  .dropdown {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(92vw, 360px);
+    max-width: calc(100vw - 16px);
+    top: calc(100% + 8px);
+  }
+   .dropdown { max-height: 70vh; overflow: auto; }
+
+  .wrapper {
+    overflow-x: hidden;
   }
 }
+
+
+
+
+
+

@@ -1,25 +1,66 @@
+// TopPicks.tsx (backend-ready + bug fix)
+//
+//  Fixes the "leaf root category (Men/Kids/etc) applies All" bug
+//  Makes categories + products backend-ready (with safe fallbacks)
+//  Keeps your existing UI/UX almost the same
+//
+// HOW BACKEND DEV CAN CONNECT:
+// 1) Provide GET /api/categories -> returns CategoryNode[]
+// 2) Provide GET /api/products?... -> returns { items: Product[], total: number } OR { items, hasMore }
+// 3) You can adjust the API URLs below.
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./TopPicks.module.css";
 import ProductCard from "../productcard/ProductCard";
 import { ChevronDown } from "../../components/icons";
+import { Shirt } from "lucide-react";
 
-
-type CategoryNode = {
+/* ---------------- TYPES ---------------- */
+export type CategoryNode = {
   key: string;
   label: string;
+  iconUrl?: string; // backend can send icon if you want
   children?: CategoryNode[];
   options?: string[]; // leaf options
 };
 
-const CATEGORY_TREE: CategoryNode[] = [
+type Drop = "category" | "price" | "size" | "sort" | null;
+
+export type Product = {
+  id: string;
+  image?: string;
+  brand: string;
+  meta: string;
+  price: string;
+  likes: string;
+};
+
+/* ---------------- DEFAULT FALLBACK DATA (UI demo) ---------------- */
+const CATEGORY_TREE_FALLBACK: CategoryNode[] = [
   {
     key: "women",
     label: "Women",
     children: [
-      { key: "women_clothing", label: "Clothing", options: ["Dresses", "Tops", "Jeans", "Jackets", "Abayas"] },
-      { key: "women_shoes", label: "Shoes", options: ["Heels", "Sneakers", "Boots", "Flats", "Sandals", "Wedges"] },
-      { key: "women_bags", label: "Bags", options: ["Handbags", "Crossbody", "Totes", "Clutches", "Backpacks", "Wallets"] },
-      { key: "women_accessories", label: "Accessories", options: ["Jewelry", "Belts", "Scarves", "Sunglasses", "Watches", "Hats"] },
+      {
+        key: "women_clothing",
+        label: "Clothing",
+        options: ["Dresses", "Tops", "Jeans", "Jackets", "Abayas"],
+      },
+      {
+        key: "women_shoes",
+        label: "Shoes",
+        options: ["Heels", "Sneakers", "Boots", "Flats", "Sandals", "Wedges"],
+      },
+      {
+        key: "women_bags",
+        label: "Bags",
+        options: ["Handbags", "Crossbody", "Totes", "Clutches", "Backpacks", "Wallets"],
+      },
+      {
+        key: "women_accessories",
+        label: "Accessories",
+        options: ["Jewelry", "Belts", "Scarves", "Sunglasses", "Watches", "Hats"],
+      },
     ],
   },
   { key: "men", label: "Men" },
@@ -33,18 +74,6 @@ const CATEGORY_TREE: CategoryNode[] = [
 const SIZE_OPTIONS = ["XXXS / 2", "XXX / 4", "XS / 6", "S / 8", "M / 10"];
 const SORT_OPTIONS = ["Recommended", "Newest", "Price: Low to High", "Price: High to Low"];
 
-type Drop = "category" | "price" | "size" | "sort" | null;
-
-type Product = {
-  id: string;
-  image?: string;
-  brand: string;
-  meta: string;
-  price: string;
-  likes: string;
-};
-
-// Demo products (for UI only)
 const ALL_DEMO_PRODUCTS: Product[] = Array.from({ length: 24 }).map((_, i) => {
   const brands = ["River Island", "Mango", "Topman", "Fashion House", "Zara", "Nike", "Adidas"];
   const b = brands[i % brands.length];
@@ -58,6 +87,7 @@ const ALL_DEMO_PRODUCTS: Product[] = Array.from({ length: 24 }).map((_, i) => {
   };
 });
 
+/* ---------------- HELPERS ---------------- */
 function findNodeByKey(nodes: CategoryNode[], key: string): CategoryNode | null {
   for (const n of nodes) {
     if (n.key === key) return n;
@@ -71,38 +101,166 @@ function findNodeByKey(nodes: CategoryNode[], key: string): CategoryNode | null 
 
 const PAGE_SIZE = 8;
 
+function buildCategoryLabel(tree: CategoryNode[], stack: string[]) {
+  const labels = stack
+    .map((k) => findNodeByKey(tree, k)?.label)
+    .filter(Boolean) as string[];
+  return labels.length ? labels.join(" / ") : "All";
+}
+
+function toNumberOrUndefined(v: string) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+/* ---------------- API (PLACEHOLDERS) ----------------
+   Your backend dev can change URLs and response formats if needed. */
+async function apiFetchCategories(): Promise<CategoryNode[]> {
+  const res = await fetch("/api/categories");
+  if (!res.ok) throw new Error("Failed to load categories");
+  return res.json();
+}
+
+type FetchProductsResponse =
+  | { items: Product[]; total: number } // option A
+  | { items: Product[]; hasMore: boolean }; // option B
+
+type ProductFiltersPayload = {
+  page: number;
+  pageSize: number;
+  sort: string;
+  categoryKey?: string; // usually last stack key
+  categoryPath?: string[]; // full stack if backend wants it
+  categoryOptions?: Record<string, string[]>;
+  minPrice?: number;
+  maxPrice?: number;
+  sizes?: string[];
+};
+
+async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchProductsResponse> {
+  const params = new URLSearchParams();
+
+  params.set("page", String(payload.page));
+  params.set("pageSize", String(payload.pageSize));
+  params.set("sort", payload.sort);
+
+  if (payload.categoryKey) params.set("categoryKey", payload.categoryKey);
+
+  // If backend wants stack/path, you can send it like this:
+  if (payload.categoryPath?.length) params.set("categoryPath", payload.categoryPath.join(">"));
+
+  // If backend wants options, simplest is JSON:
+  if (payload.categoryOptions && Object.keys(payload.categoryOptions).length) {
+    params.set("categoryOptions", JSON.stringify(payload.categoryOptions));
+  }
+
+  if (typeof payload.minPrice === "number") params.set("minPrice", String(payload.minPrice));
+  if (typeof payload.maxPrice === "number") params.set("maxPrice", String(payload.maxPrice));
+  if (payload.sizes?.length) params.set("sizes", payload.sizes.join(","));
+
+  const res = await fetch(`/api/products?${params.toString()}`);
+  if (!res.ok) throw new Error("Failed to load products");
+  return res.json();
+}
+
+/* ---------------- COMPONENT ---------------- */
 const TopPicks = () => {
   const [open, setOpen] = useState<Drop>(null);
+
+  // Backend-ready category tree (fallback to demo)
+  const [categoryTree, setCategoryTree] = useState<CategoryNode[]>(CATEGORY_TREE_FALLBACK);
 
   // Category navigation (screen stack)
   const [catStack, setCatStack] = useState<string[]>([]);
 
-  // Selected values (UI only)
+  // Selected values
   const [selectedPath, setSelectedPath] = useState<string>("All"); // for showing label on button
   const [selectedCatOptions, setSelectedCatOptions] = useState<Record<string, string[]>>({});
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortValue, setSortValue] = useState<string>(SORT_OPTIONS[0]);
-
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
 
-  // Pagination simulation
+  // Pagination + products (backend-ready)
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Optional loading/error states (nice for real API)
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [loadingCats, setLoadingCats] = useState(false);
+
+  // When backend not connected, we fallback to demo mode automatically if API fails
+  const [useDemoMode, setUseDemoMode] = useState(true);
 
   const panelRef = useRef<HTMLDivElement | null>(null);
 
   const currentCatNode = useMemo(() => {
     if (catStack.length === 0) return null;
-    return findNodeByKey(CATEGORY_TREE, catStack[catStack.length - 1]);
-  }, [catStack]);
+    return findNodeByKey(categoryTree, catStack[catStack.length - 1]);
+  }, [catStack, categoryTree]);
 
-  // On first load: show first PAGE_SIZE products
+  const showRoot = open === "category" && catStack.length === 0;
+  const showCategoryScreen = open === "category" && catStack.length > 0;
+
+  /* ---------- INITIAL LOAD ---------- */
   useEffect(() => {
-    setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+    // Load categories from backend (if available)
+    const loadCats = async () => {
+      try {
+        setLoadingCats(true);
+        const cats = await apiFetchCategories();
+        if (Array.isArray(cats) && cats.length) {
+          setCategoryTree(cats);
+          setUseDemoMode(false); // if categories endpoint works, likely backend exists
+        }
+      } catch {
+        // keep fallback
+      } finally {
+        setLoadingCats(false);
+      }
+    };
+
+    loadCats();
   }, []);
 
-  // Close dropdown on outside click
+  // Initial products load
+  useEffect(() => {
+    // show demo products immediately for UI
+    setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+    setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
+
+    // Try backend products (if exists)
+    const loadInitialProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        const payload: ProductFiltersPayload = {
+          page: 1,
+          pageSize: PAGE_SIZE,
+          sort: sortValue,
+        };
+        const resp = await apiFetchProducts(payload);
+
+        setProducts(resp.items);
+        if ("hasMore" in resp) {
+          setHasMore(resp.hasMore);
+        } else {
+          setHasMore(resp.total > resp.items.length);
+        }
+
+        setUseDemoMode(false);
+      } catch {
+        // stay in demo mode
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    loadInitialProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* ---------- OUTSIDE CLICK CLOSE ---------- */
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!panelRef.current) return;
@@ -115,6 +273,7 @@ const TopPicks = () => {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
+  /* ---------- UI ACTIONS ---------- */
   const toggleOpen = (d: Drop) => {
     setOpen((prev) => (prev === d ? null : d));
     if (d !== "category") setCatStack([]);
@@ -123,14 +282,14 @@ const TopPicks = () => {
   const goIntoCategory = (key: string) => setCatStack((s) => [...s, key]);
   const goBackCategory = () => setCatStack((s) => s.slice(0, -1));
 
-  const showRoot = open === "category" && catStack.length === 0;
-  const showCategoryScreen = open === "category" && catStack.length > 0;
-
   const toggleOption = (groupKey: string, option: string) => {
     setSelectedCatOptions((prev) => {
       const existing = prev[groupKey] ?? [];
       const has = existing.includes(option);
-      const next = has ? existing.filter((x) => x !== option) : [...existing, option];
+
+      // agar same option dubara click kare to unselect ho jaye
+      const next = has ? [] : [option];
+
       return { ...prev, [groupKey]: next };
     });
   };
@@ -139,31 +298,96 @@ const TopPicks = () => {
     setSelectedSizes((prev) => (prev.includes(size) ? prev.filter((x) => x !== size) : [...prev, size]));
   };
 
-  // --- UI demo “apply” behaviour (later backend will replace this) ---
-  const applyCategorySelection = () => {
+  /* ---------- BACKEND-READY PRODUCT FETCH ---------- */
+  const fetchProductsWithCurrentFilters = async (nextPage: number, mode: "replace" | "append") => {
+    // DEMO fallback
+    if (useDemoMode) {
+      const nextCount = nextPage * PAGE_SIZE;
+      const nextProducts = ALL_DEMO_PRODUCTS.slice(0, nextCount);
+      setProducts(nextProducts);
+      setHasMore(nextProducts.length < ALL_DEMO_PRODUCTS.length);
+      setPage(nextPage);
+      return;
+    }
 
-  console.log("Selected category stack:", catStack);
-  console.log("LAST category (to send backend):", catStack[catStack.length - 1]);
-    
-    // create readable label from stack
-    const labels = catStack
-      .map((k) => findNodeByKey(CATEGORY_TREE, k)?.label)
-      .filter(Boolean) as string[];
+    // BACKEND mode
+    try {
+      setLoadingProducts(true);
 
-    const leaf = currentCatNode?.label ? [currentCatNode.label] : [];
-    const path = labels.length ? labels.join(" / ") : "All";
+      const payload: ProductFiltersPayload = {
+        page: nextPage,
+        pageSize: PAGE_SIZE,
+        sort: sortValue,
+        categoryKey: selectedPath === "All" ? undefined : undefined, // we send categoryKey differently below
+        categoryPath: undefined,
+        categoryOptions: Object.keys(selectedCatOptions).length ? selectedCatOptions : undefined,
+        minPrice: toNumberOrUndefined(priceFrom),
+        maxPrice: toNumberOrUndefined(priceTo),
+        sizes: selectedSizes.length ? selectedSizes : undefined,
+      };
 
-    setSelectedPath(path);
+      // If you want the backend category to be the "last selected stack key":
+      // We store it when applying category via "appliedCategoryKey"
+      // (see applyCategorySelection below)
+      // We'll set it from state:
+      // NOTE: we maintain appliedCategoryKey separately
+      payload.categoryKey = appliedCategoryKey ?? undefined;
+      payload.categoryPath = appliedCategoryPath?.length ? appliedCategoryPath : undefined;
+
+      const resp = await apiFetchProducts(payload);
+
+      if (mode === "replace") setProducts(resp.items);
+      else setProducts((prev) => [...prev, ...resp.items]);
+
+      if ("hasMore" in resp) {
+        setHasMore(resp.hasMore);
+      } else {
+        const alreadyCount = mode === "replace" ? resp.items.length : products.length + resp.items.length;
+        setHasMore(resp.total > alreadyCount);
+      }
+
+      setPage(nextPage);
+    } catch {
+      // if backend fails mid-way, you can keep current products
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
+  // We store applied category key/path separately (important for backend)
+  const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(null);
+  const [appliedCategoryPath, setAppliedCategoryPath] = useState<string[]>([]);
+
+  // ✅ Apply category selection + bug fix handled here
+  const applyCategorySelection = async (stackToApply?: string[]) => {
+    const stack = stackToApply ?? catStack;
+
+    // build readable label from stack
+    const label = buildCategoryLabel(categoryTree, stack);
+    setSelectedPath(label);
+
+    // The backend-friendly values:
+    const lastKey = stack.length ? stack[stack.length - 1] : null;
+    setAppliedCategoryKey(lastKey);
+    setAppliedCategoryPath(stack);
+
     setOpen(null);
     setCatStack([]);
 
-    // reset pagination and show page 1 again (UI demo)
-    setPage(1);
-    setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+    // Reset to page 1 and fetch products with filters
+    await fetchProductsWithCurrentFilters(1, "replace");
   };
 
-  const resetAll = () => {
+  const applyNonCategoryFilters = async () => {
+    setOpen(null);
+    setCatStack([]);
+    await fetchProductsWithCurrentFilters(1, "replace");
+  };
+
+  const resetAll = async () => {
     setSelectedPath("All");
+    setAppliedCategoryKey(null);
+    setAppliedCategoryPath([]);
     setSelectedCatOptions({});
     setSelectedSizes([]);
     setSortValue(SORT_OPTIONS[0]);
@@ -171,18 +395,12 @@ const TopPicks = () => {
     setPriceTo("");
     setOpen(null);
     setCatStack([]);
-    setPage(1);
-    setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+    await fetchProductsWithCurrentFilters(1, "replace");
   };
 
-  const hasMore = products.length < ALL_DEMO_PRODUCTS.length;
-
-  const onSeeMore = () => {
-    // UI demo pagination (later backend will do page=2 etc)
-    const nextPage = page + 1;
-    const nextCount = nextPage * PAGE_SIZE;
-    setPage(nextPage);
-    setProducts(ALL_DEMO_PRODUCTS.slice(0, nextCount));
+  const onSeeMore = async () => {
+    if (!hasMore || loadingProducts) return;
+    await fetchProductsWithCurrentFilters(page + 1, "append");
   };
 
   return (
@@ -198,12 +416,13 @@ const TopPicks = () => {
       {/* Filters */}
       <div className={styles.filters} ref={panelRef}>
         <button
-          className={`${styles.pill} ${selectedPath === "All" ? styles.pillActive : ""}`}
+          className={`${styles.pill} ${styles.allPill} ${selectedPath === "All" ? styles.pillActive : ""}`}
           type="button"
-          onClick={() => {
+          onClick={async () => {
             setSelectedPath("All");
-            setPage(1);
-            setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+            setAppliedCategoryKey(null);
+            setAppliedCategoryPath([]);
+            await fetchProductsWithCurrentFilters(1, "replace");
           }}
         >
           All
@@ -217,31 +436,43 @@ const TopPicks = () => {
             onClick={() => toggleOpen("category")}
             title={selectedPath}
           >
-            {selectedPath === "All" ? "Category" : selectedPath} <ChevronDown />
+            {selectedPath === "All" ? "Category" : selectedPath} <ChevronDown size={16}/>
           </button>
 
           {open === "category" && (
             <div className={styles.dropdown}>
               {showRoot && (
                 <div className={styles.menuList}>
-                  <div className={styles.ddHeader}>Category</div>
+                  <div className={styles.ddHeader}>
+                    Category{loadingCats ? " (Loading…)" : ""}
+                  </div>
 
-                  {CATEGORY_TREE.map((c) => (
+                  {categoryTree.map((c) => (
                     <button
                       key={c.key}
                       className={styles.menuItem}
                       type="button"
-                      onClick={() => (c.children ? goIntoCategory(c.key) : applyCategorySelection())}
+                      onClick={() => {
+                        // BUG FIX:
+                        // If category has NO children, we must apply that key (not empty stack).
+                        if (c.children && c.children.length) {
+                          goIntoCategory(c.key);
+                        } else {
+                          // apply with stack containing this leaf root key
+                          void applyCategorySelection([c.key]);
+                        }
+                      }}
                     >
                       <span className={styles.menuLeft}>
                         <span className={styles.iconBox} aria-hidden="true">
-                          □
+                          {/* testing icon (lucide). Later backend iconUrl can be used. */}
+                          <Shirt size={16} />
                         </span>
                         <span className={styles.menuLabel}>{c.label}</span>
                       </span>
 
                       <span className={styles.menuRight} aria-hidden="true">
-                        {c.children ? "›" : ""}
+                        {c.children && c.children.length ? "›" : ""}
                       </span>
                     </button>
                   ))}
@@ -257,7 +488,7 @@ const TopPicks = () => {
 
                     <div className={styles.menuTitle}>{currentCatNode?.label ?? "Category"}</div>
 
-                    <button className={styles.applyBtn} type="button" onClick={applyCategorySelection}>
+                    <button className={styles.applyBtn} type="button" onClick={() => void applyCategorySelection()}>
                       Apply
                     </button>
                   </div>
@@ -274,7 +505,7 @@ const TopPicks = () => {
                         >
                           <span className={styles.menuLeft}>
                             <span className={styles.iconBox} aria-hidden="true">
-                              □
+                              <Shirt size={16} />
                             </span>
                             <span className={styles.menuLabel}>{child.label}</span>
                           </span>
@@ -285,7 +516,7 @@ const TopPicks = () => {
                       ))}
                     </div>
                   ) : (
-                    // leaf options (checkbox list)
+                    // leaf options (checkbox list)  ✅ NOW SAME AS SIZE (black tick box)
                     <div className={styles.checkList}>
                       <div className={styles.ddSubHeader}>Choose options</div>
 
@@ -294,15 +525,18 @@ const TopPicks = () => {
                         const checked = (selectedCatOptions[groupKey] ?? []).includes(opt);
 
                         return (
-                          <label key={opt} className={styles.checkRow}>
-                            <input
-                              className={styles.checkInput}
-                              type="checkbox"
-                              checked={checked}
-                              onChange={() => toggleOption(groupKey, opt)}
-                            />
+                          <button
+                            key={opt}
+                            type="button"
+                            className={styles.checkRow}
+                            onClick={() => toggleOption(groupKey, opt)}
+                          >
                             <span className={styles.checkText}>{opt}</span>
-                          </label>
+
+                            <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
+                              {checked ? "✓" : ""}
+                            </span>
+                          </button>
                         );
                       })}
                     </div>
@@ -320,7 +554,7 @@ const TopPicks = () => {
             type="button"
             onClick={() => toggleOpen("price")}
           >
-            Price <ChevronDown />
+            Price <ChevronDown size={16} />
           </button>
 
           {open === "price" && (
@@ -332,7 +566,7 @@ const TopPicks = () => {
                   <label className={styles.priceLabel}>From</label>
                   <input
                     className={styles.priceInput}
-                    placeholder="0"
+                    placeholder="0$"
                     value={priceFrom}
                     onChange={(e) => setPriceFrom(e.target.value)}
                   />
@@ -341,7 +575,7 @@ const TopPicks = () => {
                   <label className={styles.priceLabel}>To</label>
                   <input
                     className={styles.priceInput}
-                    placeholder="999"
+                    placeholder="999$"
                     value={priceTo}
                     onChange={(e) => setPriceTo(e.target.value)}
                   />
@@ -349,7 +583,7 @@ const TopPicks = () => {
               </div>
 
               <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => setOpen(null)}>
+                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
                   Done
                 </button>
               </div>
@@ -364,7 +598,7 @@ const TopPicks = () => {
             type="button"
             onClick={() => toggleOpen("size")}
           >
-            Size <ChevronDown />
+            Size <ChevronDown size={16} />
           </button>
 
           {open === "size" && (
@@ -375,12 +609,7 @@ const TopPicks = () => {
                 {SIZE_OPTIONS.map((s) => {
                   const checked = selectedSizes.includes(s);
                   return (
-                    <button
-                      key={s}
-                      type="button"
-                      className={styles.sizeRow}
-                      onClick={() => toggleSize(s)}
-                    >
+                    <button key={s} type="button" className={styles.sizeRow} onClick={() => toggleSize(s)}>
                       <span className={styles.sizeText}>{s}</span>
                       <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
                         {checked ? "✓" : ""}
@@ -391,7 +620,7 @@ const TopPicks = () => {
               </div>
 
               <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => setOpen(null)}>
+                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
                   Done
                 </button>
               </div>
@@ -406,7 +635,7 @@ const TopPicks = () => {
             type="button"
             onClick={() => toggleOpen("sort")}
           >
-            Sort By <ChevronDown />
+            Sort By <ChevronDown size={16} />
           </button>
 
           {open === "sort" && (
@@ -419,15 +648,17 @@ const TopPicks = () => {
                     key={opt}
                     type="button"
                     className={styles.menuItem}
-                    onClick={() => {
+                    onClick={async () => {
                       setSortValue(opt);
                       setOpen(null);
+                      // re-fetch products with new sort (page 1)
+                      await fetchProductsWithCurrentFilters(1, "replace");
                     }}
                   >
                     <span className={styles.menuLeft}>
                       <span className={styles.menuLabel}>{opt}</span>
                     </span>
-                    <span className={styles.menuRight} aria-hidden="true">
+                    <span className={`${styles.rightBox} ${sortValue === opt ? styles.rightBoxOn : ""}`} aria-hidden="true">
                       {sortValue === opt ? "✓" : ""}
                     </span>
                   </button>
@@ -441,21 +672,14 @@ const TopPicks = () => {
       {/* Products */}
       <div className={styles.grid}>
         {products.map((p) => (
-          <ProductCard
-            key={p.id}
-            image={p.image}
-            brand={p.brand}
-            meta={p.meta}
-            price={p.price}
-            likes={p.likes}
-          />
+          <ProductCard key={p.id} image={p.image} brand={p.brand} meta={p.meta} price={p.price} likes={p.likes} />
         ))}
       </div>
 
-      {/* See more */}
+      {/* Footer / pagination */}
       <div className={styles.footer}>
-        <button className={styles.seeMore} type="button" onClick={onSeeMore} disabled={!hasMore}>
-          {hasMore ? "See More" : "No More Products"}
+        <button className={styles.seeMore} type="button" onClick={onSeeMore} disabled={!hasMore || loadingProducts}>
+          {loadingProducts ? "Loading…" : hasMore ? "See More" : "No More Products"}
         </button>
       </div>
     </section>
