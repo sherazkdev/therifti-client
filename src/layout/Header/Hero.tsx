@@ -1,12 +1,10 @@
-// In this files we have the content changing based upon the coming data 
-
 import { useEffect, useState } from "react";
 import styles from "./Hero.module.css";
 import { MoveLeft, MoveRight } from "../../components/icons";
-import bannerImg1 from "../../assets/images/Herobanner/HeroSection.png"
-import bannerImg2 from "../../assets/images/Herobanner/Desktop - 59.png";
-import bannerImg3 from "../../assets/images/Herobanner/Desktop - 60.png"
 
+import bannerImg1 from "../../assets/images/Herobanner/HeroSection.png";
+import bannerImg2 from "../../assets/images/Herobanner/Desktop - 59.png";
+import bannerImg3 from "../../assets/images/Herobanner/Desktop - 60.png";
 
 const slides = [
   {
@@ -26,8 +24,6 @@ const slides = [
   },
 ];
 
-
-
 const Hero = () => {
   const [active, setActive] = useState(0);
 
@@ -41,9 +37,7 @@ const Hero = () => {
   }, []);
 
   const goPrev = () => {
-    setActive((prev) =>
-      prev === 0 ? slides.length - 1 : prev - 1
-    );
+    setActive((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };
 
   const goNext = () => {
@@ -52,18 +46,21 @@ const Hero = () => {
 
   return (
     <section className={styles.hero}>
-      {/* Background */}
-      <div
-        className={styles.heroBg}
-        style={{
-          backgroundImage: slides[active].image
-            ? `url(${slides[active].image})`
-            : undefined,
-        }}
-      />
+      {/* ✅ Background Slides (stacked + smooth fade + zoom) */}
+      {slides.map((slide, index) => (
+        <div
+          key={index}
+          className={`${styles.heroBg} ${
+            index === active ? styles.activeSlide : ""
+          }`}
+          style={{
+            backgroundImage: `url(${slide.image})`,
+          }}
+        />
+      ))}
 
-      {/* Center Content */}
-      <div className={styles.heroOverlay}>
+      {/* ✅ Text animation on each slide change */}
+      <div key={active} className={styles.heroOverlay}>
         <h1>{slides[active].title}</h1>
         <p>{slides[active].subtitle}</p>
 
@@ -99,9 +96,7 @@ const Hero = () => {
           <span
             key={idx}
             onClick={() => setActive(idx)}
-            className={`${styles.dot} ${
-              idx === active ? styles.activeDot : ""
-            }`}
+            className={`${styles.dot} ${idx === active ? styles.activeDot : ""}`}
           />
         ))}
       </div>
