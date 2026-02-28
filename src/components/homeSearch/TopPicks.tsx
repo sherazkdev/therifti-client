@@ -1,13 +1,6 @@
-// TopPicks.tsx (backend-ready + bug fix)
-//
-//  Fixes the "leaf root category (Men/Kids/etc) applies All" bug
-//  Makes categories + products backend-ready (with safe fallbacks)
-//  Keeps your existing UI/UX almost the same
-//
-// HOW BACKEND DEV CAN CONNECT:
-// 1) Provide GET /api/categories -> returns CategoryNode[]
-// 2) Provide GET /api/products?... -> returns { items: Product[], total: number } OR { items, hasMore }
-// 3) You can adjust the API URLs below.
+
+
+// TopPicks.tsx (backend-ready + payload simplified + state lag fixed)
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./TopPicks.module.css";
@@ -19,9 +12,9 @@ import { Shirt } from "lucide-react";
 export type CategoryNode = {
   key: string;
   label: string;
-  iconUrl?: string; // backend can send icon if you want
+  iconUrl?: string; 
   children?: CategoryNode[];
-  options?: string[]; // leaf options
+  options?: string[]; 
 };
 
 type Drop = "category" | "price" | "size" | "sort" | null;
@@ -113,8 +106,7 @@ function toNumberOrUndefined(v: string) {
   return Number.isFinite(n) ? n : undefined;
 }
 
-/* ---------------- API (PLACEHOLDERS) ----------------
-   Your backend dev can change URLs and response formats if needed. */
+/* ---------------- API (PLACEHOLDERS) ---------------- */
 async function apiFetchCategories(): Promise<CategoryNode[]> {
   const res = await fetch("/api/categories");
   if (!res.ok) throw new Error("Failed to load categories");
@@ -122,16 +114,14 @@ async function apiFetchCategories(): Promise<CategoryNode[]> {
 }
 
 type FetchProductsResponse =
-  | { items: Product[]; total: number } // option A
-  | { items: Product[]; hasMore: boolean }; // option B
+  | { items: Product[]; total: number }
+  | { items: Product[]; hasMore: boolean };
 
 type ProductFiltersPayload = {
   page: number;
   pageSize: number;
   sort: string;
-  categoryKey?: string; // usually last stack key
-  categoryPath?: string[]; // full stack if backend wants it
-  categoryOptions?: Record<string, string[]>;
+  categoryKey?: string; 
   minPrice?: number;
   maxPrice?: number;
   sizes?: string[];
@@ -145,15 +135,6 @@ async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchPr
   params.set("sort", payload.sort);
 
   if (payload.categoryKey) params.set("categoryKey", payload.categoryKey);
-
-  // If backend wants stack/path, you can send it like this:
-  if (payload.categoryPath?.length) params.set("categoryPath", payload.categoryPath.join(">"));
-
-  // If backend wants options, simplest is JSON:
-  if (payload.categoryOptions && Object.keys(payload.categoryOptions).length) {
-    params.set("categoryOptions", JSON.stringify(payload.categoryOptions));
-  }
-
   if (typeof payload.minPrice === "number") params.set("minPrice", String(payload.minPrice));
   if (typeof payload.maxPrice === "number") params.set("maxPrice", String(payload.maxPrice));
   if (payload.sizes?.length) params.set("sizes", payload.sizes.join(","));
@@ -166,32 +147,27 @@ async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchPr
 /* ---------------- COMPONENT ---------------- */
 const TopPicks = () => {
   const [open, setOpen] = useState<Drop>(null);
-
-  // Backend-ready category tree (fallback to demo)
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>(CATEGORY_TREE_FALLBACK);
-
-  // Category navigation (screen stack)
   const [catStack, setCatStack] = useState<string[]>([]);
 
   // Selected values
-  const [selectedPath, setSelectedPath] = useState<string>("All"); // for showing label on button
+  const [selectedPath, setSelectedPath] = useState<string>("All"); 
   const [selectedCatOptions, setSelectedCatOptions] = useState<Record<string, string[]>>({});
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortValue, setSortValue] = useState<string>(SORT_OPTIONS[0]);
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
 
-  // Pagination + products (backend-ready)
+  const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(null);
+
+  // Pagination + products
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [hasMore, setHasMore] = useState(true);
 
-  // Optional loading/error states (nice for real API)
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingCats, setLoadingCats] = useState(false);
-
-  // When backend not connected, we fallback to demo mode automatically if API fails
-  const [useDemoMode, setUseDemoMode] = useState(true);
+  const [useDemoMode, setUseDemoMode] = useState(false);
 
   const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -205,32 +181,27 @@ const TopPicks = () => {
 
   /* ---------- INITIAL LOAD ---------- */
   useEffect(() => {
-    // Load categories from backend (if available)
     const loadCats = async () => {
       try {
         setLoadingCats(true);
         const cats = await apiFetchCategories();
         if (Array.isArray(cats) && cats.length) {
           setCategoryTree(cats);
-          setUseDemoMode(false); // if categories endpoint works, likely backend exists
+          setUseDemoMode(false);
         }
       } catch {
-        // keep fallback
+        // fallback
       } finally {
         setLoadingCats(false);
       }
     };
-
     loadCats();
   }, []);
 
-  // Initial products load
   useEffect(() => {
-    // show demo products immediately for UI
     setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
     setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
 
-    // Try backend products (if exists)
     const loadInitialProducts = async () => {
       try {
         setLoadingProducts(true);
@@ -247,20 +218,17 @@ const TopPicks = () => {
         } else {
           setHasMore(resp.total > resp.items.length);
         }
-
         setUseDemoMode(false);
       } catch {
-        // stay in demo mode
+        // fallback
       } finally {
         setLoadingProducts(false);
       }
     };
-
     loadInitialProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ---------- OUTSIDE CLICK CLOSE ---------- */
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!panelRef.current) return;
@@ -286,10 +254,7 @@ const TopPicks = () => {
     setSelectedCatOptions((prev) => {
       const existing = prev[groupKey] ?? [];
       const has = existing.includes(option);
-
-      // agar same option dubara click kare to unselect ho jaye
       const next = has ? [] : [option];
-
       return { ...prev, [groupKey]: next };
     });
   };
@@ -299,8 +264,16 @@ const TopPicks = () => {
   };
 
   /* ---------- BACKEND-READY PRODUCT FETCH ---------- */
-  const fetchProductsWithCurrentFilters = async (nextPage: number, mode: "replace" | "append") => {
-    // DEMO fallback
+  type FilterOverrides = {
+    categoryKey?: string | null;
+    sort?: string;
+  };
+
+  const fetchProductsWithCurrentFilters = async (
+    nextPage: number,
+    mode: "replace" | "append",
+    overrides?: FilterOverrides
+  ) => {
     if (useDemoMode) {
       const nextCount = nextPage * PAGE_SIZE;
       const nextProducts = ALL_DEMO_PRODUCTS.slice(0, nextCount);
@@ -310,29 +283,32 @@ const TopPicks = () => {
       return;
     }
 
-    // BACKEND mode
     try {
       setLoadingProducts(true);
+
+      // Fixes the state delay bug: Use the override if provided, otherwise fallback to React state
+      const activeCatKey = overrides && "categoryKey" in overrides ? overrides.categoryKey : appliedCategoryKey;
+      let finalCategoryKey = activeCatKey ?? undefined;
+      
+      if (activeCatKey && selectedCatOptions[activeCatKey]?.length > 0) {
+        finalCategoryKey = selectedCatOptions[activeCatKey][0];
+      }
+
+      const activeSort = overrides?.sort ?? sortValue;
 
       const payload: ProductFiltersPayload = {
         page: nextPage,
         pageSize: PAGE_SIZE,
-        sort: sortValue,
-        categoryKey: selectedPath === "All" ? undefined : undefined, // we send categoryKey differently below
-        categoryPath: undefined,
-        categoryOptions: Object.keys(selectedCatOptions).length ? selectedCatOptions : undefined,
+        sort: activeSort,
+        categoryKey: finalCategoryKey,
         minPrice: toNumberOrUndefined(priceFrom),
         maxPrice: toNumberOrUndefined(priceTo),
         sizes: selectedSizes.length ? selectedSizes : undefined,
       };
 
-      // If you want the backend category to be the "last selected stack key":
-      // We store it when applying category via "appliedCategoryKey"
-      // (see applyCategorySelection below)
-      // We'll set it from state:
-      // NOTE: we maintain appliedCategoryKey separately
-      payload.categoryKey = appliedCategoryKey ?? undefined;
-      payload.categoryPath = appliedCategoryPath?.length ? appliedCategoryPath : undefined;
+      console.group("🟢 FETCH PRODUCTS PAYLOAD");
+      console.log("Final Payload sent to backend:", payload);
+      console.groupEnd();
 
       const resp = await apiFetchProducts(payload);
 
@@ -348,34 +324,25 @@ const TopPicks = () => {
 
       setPage(nextPage);
     } catch {
-      // if backend fails mid-way, you can keep current products
+      // backend error ignore
     } finally {
       setLoadingProducts(false);
     }
   };
 
-  // We store applied category key/path separately (important for backend)
-  const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(null);
-  const [appliedCategoryPath, setAppliedCategoryPath] = useState<string[]>([]);
-
-  // ✅ Apply category selection + bug fix handled here
   const applyCategorySelection = async (stackToApply?: string[]) => {
     const stack = stackToApply ?? catStack;
-
-    // build readable label from stack
     const label = buildCategoryLabel(categoryTree, stack);
     setSelectedPath(label);
 
-    // The backend-friendly values:
     const lastKey = stack.length ? stack[stack.length - 1] : null;
     setAppliedCategoryKey(lastKey);
-    setAppliedCategoryPath(stack);
 
     setOpen(null);
     setCatStack([]);
 
-    // Reset to page 1 and fetch products with filters
-    await fetchProductsWithCurrentFilters(1, "replace");
+    // Pass the exact new key directly into the fetch
+    await fetchProductsWithCurrentFilters(1, "replace", { categoryKey: lastKey });
   };
 
   const applyNonCategoryFilters = async () => {
@@ -387,7 +354,6 @@ const TopPicks = () => {
   const resetAll = async () => {
     setSelectedPath("All");
     setAppliedCategoryKey(null);
-    setAppliedCategoryPath([]);
     setSelectedCatOptions({});
     setSelectedSizes([]);
     setSortValue(SORT_OPTIONS[0]);
@@ -395,7 +361,12 @@ const TopPicks = () => {
     setPriceTo("");
     setOpen(null);
     setCatStack([]);
-    await fetchProductsWithCurrentFilters(1, "replace");
+    
+    // Pass the null key and default sort directly into the fetch
+    await fetchProductsWithCurrentFilters(1, "replace", { 
+      categoryKey: null, 
+      sort: SORT_OPTIONS[0] 
+    });
   };
 
   const onSeeMore = async () => {
@@ -421,8 +392,7 @@ const TopPicks = () => {
           onClick={async () => {
             setSelectedPath("All");
             setAppliedCategoryKey(null);
-            setAppliedCategoryPath([]);
-            await fetchProductsWithCurrentFilters(1, "replace");
+            await fetchProductsWithCurrentFilters(1, "replace", { categoryKey: null });
           }}
         >
           All
@@ -453,19 +423,15 @@ const TopPicks = () => {
                       className={styles.menuItem}
                       type="button"
                       onClick={() => {
-                        // BUG FIX:
-                        // If category has NO children, we must apply that key (not empty stack).
                         if (c.children && c.children.length) {
                           goIntoCategory(c.key);
                         } else {
-                          // apply with stack containing this leaf root key
                           void applyCategorySelection([c.key]);
                         }
                       }}
                     >
                       <span className={styles.menuLeft}>
                         <span className={styles.iconBox} aria-hidden="true">
-                          {/* testing icon (lucide). Later backend iconUrl can be used. */}
                           <Shirt size={16} />
                         </span>
                         <span className={styles.menuLabel}>{c.label}</span>
@@ -493,7 +459,6 @@ const TopPicks = () => {
                     </button>
                   </div>
 
-                  {/* if this level has children */}
                   {currentCatNode?.children?.length ? (
                     <div className={styles.menuList}>
                       {currentCatNode.children.map((child) => (
@@ -516,7 +481,6 @@ const TopPicks = () => {
                       ))}
                     </div>
                   ) : (
-                    // leaf options (checkbox list)  ✅ NOW SAME AS SIZE (black tick box)
                     <div className={styles.checkList}>
                       <div className={styles.ddSubHeader}>Choose options</div>
 
@@ -651,8 +615,8 @@ const TopPicks = () => {
                     onClick={async () => {
                       setSortValue(opt);
                       setOpen(null);
-                      // re-fetch products with new sort (page 1)
-                      await fetchProductsWithCurrentFilters(1, "replace");
+                      // Pass the new sort value directly
+                      await fetchProductsWithCurrentFilters(1, "replace", { sort: opt });
                     }}
                   >
                     <span className={styles.menuLeft}>
