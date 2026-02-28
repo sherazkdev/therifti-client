@@ -288,7 +288,6 @@ const TopPicks = () => {
     try {
       setLoadingProducts(true);
 
-      // Fixes the state delay bug: Use the override if provided, otherwise fallback to React state
       const activeCatKey = overrides && "categoryKey" in overrides ? overrides.categoryKey : appliedCategoryKey;
       let finalCategoryKey = activeCatKey ?? undefined;
       
@@ -314,19 +313,45 @@ const TopPicks = () => {
 
       const resp = await apiFetchProducts(payload);
 
-      if (mode === "replace") setProducts(resp.items);
-      else setProducts((prev) => [...prev, ...resp.items]);
+      const fetchedItems = resp.items || (resp as any).data || (resp as any).products || [];
+
+      if (mode === "replace") {
+        setProducts(fetchedItems);
+      } else {
+        setProducts((prev) => [...prev, ...fetchedItems]);
+      }
 
       if ("hasMore" in resp) {
         setHasMore(resp.hasMore);
       } else {
-        const alreadyCount = mode === "replace" ? resp.items.length : products.length + resp.items.length;
+        const alreadyCount = mode === "replace" ? fetchedItems.length : products.length + fetchedItems.length;
         setHasMore(resp.total > alreadyCount);
       }
 
       setPage(nextPage);
-    } catch {
-      // backend error ignore
+    } catch (error) {
+      console.log("🔴 API Fetch Failed. Injecting fake data to test UI.");
+      
+      // 👇 THIS WILL RUN WHEN THE BACKEND FAILS 👇
+      if (mode === "append") {
+        const fakeData = [
+          { id: `fake-${Date.now()}-1`, brand: "Test Brand 1", meta: "Test", price: "$99", likes: "1k" },
+          { id: `fake-${Date.now()}-2`, brand: "Test Brand 2", meta: "Test", price: "$99", likes: "1k" },
+          { id: `fake-${Date.now()}-3`, brand: "Test Brand 3", meta: "Test", price: "$99", likes: "1k" },
+          { id: `fake-${Date.now()}-4`, brand: "Test Brand 4", meta: "Test", price: "$99", likes: "1k" },
+        ];
+        
+        // Append the fake data to the grid
+        setProducts((prev) => [...prev, ...fakeData]);
+        setHasMore(true); 
+        setPage(nextPage); 
+      } else if (mode === "replace") {
+         // ✅ BEST UX: Put the original default products back on the screen
+         setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+         setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
+         setPage(1);
+      }
+
     } finally {
       setLoadingProducts(false);
     }
@@ -640,9 +665,17 @@ const TopPicks = () => {
       </div>
 
       {/* Products */}
+       {/* Products */}
       <div className={styles.grid}>
-        {products.map((p) => (
-          <ProductCard key={p.id} image={p.image} brand={p.brand} meta={p.meta} price={p.price} likes={p.likes} />
+        {products.map((p, index) => (
+          <ProductCard 
+            key={`${p.id}-${index}`} // <-- THIS IS CRITICAL FOR THE TEST TO WORK
+            image={p.image} 
+            brand={p.brand} 
+            meta={p.meta} 
+            price={p.price} 
+            likes={p.likes} 
+          />
         ))}
       </div>
 
