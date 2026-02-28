@@ -7,6 +7,8 @@ import styles from "./TopPicks.module.css";
 import ProductCard from "../productcard/ProductCard";
 import { ChevronDown } from "../../components/icons";
 import { Shirt } from "lucide-react";
+import { ChevronLeft } from 'lucide-react';
+
 
 /* ---------------- TYPES ---------------- */
 export type CategoryNode = {
@@ -448,8 +450,12 @@ const TopPicks = () => {
               {showCategoryScreen && (
                 <div className={styles.menuScreen}>
                   <div className={styles.menuTop}>
-                    <button className={styles.backBtn} type="button" onClick={goBackCategory}>
-                      ‹
+                    <button
+                      className={styles.backBtn}
+                      type="button"
+                      onClick={goBackCategory}
+                    >
+                      <ChevronLeft size={16} />
                     </button>
 
                     <div className={styles.menuTitle}>{currentCatNode?.label ?? "Category"}</div>
