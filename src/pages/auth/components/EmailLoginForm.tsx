@@ -3,6 +3,10 @@ import { useForm } from "react-hook-form";
 import styles from "./EmailLoginForm.module.css";
 import { EyeIcon } from "../../../components/icons";
 
+/** @note: Hook */
+import useLogin from "../../../hooks/server/useLogin";
+import type { ApiError } from "../../../interfaces/api.interfaces";
+
 type Form = {
   email: string;
   password: string;
@@ -10,33 +14,41 @@ type Form = {
 
 export default function EmailLoginForm({ onForgot}: any) {
   const [showPassword, setShowPassword] = useState(false);
+  const [serverError,setServerError] = useState<string | null>(null);
 
+  const loginMutation = useLogin();
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<Form>();
 
 
   //handler that get the form response 
   const handleLogin = async (data: Form) => {
-  try {
-    
-    console.log("Login attempt:", data);
-
-    alert(`Login attempt for ${data.email}`);
-
-    
-  } catch (err) {
-    alert("Login failed");
-  }
-};
+    try {
+      loginMutation.mutate(data,{
+        onError(err) {
+          if(err.response && err.response.data){
+            const Error = err.response.data as ApiError || undefined;
+            if(Error){
+              setServerError(Error.message);
+            }
+          }
+        },
+      });
+    } catch (err) {
+      console.log(err)
+      alert("Login failed");
+    }
+  };
 
   return (
     <form className={styles.card} onSubmit={handleSubmit(handleLogin)}>
 
       <h2>Log in</h2>
-
+      {serverError && (<p className={styles.error} >{serverError}</p>)}
       {/* EMAIL */}
       <div className={styles.field}>
         <div className={styles.passwordRow}>
@@ -89,8 +101,8 @@ export default function EmailLoginForm({ onForgot}: any) {
       </div>
 
       {/* SUBMIT */}
-      <button type="submit" className={styles.submitBtn}>
-        Continue
+      <button type="submit" className={loginMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={loginMutation.isPending}>
+        {loginMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
       </button>
 
       <span className={styles.link} onClick={onForgot}>
