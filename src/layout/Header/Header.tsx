@@ -6,13 +6,20 @@ import Hero from "./Hero";
 import TopBar from "./TopBar";
 
 
-const Header = () => {
+type HeaderProps = {
+  showHero?: boolean;
+  category?: string;
+};
+
+const Header = ({ showHero = true, category }: HeaderProps) => {
   return (
     <header className={styles.header}>
       <TopBar />
+
       <div className={styles.overlayArea}>
         <CategoryBar />
-        <Hero />
+
+        {showHero && <Hero category={category} />}
       </div>
     </header>
   );

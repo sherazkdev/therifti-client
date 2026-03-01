@@ -1,0 +1,467 @@
+/* =========================================
+   NEW: Breadcrumbs and Items Row 
+========================================= */
+.metaRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  margin-bottom: 24px; /* Gives nice breathing room before the grid */
+  font-size: 14px;
+  color: #111;
+}
+
+.breadcrumbs {
+  color: #6b6b6b;
+}
+
+.breadcrumbs span {
+  color: #111; /* Highlights the currently selected category */
+  font-weight: 500;
+}
+
+.itemCount {
+  font-weight: 500;
+  color: #444;
+}
+
+@media (max-width: 600px) {
+  .metaRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+  }
+}
+
+.wrapper {
+  padding: 28px 3%;
+  background: #fff;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+}
+
+.resetBtn {
+  border: none;
+  background: transparent;
+  color: #111;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.resetBtn:hover {
+  opacity: 1;
+}
+
+/* Filters row */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+/* ✅ Make all pills same height (All button issue fix) */
+.pill {
+  background: #f3f3f3;
+  border: 1px solid #ededed;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #111;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 36px; /* ✅ same visual height */
+}
+
+.pillActive {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.pillOpen {
+  border-color: #cfcfcf;
+  background: #fafafa;
+}
+
+.dropWrap {
+  position: relative;
+}
+
+/* Dropdown panel */
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 300px;
+  background: #fff;
+  border: 1px solid #ededed;
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 50;
+}
+
+.ddHeader {
+  padding: 12px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #111;
+}
+
+.ddSubHeader {
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 12px;
+  color: #444;
+  border-bottom: 1px solid #f3f3f3;
+}
+
+.ddFooter {
+  padding: 10px 12px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.smallBtn {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 12px;
+  padding: 7px 12px;
+  cursor: pointer;
+  min-height: 32px; /* ✅ consistent */
+}
+
+/* Menu list */
+.menuList {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.menuItem {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.menuItem:hover {
+  background: #f7f7f7;
+}
+
+.menuLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconBox {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  font-size: 12px;
+  color: #333;
+}
+
+.menuLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+}
+
+.menuRight {
+  color: #777;
+  font-size: 16px;
+}
+
+/* Category nested screen */
+.menuScreen {
+  width: 100%;
+}
+
+.menuTop {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  padding: 10px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.backBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #ededed;
+  background: #fff;
+  cursor: pointer;
+}
+
+.menuTitle {
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* ✅ Apply button size same as others */
+.applyBtn {
+  border: 1px solid #111;
+  background: #111;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 12px;
+  padding: 7px 12px;
+  cursor: pointer;
+  min-height: 32px; /* ✅ consistent with Done */
+}
+
+/* Checkbox list */
+.checkList {
+  max-height: 320px;
+  overflow: auto;
+}
+
+/* ✅ NOW checkRow behaves like sizeRow (button, right box) */
+.checkRow {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  border-bottom: 1px solid #f3f3f3;
+}
+
+.checkRow:hover {
+  background: #f7f7f7;
+}
+
+/* keep this class (even if not used now) */
+.checkInput {
+  width: 18px;
+  height: 18px;
+}
+
+.checkText {
+  font-size: 14px;
+  color: #111;
+}
+
+/* .checkRow, .menuItem, .sizeRow { -webkit-tap-highlight-color: transparent; } */
+
+
+
+/* Price */
+.priceBox {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.priceField {
+  border: 1px solid #ededed;
+  border-radius: 12px;
+  padding: 5px;
+  background: #fff;
+}
+
+.priceLabel {
+  display: block;
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.priceInput {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+/* Size */
+.sizeList {
+  max-height: 320px;
+  overflow: auto;
+  padding: 6px 0;
+}
+
+.sizeRow {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.sizeRow:hover {
+  background: #f7f7f7;
+}
+
+.sizeText {
+  font-size: 14px;
+  color: #111;
+}
+
+.rightBox {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 2px solid #111;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+}
+
+.rightBoxOn {
+  background: #111;
+  color: #fff;
+}
+
+/* Product grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 4px;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: 26px 0 8px;
+}
+
+.seeMore {
+  background: #fff;
+  border: 1px solid #111;
+  color: #111;
+  border-radius: 999px;
+  padding: 10px 34px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.seeMore:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.allPill {
+  padding: 9px 16px;   /* bigger padding */
+  font-size: 13px;      /* slightly bigger text */
+  min-height: 19px;     /* taller */
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dropdown {
+    width: 280px;
+  }
+}
+
+/* ✅ Mobile improved: filters scroll horizontally (better UX) */
+/* @media (max-width: 600px) {
+  .filters {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 8px;
+  }
+
+  .pill {
+    min-height: 38px;
+  }
+
+  .dropWrap {
+    width: auto;
+  }
+
+  .dropdown {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(92vw, 360px);
+    max-width: 92vw;
+    top: calc(100% + 8px);
+  }
+
+  .wrapper {
+    overflow-x: hidden;
+  }
+} */
+
+
+@media (max-width: 600px) {
+  .filters {
+    flex-wrap: wrap;
+    overflow: visible;
+    gap: 8px;
+    position: relative; /* keep this */
+  }
+
+  .pill {
+    min-height: 38px;
+  }
+
+  .dropWrap {
+    width: auto;
+    position: static; /* ✅ key fix */
+  }
+
+  .dropdown {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(92vw, 360px);
+    max-width: calc(100vw - 16px);
+    top: calc(100% + 8px);
+  }
+   .dropdown { max-height: 70vh; overflow: auto; }
+
+  .wrapper {
+    overflow-x: hidden;
+  }
+}

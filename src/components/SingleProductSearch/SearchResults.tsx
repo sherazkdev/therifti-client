@@ -1,25 +1,22 @@
-
-
-// TopPicks.tsx (backend-ready + payload simplified + state lag fixed)
+// SearchResults.tsx (backend-ready + extended filters + breadcrumbs)
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import styles from "./TopPicks.module.css";
-import ProductCard from "../productcard/ProductCard";
+import styles from "./SearchResults.module.css";
+import ProductCard from "../productcard/ProductCard"; // Adjust import path if needed
 import { ChevronDown } from "../../components/icons";
-import { Shirt } from "lucide-react";
-import { ChevronLeft } from 'lucide-react';
-
+import { Shirt, ChevronLeft } from "lucide-react";
 
 /* ---------------- TYPES ---------------- */
 export type CategoryNode = {
   key: string;
   label: string;
-  iconUrl?: string; 
+  iconUrl?: string;
   children?: CategoryNode[];
-  options?: string[]; 
+  options?: string[];
 };
 
-type Drop = "category" | "price" | "size" | "sort" | null;
+// Added new drop options
+type Drop = "category" | "price" | "size" | "sort" | "condition" | "brand" | "color" | "pattern" | "material" | null;
 
 export type Product = {
   id: string;
@@ -30,7 +27,7 @@ export type Product = {
   likes: string;
 };
 
-/* ---------------- DEFAULT FALLBACK DATA (UI demo) ---------------- */
+/* ---------------- DEFAULT FALLBACK DATA ---------------- */
 const CATEGORY_TREE_FALLBACK: CategoryNode[] = [
   {
     key: "women",
@@ -46,35 +43,27 @@ const CATEGORY_TREE_FALLBACK: CategoryNode[] = [
         label: "Shoes",
         options: ["Heels", "Sneakers", "Boots", "Flats", "Sandals", "Wedges"],
       },
-      {
-        key: "women_bags",
-        label: "Bags",
-        options: ["Handbags", "Crossbody", "Totes", "Clutches", "Backpacks", "Wallets"],
-      },
-      {
-        key: "women_accessories",
-        label: "Accessories",
-        options: ["Jewelry", "Belts", "Scarves", "Sunglasses", "Watches", "Hats"],
-      },
     ],
   },
   { key: "men", label: "Men" },
   { key: "kids", label: "Kids" },
-  { key: "electronics", label: "Electronics" },
-  { key: "sports", label: "Sports" },
-  { key: "entertainment", label: "Entertainment" },
-  { key: "faizan", label: "faizan Sports" },
 ];
 
-const SIZE_OPTIONS = ["XXXS / 2", "XXX / 4", "XS / 6", "S / 8", "M / 10"];
 const SORT_OPTIONS = ["Recommended", "Newest", "Price: Low to High", "Price: High to Low"];
+
+// NEW FILTER OPTIONS
+const SIZE_OPTIONS = ["XXXS / 2", "XXX / 4", "XS / 6", "S / 8", "M / 10", "L / 12", "XL / 14"];
+const CONDITION_OPTIONS = ["New with tags", "Like new", "Good", "Fair"];
+const BRAND_OPTIONS = ["River Island", "Mango", "Topman", "Nike", "Adidas", "Zara", "ASOS"];
+const COLOR_OPTIONS = ["Black", "White", "Blue", "Red", "Green", "Grey", "Brown"];
+const PATTERN_OPTIONS = ["Solid", "Striped", "Checked", "Floral", "Graphic"];
+const MATERIAL_OPTIONS = ["Cotton", "Polyester", "Denim", "Leather", "Linen"];
 
 const ALL_DEMO_PRODUCTS: Product[] = Array.from({ length: 24 }).map((_, i) => {
   const brands = ["River Island", "Mango", "Topman", "Fashion House", "Zara", "Nike", "Adidas"];
-  const b = brands[i % brands.length];
   return {
     id: String(i + 1),
-    brand: b,
+    brand: brands[i % brands.length],
     meta: "M30 · Good",
     price: "$59.99",
     likes: "1.2k",
@@ -119,19 +108,24 @@ type FetchProductsResponse =
   | { items: Product[]; total: number }
   | { items: Product[]; hasMore: boolean };
 
+// Backend Payload now accepts all new filters
 type ProductFiltersPayload = {
   page: number;
   pageSize: number;
   sort: string;
-  categoryKey?: string; 
+  categoryKey?: string;
   minPrice?: number;
   maxPrice?: number;
   sizes?: string[];
+  conditions?: string[];
+  brands?: string[];
+  colors?: string[];
+  patterns?: string[];
+  materials?: string[];
 };
 
 async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchProductsResponse> {
   const params = new URLSearchParams();
-
   params.set("page", String(payload.page));
   params.set("pageSize", String(payload.pageSize));
   params.set("sort", payload.sort);
@@ -139,7 +133,13 @@ async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchPr
   if (payload.categoryKey) params.set("categoryKey", payload.categoryKey);
   if (typeof payload.minPrice === "number") params.set("minPrice", String(payload.minPrice));
   if (typeof payload.maxPrice === "number") params.set("maxPrice", String(payload.maxPrice));
+  
   if (payload.sizes?.length) params.set("sizes", payload.sizes.join(","));
+  if (payload.conditions?.length) params.set("conditions", payload.conditions.join(","));
+  if (payload.brands?.length) params.set("brands", payload.brands.join(","));
+  if (payload.colors?.length) params.set("colors", payload.colors.join(","));
+  if (payload.patterns?.length) params.set("patterns", payload.patterns.join(","));
+  if (payload.materials?.length) params.set("materials", payload.materials.join(","));
 
   const res = await fetch(`/api/products?${params.toString()}`);
   if (!res.ok) throw new Error("Failed to load products");
@@ -147,15 +147,23 @@ async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchPr
 }
 
 /* ---------------- COMPONENT ---------------- */
-const TopPicks = () => {
+const SearchResults = () => {
   const [open, setOpen] = useState<Drop>(null);
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>(CATEGORY_TREE_FALLBACK);
   const [catStack, setCatStack] = useState<string[]>([]);
 
   // Selected values
-  const [selectedPath, setSelectedPath] = useState<string>("All"); 
+  const [selectedPath, setSelectedPath] = useState<string>("All");
   const [selectedCatOptions, setSelectedCatOptions] = useState<Record<string, string[]>>({});
+  
+  // States for all the filters
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedPatterns, setSelectedPatterns] = useState<string[]>([]);
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+  
   const [sortValue, setSortValue] = useState<string>(SORT_OPTIONS[0]);
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
@@ -166,10 +174,11 @@ const TopPicks = () => {
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [totalItems, setTotalItems] = useState(1200); // Used for the "1200 items" text
 
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingCats, setLoadingCats] = useState(false);
-  const [useDemoMode, setUseDemoMode] = useState(false);
+  const [useDemoMode, setUseDemoMode] = useState(true); // Defaulted to true for testing
 
   const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -183,52 +192,17 @@ const TopPicks = () => {
 
   /* ---------- INITIAL LOAD ---------- */
   useEffect(() => {
-    const loadCats = async () => {
-      try {
-        setLoadingCats(true);
-        const cats = await apiFetchCategories();
-        if (Array.isArray(cats) && cats.length) {
-          setCategoryTree(cats);
-          setUseDemoMode(false);
-        }
-      } catch {
-        // fallback
-      } finally {
-        setLoadingCats(false);
-      }
-    };
-    loadCats();
+    // Basic category mock fetch (you can connect real backend here later)
+    setLoadingCats(true);
+    setTimeout(() => {
+      setCategoryTree(CATEGORY_TREE_FALLBACK);
+      setLoadingCats(false);
+    }, 500);
   }, []);
 
   useEffect(() => {
     setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
     setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
-
-    const loadInitialProducts = async () => {
-      try {
-        setLoadingProducts(true);
-        const payload: ProductFiltersPayload = {
-          page: 1,
-          pageSize: PAGE_SIZE,
-          sort: sortValue,
-        };
-        const resp = await apiFetchProducts(payload);
-
-        setProducts(resp.items);
-        if ("hasMore" in resp) {
-          setHasMore(resp.hasMore);
-        } else {
-          setHasMore(resp.total > resp.items.length);
-        }
-        setUseDemoMode(false);
-      } catch {
-        // fallback
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-    loadInitialProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -256,13 +230,17 @@ const TopPicks = () => {
     setSelectedCatOptions((prev) => {
       const existing = prev[groupKey] ?? [];
       const has = existing.includes(option);
-      const next = has ? [] : [option];
-      return { ...prev, [groupKey]: next };
+      return { ...prev, [groupKey]: has ? [] : [option] };
     });
   };
 
-  const toggleSize = (size: string) => {
-    setSelectedSizes((prev) => (prev.includes(size) ? prev.filter((x) => x !== size) : [...prev, size]));
+  // Helper to toggle any standard string array state
+  const toggleArrayState = (
+    val: string,
+    state: string[],
+    setState: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    setState((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]));
   };
 
   /* ---------- BACKEND-READY PRODUCT FETCH ---------- */
@@ -271,21 +249,11 @@ const TopPicks = () => {
     sort?: string;
   };
 
-  //payload for fetching products based on current filters, with ability to override specific ones (used for category selection and sort changes)
   const fetchProductsWithCurrentFilters = async (
     nextPage: number,
     mode: "replace" | "append",
     overrides?: FilterOverrides
   ) => {
-    if (useDemoMode) {
-      const nextCount = nextPage * PAGE_SIZE;
-      const nextProducts = ALL_DEMO_PRODUCTS.slice(0, nextCount);
-      setProducts(nextProducts);
-      setHasMore(nextProducts.length < ALL_DEMO_PRODUCTS.length);
-      setPage(nextPage);
-      return;
-    }
-
     try {
       setLoadingProducts(true);
 
@@ -296,16 +264,19 @@ const TopPicks = () => {
         finalCategoryKey = selectedCatOptions[activeCatKey][0];
       }
 
-      const activeSort = overrides?.sort ?? sortValue;
-
       const payload: ProductFiltersPayload = {
         page: nextPage,
         pageSize: PAGE_SIZE,
-        sort: activeSort,
+        sort: overrides?.sort ?? sortValue,
         categoryKey: finalCategoryKey,
         minPrice: toNumberOrUndefined(priceFrom),
         maxPrice: toNumberOrUndefined(priceTo),
         sizes: selectedSizes.length ? selectedSizes : undefined,
+        conditions: selectedConditions.length ? selectedConditions : undefined,
+        brands: selectedBrands.length ? selectedBrands : undefined,
+        colors: selectedColors.length ? selectedColors : undefined,
+        patterns: selectedPatterns.length ? selectedPatterns : undefined,
+        materials: selectedMaterials.length ? selectedMaterials : undefined,
       };
 
       console.group("🟢 FETCH PRODUCTS PAYLOAD");
@@ -322,37 +293,36 @@ const TopPicks = () => {
         setProducts((prev) => [...prev, ...fetchedItems]);
       }
 
+      if ("total" in resp) setTotalItems(resp.total);
+
       if ("hasMore" in resp) {
         setHasMore(resp.hasMore);
       } else {
         const alreadyCount = mode === "replace" ? fetchedItems.length : products.length + fetchedItems.length;
-        setHasMore(resp.total > alreadyCount);
+        setHasMore((resp as any).total > alreadyCount);
       }
 
       setPage(nextPage);
     } catch (error) {
       console.log("🔴 API Fetch Failed. Injecting fake data to test UI.");
       
-      // 👇 THIS WILL RUN WHEN THE BACKEND FAILS 👇
       if (mode === "append") {
-        const fakeData = [
-          { id: `fake-${Date.now()}-1`, brand: "Test Brand 1", meta: "Test", price: "$99", likes: "1k" },
-          { id: `fake-${Date.now()}-2`, brand: "Test Brand 2", meta: "Test", price: "$99", likes: "1k" },
-          { id: `fake-${Date.now()}-3`, brand: "Test Brand 3", meta: "Test", price: "$99", likes: "1k" },
-          { id: `fake-${Date.now()}-4`, brand: "Test Brand 4", meta: "Test", price: "$99", likes: "1k" },
-        ];
-        
-        // Append the fake data to the grid
+        const fakeData = Array.from({ length: 8 }).map((_, i) => ({
+          id: `fake-${Date.now()}-${i}`,
+          brand: BRAND_OPTIONS[Math.floor(Math.random() * BRAND_OPTIONS.length)],
+          meta: "Test · Good",
+          price: "$99",
+          likes: "1k"
+        }));
         setProducts((prev) => [...prev, ...fakeData]);
         setHasMore(true); 
         setPage(nextPage); 
       } else if (mode === "replace") {
-         // ✅ BEST UX: Put the original default products back on the screen
          setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
          setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
+         setTotalItems(1200);
          setPage(1);
       }
-
     } finally {
       setLoadingProducts(false);
     }
@@ -365,11 +335,9 @@ const TopPicks = () => {
 
     const lastKey = stack.length ? stack[stack.length - 1] : null;
     setAppliedCategoryKey(lastKey);
-
     setOpen(null);
     setCatStack([]);
 
-    // Pass the exact new key directly into the fetch
     await fetchProductsWithCurrentFilters(1, "replace", { categoryKey: lastKey });
   };
 
@@ -384,29 +352,53 @@ const TopPicks = () => {
     setAppliedCategoryKey(null);
     setSelectedCatOptions({});
     setSelectedSizes([]);
+    setSelectedConditions([]);
+    setSelectedBrands([]);
+    setSelectedColors([]);
+    setSelectedPatterns([]);
+    setSelectedMaterials([]);
     setSortValue(SORT_OPTIONS[0]);
     setPriceFrom("");
     setPriceTo("");
     setOpen(null);
     setCatStack([]);
     
-    // Pass the null key and default sort directly into the fetch
     await fetchProductsWithCurrentFilters(1, "replace", { 
       categoryKey: null, 
       sort: SORT_OPTIONS[0] 
     });
   };
 
-  const onSeeMore = async () => {
-    if (!hasMore || loadingProducts) return;
-    await fetchProductsWithCurrentFilters(page + 1, "append");
-  };
+  // Helper to render simple list dropdowns cleanly
+  const renderListDropdown = (title: string, options: string[], state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => (
+    <div className={styles.dropdown}>
+      <div className={styles.ddHeader}>{title}</div>
+      <div className={styles.sizeList}>
+        {options.map((opt) => {
+          const checked = state.includes(opt);
+          return (
+            <button key={opt} type="button" className={styles.sizeRow} onClick={() => toggleArrayState(opt, state, setState)}>
+              <span className={styles.sizeText}>{opt}</span>
+              <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
+                {checked ? "✓" : ""}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div className={styles.ddFooter}>
+        <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
+          Done
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <section className={styles.wrapper}>
+      {/* Search Header + Reset Button */}
       <div className={styles.header}>
-        <h2 className={styles.title}>Top Picks</h2>
-
+        <h2 className={styles.title}>Search</h2>
         <button className={styles.resetBtn} type="button" onClick={resetAll}>
           Reset
         </button>
@@ -432,42 +424,29 @@ const TopPicks = () => {
             className={`${styles.pill} ${open === "category" ? styles.pillOpen : ""}`}
             type="button"
             onClick={() => toggleOpen("category")}
-            title={selectedPath}
           >
             {selectedPath === "All" ? "Category" : selectedPath} <ChevronDown size={16}/>
           </button>
-
           {open === "category" && (
             <div className={styles.dropdown}>
               {showRoot && (
                 <div className={styles.menuList}>
-                  <div className={styles.ddHeader}>
-                    Category{loadingCats ? " (Loading…)" : ""}
-                  </div>
-
+                  <div className={styles.ddHeader}>Category{loadingCats ? " (Loading…)" : ""}</div>
                   {categoryTree.map((c) => (
                     <button
                       key={c.key}
                       className={styles.menuItem}
                       type="button"
                       onClick={() => {
-                        if (c.children && c.children.length) {
-                          goIntoCategory(c.key);
-                        } else {
-                          void applyCategorySelection([c.key]);
-                        }
+                        if (c.children?.length) goIntoCategory(c.key);
+                        else void applyCategorySelection([c.key]);
                       }}
                     >
                       <span className={styles.menuLeft}>
-                        <span className={styles.iconBox} aria-hidden="true">
-                          <Shirt size={16} />
-                        </span>
+                        <span className={styles.iconBox}><Shirt size={16} /></span>
                         <span className={styles.menuLabel}>{c.label}</span>
                       </span>
-
-                      <span className={styles.menuRight} aria-hidden="true">
-                        {c.children && c.children.length ? "›" : ""}
-                      </span>
+                      <span className={styles.menuRight}>{c.children?.length ? "›" : ""}</span>
                     </button>
                   ))}
                 </div>
@@ -476,16 +455,10 @@ const TopPicks = () => {
               {showCategoryScreen && (
                 <div className={styles.menuScreen}>
                   <div className={styles.menuTop}>
-                    <button
-                      className={styles.backBtn}
-                      type="button"
-                      onClick={goBackCategory}
-                    >
+                    <button className={styles.backBtn} type="button" onClick={goBackCategory}>
                       <ChevronLeft size={16} />
                     </button>
-
                     <div className={styles.menuTitle}>{currentCatNode?.label ?? "Category"}</div>
-
                     <button className={styles.applyBtn} type="button" onClick={() => void applyCategorySelection()}>
                       Apply
                     </button>
@@ -494,44 +467,25 @@ const TopPicks = () => {
                   {currentCatNode?.children?.length ? (
                     <div className={styles.menuList}>
                       {currentCatNode.children.map((child) => (
-                        <button
-                          key={child.key}
-                          className={styles.menuItem}
-                          type="button"
-                          onClick={() => goIntoCategory(child.key)}
-                        >
+                        <button key={child.key} className={styles.menuItem} type="button" onClick={() => goIntoCategory(child.key)}>
                           <span className={styles.menuLeft}>
-                            <span className={styles.iconBox} aria-hidden="true">
-                              <Shirt size={16} />
-                            </span>
+                            <span className={styles.iconBox}><Shirt size={16} /></span>
                             <span className={styles.menuLabel}>{child.label}</span>
                           </span>
-                          <span className={styles.menuRight} aria-hidden="true">
-                            ›
-                          </span>
+                          <span className={styles.menuRight}>›</span>
                         </button>
                       ))}
                     </div>
                   ) : (
                     <div className={styles.checkList}>
                       <div className={styles.ddSubHeader}>Choose options</div>
-
                       {(currentCatNode?.options ?? []).map((opt) => {
                         const groupKey = currentCatNode?.key ?? "unknown";
                         const checked = (selectedCatOptions[groupKey] ?? []).includes(opt);
-
                         return (
-                          <button
-                            key={opt}
-                            type="button"
-                            className={styles.checkRow}
-                            onClick={() => toggleOption(groupKey, opt)}
-                          >
+                          <button key={opt} type="button" className={styles.checkRow} onClick={() => toggleOption(groupKey, opt)}>
                             <span className={styles.checkText}>{opt}</span>
-
-                            <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
-                              {checked ? "✓" : ""}
-                            </span>
+                            <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>{checked ? "✓" : ""}</span>
                           </button>
                         );
                       })}
@@ -545,99 +499,80 @@ const TopPicks = () => {
 
         {/* Price */}
         <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "price" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("price")}
-          >
+          <button className={`${styles.pill} ${open === "price" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("price")}>
             Price <ChevronDown size={16} />
           </button>
-
           {open === "price" && (
             <div className={styles.dropdown}>
               <div className={styles.ddHeader}>Price Range</div>
-
               <div className={styles.priceBox}>
                 <div className={styles.priceField}>
                   <label className={styles.priceLabel}>From</label>
-                  <input
-                    className={styles.priceInput}
-                    placeholder="0$"
-                    value={priceFrom}
-                    onChange={(e) => setPriceFrom(e.target.value)}
-                  />
+                  <input className={styles.priceInput} placeholder="0$" value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} />
                 </div>
                 <div className={styles.priceField}>
                   <label className={styles.priceLabel}>To</label>
-                  <input
-                    className={styles.priceInput}
-                    placeholder="999$"
-                    value={priceTo}
-                    onChange={(e) => setPriceTo(e.target.value)}
-                  />
+                  <input className={styles.priceInput} placeholder="999$" value={priceTo} onChange={(e) => setPriceTo(e.target.value)} />
                 </div>
               </div>
-
               <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
-                  Done
-                </button>
+                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>Done</button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Size */}
+        {/* Dynamic Filters */}
         <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "size" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("size")}
-          >
+          <button className={`${styles.pill} ${open === "size" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("size")}>
             Size <ChevronDown size={16} />
           </button>
-
-          {open === "size" && (
-            <div className={styles.dropdown}>
-              <div className={styles.ddHeader}>Sizes</div>
-
-              <div className={styles.sizeList}>
-                {SIZE_OPTIONS.map((s) => {
-                  const checked = selectedSizes.includes(s);
-                  return (
-                    <button key={s} type="button" className={styles.sizeRow} onClick={() => toggleSize(s)}>
-                      <span className={styles.sizeText}>{s}</span>
-                      <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
-                        {checked ? "✓" : ""}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
-                  Done
-                </button>
-              </div>
-            </div>
-          )}
+          {open === "size" && renderListDropdown("Sizes", SIZE_OPTIONS, selectedSizes, setSelectedSizes)}
         </div>
 
-        {/* Sort */}
         <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "sort" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("sort")}
-          >
+          <button className={`${styles.pill} ${open === "condition" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("condition")}>
+            Condition <ChevronDown size={16} />
+          </button>
+          {open === "condition" && renderListDropdown("Condition", CONDITION_OPTIONS, selectedConditions, setSelectedConditions)}
+        </div>
+
+        <div className={styles.dropWrap}>
+          <button className={`${styles.pill} ${open === "brand" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("brand")}>
+            Brand <ChevronDown size={16} />
+          </button>
+          {open === "brand" && renderListDropdown("Brands", BRAND_OPTIONS, selectedBrands, setSelectedBrands)}
+        </div>
+
+        <div className={styles.dropWrap}>
+          <button className={`${styles.pill} ${open === "color" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("color")}>
+            Color <ChevronDown size={16} />
+          </button>
+          {open === "color" && renderListDropdown("Colors", COLOR_OPTIONS, selectedColors, setSelectedColors)}
+        </div>
+
+        <div className={styles.dropWrap}>
+          <button className={`${styles.pill} ${open === "pattern" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("pattern")}>
+            Pattern <ChevronDown size={16} />
+          </button>
+          {open === "pattern" && renderListDropdown("Patterns", PATTERN_OPTIONS, selectedPatterns, setSelectedPatterns)}
+        </div>
+
+        <div className={styles.dropWrap}>
+          <button className={`${styles.pill} ${open === "material" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("material")}>
+            Material <ChevronDown size={16} />
+          </button>
+          {open === "material" && renderListDropdown("Materials", MATERIAL_OPTIONS, selectedMaterials, setSelectedMaterials)}
+        </div>
+
+        {/* Sort By (Kept on the left alongside the other pills as requested) */}
+        <div className={styles.dropWrap}>
+          <button className={`${styles.pill} ${open === "sort" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("sort")}>
             Sort By <ChevronDown size={16} />
           </button>
-
           {open === "sort" && (
             <div className={styles.dropdown}>
               <div className={styles.ddHeader}>Sort</div>
-
               <div className={styles.menuList}>
                 {SORT_OPTIONS.map((opt) => (
                   <button
@@ -647,16 +582,11 @@ const TopPicks = () => {
                     onClick={async () => {
                       setSortValue(opt);
                       setOpen(null);
-                      // Pass the new sort value directly
                       await fetchProductsWithCurrentFilters(1, "replace", { sort: opt });
                     }}
                   >
-                    <span className={styles.menuLeft}>
-                      <span className={styles.menuLabel}>{opt}</span>
-                    </span>
-                    <span className={`${styles.rightBox} ${sortValue === opt ? styles.rightBoxOn : ""}`} aria-hidden="true">
-                      {sortValue === opt ? "✓" : ""}
-                    </span>
+                    <span className={styles.menuLeft}><span className={styles.menuLabel}>{opt}</span></span>
+                    <span className={`${styles.rightBox} ${sortValue === opt ? styles.rightBoxOn : ""}`}>{sortValue === opt ? "✓" : ""}</span>
                   </button>
                 ))}
               </div>
@@ -665,12 +595,19 @@ const TopPicks = () => {
         </div>
       </div>
 
-      {/* Products */}
-       {/* Products */}
+      {/* Breadcrumbs & Item Count Row */}
+      <div className={styles.metaRow}>
+        <div className={styles.breadcrumbs}>
+          Home / Men / <span>{selectedPath}</span>
+        </div>
+        <div className={styles.itemCount}>{totalItems} items</div>
+      </div>
+
+      {/* Products Grid */}
       <div className={styles.grid}>
         {products.map((p, index) => (
           <ProductCard 
-            key={`${p.id}-${index}`} // <-- THIS IS CRITICAL FOR THE TEST TO WORK
+            key={`${p.id}-${index}`} 
             image={p.image} 
             brand={p.brand} 
             meta={p.meta} 
@@ -682,7 +619,7 @@ const TopPicks = () => {
 
       {/* Footer / pagination */}
       <div className={styles.footer}>
-        <button className={styles.seeMore} type="button" onClick={onSeeMore} disabled={!hasMore || loadingProducts}>
+        <button className={styles.seeMore} type="button" onClick={() => fetchProductsWithCurrentFilters(page + 1, "append")} disabled={!hasMore || loadingProducts}>
           {loadingProducts ? "Loading…" : hasMore ? "See More" : "No More Products"}
         </button>
       </div>
@@ -690,4 +627,4 @@ const TopPicks = () => {
   );
 };
 
-export default TopPicks;
+export default SearchResults;
