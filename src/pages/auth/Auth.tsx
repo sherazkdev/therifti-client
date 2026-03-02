@@ -1,13 +1,13 @@
 import { useState } from "react";
 import styles from "./LoginPage.module.css";
 
-import SocialLogin from "./components/SocialLogin";
-import EmailLoginForm from "./components/EmailLoginForm";
-import ForgotPassword from "./components/ForgotPassword";
-import OtpVerify from "./components/OtpVerify";
-import SignupSocial from "./components/SignupSocial";
-import SignupEmail from "./components/SignupEmail";
-import ChangePassword from "./components/ChangePassword";
+import SocialLogin from "./components/SocialLogin/SocialLogin";
+import EmailLoginForm from "./components/EmailLogin/EmailLoginForm";
+import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+import OtpVerify from "./components/OtpVerify/OtpVerify";
+import SignupSocial from "./components/SignUp/SignupSocial";
+import SignupEmail from "./components/SignUp/SignupEmail";
+import ChangePassword from "./components/ChangePassword/ChangePassword";
 
 type Step =
   | "login-social"
@@ -18,13 +18,18 @@ type Step =
   | "signup-social"
   | "signup-email";
 
-type OtpFlow = "forgot" | "signup" | "login";
+type OtpFlow = "FORGOT" | "SIGNUP" | "LOGIN";
+
+interface response {
+  email:string | null,
+  userId:string | null
+}
 
 const LoginPage = () => {
   const [step, setStep] = useState<Step>("login-social");
-  const [email, setEmail] = useState("");
-  const [otpFlow, setOtpFlow] = useState<OtpFlow>("login");
-
+  const [response, setResponse] = useState<response>({email:null,userId:null});
+  const [otpFlow, setOtpFlow] = useState<OtpFlow>("LOGIN");
+  
   return (
     <div className={styles.page}>
         
@@ -40,9 +45,9 @@ const LoginPage = () => {
       {step === "login-email" && (
         <EmailLoginForm
           onForgot={() => setStep("forgot")}
-          onSuccess={(mail: any) => {
-            setEmail(mail);
-            setOtpFlow("login");
+          onSuccess={({email,userId}: response) => {
+            setResponse({email:email,userId:userId});
+            setOtpFlow("");
             setStep("otp");
           }}
         />
@@ -51,8 +56,8 @@ const LoginPage = () => {
       {/* FORGOT PASSWORD */}
       {step === "forgot" && (
         <ForgotPassword
-          onSubmit={(mail: any) => {
-            setEmail(mail);
+          onSubmit={({email,userId}: response) => {
+            setResponse({email:email,userId:userId});
             setOtpFlow("forgot");
             setStep("otp");
           }}
@@ -62,7 +67,8 @@ const LoginPage = () => {
       {/* OTP */}
       {step === "otp" && (
         <OtpVerify
-          email={email}
+          response={response}
+          type={otpFlow}
           onVerified={() => {
             if (otpFlow === "forgot") {
               setStep("change-password");
@@ -102,8 +108,8 @@ const LoginPage = () => {
       {/* SIGNUP EMAIL */}
       {step === "signup-email" && (
         <SignupEmail
-          onSubmit={(mail: any) => {
-            setEmail(mail);
+          onSubmit={({email,userId}: response) => {
+            setResponse({email:email,userId:userId});
             setOtpFlow("signup");
             setStep("otp");
           }}

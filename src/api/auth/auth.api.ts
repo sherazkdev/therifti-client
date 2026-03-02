@@ -1,5 +1,5 @@
-import { type ForgotAccountInterface, type LoginAccountInterface, type LoginApiResponse, type RegisterAccountInterface, type VerifyForgotAccountTokenAndChangePasswordInterface, type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpInterface } from "../interfaces/auth.interfaces";
-import type ApiServices from "./api.services";
+import { type ForgotAccountInterface, type LoginAccountInterface, type LoginApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountTokenAndChangePasswordInterface, type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpInterface, type VerifyRegisterationAccountOtpResponse } from "./auth.types";
+import type ApiServices from "../../services/api.services";
 
 class AuthServices {
     private apiServices:ApiServices;
@@ -24,16 +24,22 @@ class AuthServices {
     };
 
     public async ForgotAccount(forgotAccountObj:ForgotAccountInterface){
-
+        
     };
     
     public async VerifyOtpForgotAccountVerification(verifyObj:VerifyOtpForgotAccountVerificationInterface){};
 
     public async VerifyForgotAccountTokenAndChangePassword(verifyObj:VerifyForgotAccountTokenAndChangePasswordInterface){};
 
-    public async RegisterAccount(registerAccountObj:RegisterAccountInterface){};
+    public async RegisterAccount(registerAccountObj:RegisterAccountInterface):Promise<RegisterApiResponse>{
+        const response = await this.apiServices.Post<RegisterApiResponse>("/auth/register",registerAccountObj);
+        return response;
+    };
 
-    public async VerifyRegisterationAccountOtp(verifyObj:VerifyRegisterationAccountOtpInterface){};
+    public async VerifyRegisterationAccountOtp(verifyObj:VerifyRegisterationAccountOtpInterface):Promise<VerifyRegisterationAccountOtpResponse>{
+        const response = await this.apiServices.Patch<VerifyRegisterationAccountOtpResponse>("/auth/registeration-otp-verifier",verifyObj);
+        return response;
+    };
 
     public async LogoutAccount(){};
 }

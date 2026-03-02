@@ -78,6 +78,13 @@
   font-size: 12px;
   color: #d92d20;
 }
+.serverErrorAuth {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 375;
+  line-height: 22px;
+  color: #d92d20;
+}
 
 /* ---------- Continue Button ---------- */
 .submitBtn {

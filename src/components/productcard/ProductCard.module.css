@@ -2,13 +2,25 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Added a subtle lift effect when hovering over the card */
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card:active {
+  transform: translateY(0);
 }
 
 .media {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  background: #efefef;
+  background: #f8f8f8;
+  border: 1px solid #efefef; /* Defines the edge slightly better */
   height: 220px;
 }
 
@@ -16,13 +28,18 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  object-position: center;
   display: block;
 }
 
+/* Centered the placeholder content so the fallback icon looks intentional */
 .placeholder {
   width: 100%;
   height: 100%;
-  background: #d9d9d9;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .likeBadge {
@@ -42,12 +59,14 @@
 
 .likesText {
   font-size: 12px;
+  font-weight: 500;
 }
 
 .info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 0 2px; /* Slight padding so text doesn't touch the absolute edge */
 }
 
 .row {
@@ -61,12 +80,17 @@
   font-size: 14px;
   font-weight: 500;
   color: #111;
+  /* Truncates extra long brand names with "..." */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .price {
   font-size: 14px;
   font-weight: 600;
   color: #111;
+  flex-shrink: 0; /* Prevents the price from shrinking if the brand name is long */
 }
 
 .meta {

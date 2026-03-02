@@ -108,7 +108,7 @@ const TopBar = () => {
             <button
               type="button"
               className={styles.startSelling}
-              onClick={() => navigate("/sell")}
+              onClick={() => navigate("/Sell")}
             >
               Start Selling
             </button>

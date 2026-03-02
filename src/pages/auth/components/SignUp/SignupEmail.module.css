@@ -36,6 +36,15 @@
 
 }
 
+.serverErrorAuth {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 375;
+  line-height: 22px;
+  color: #d92d20;
+}
+
+
 /* HELP TEXT */
 
 .help {

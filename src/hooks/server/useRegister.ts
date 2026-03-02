@@ -1,4 +1,4 @@
-import { type LoginApiResponse, type LoginAccountInterface } from "../../api/auth/auth.types";
+import { type RegisterApiResponse, type RegisterAccountInterface } from "../../api/auth/auth.types";
 import { useMutation } from "@tanstack/react-query";
 
 /** Services */
@@ -12,9 +12,9 @@ const BaseURL = import.meta.env.VITE_SERVER_URL;
 const apiServices = new ApiServices(BaseURL);
 const authServices = new AuthServices(apiServices);
 
-const useLogin = () => {
-    return useMutation<LoginApiResponse,AxiosError,LoginAccountInterface>({
-        mutationFn: (loginData:LoginAccountInterface) => authServices.LoginWithEmailAndPassword(loginData),
+const useRegister = () => {
+    return useMutation<RegisterApiResponse,AxiosError,RegisterAccountInterface>({
+        mutationFn: (registerObj:RegisterAccountInterface) => authServices.RegisterAccount(registerObj),
     })
 };
-export default useLogin;
+export default useRegister;

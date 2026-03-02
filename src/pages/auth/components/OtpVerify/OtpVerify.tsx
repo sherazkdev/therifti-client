@@ -1,12 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState,useContext } from "react";
 import styles from "./OtpVerify.module.css";
 
-export default function OtpVerify({ email, onVerified }: any) {
+/** Hooks */
+import useVerifyRegisterationOtp from "../../../../hooks/server/useVerifyRegisterationOtp";
+import type { ApiError } from "../../../../types/api/api.interfaces";
+
+/** @note: AuthProviders */
+import { AuthContext } from "../../../../contexts/auth/AuthContext";
+
+export default function OtpVerify({ response, onVerified,type }: any) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [time, setTime] = useState(10);      
   const [error, setError] = useState("");
 
   const inputsRef = useRef<HTMLInputElement[]>([]);
+  const verifyVerifyRegisterationMutation = useVerifyRegisterationOtp();
+  
+  /** Note: Contexts */
+  const {handleSetUser} = useContext(AuthContext);
 
   // TIMER
   useEffect(() => {
@@ -74,29 +85,44 @@ export default function OtpVerify({ email, onVerified }: any) {
     inputsRef.current[pasted.length - 1]?.focus();
   };
 
-
   const isComplete = otp.every((d) => d !== "");
 
 
 
-//   plug in the real API inside handleVerify    on continue this handle 
+  // plug in the real API inside handleVerify    on continue this handle 
   const handleVerify = async () => {
     try {
-      const isValid = true; // for testing purppose only 
+      const isValid = false; // for testing purppose only;
+      const payload = {
+        type,
+        userId:response.userId,
+        otp:Object.values(inputsRef.current)
+            .map(input => input.value)
+            .join('')
+      };
+      verifyVerifyRegisterationMutation.mutate(payload,{
+        onError:(resErr) => {
+          const err = resErr.response?.data as ApiError || undefined;
+          console.log(err)
+          if(err){
+            setError(err.message);
+          }
+        },
+        onSuccess:(res) => {
+          if(res.success === true && res.statusCode === 200){
+            handleSetUser(res.data)
+          }
+        }
+      })
 
-      if (!isValid) {
-        setError("Invalid verification code. Please try again.");
-        return;
-      }
-
-      onVerified(otp.join(""));
+      // onVerified(otp.join(""));
     } catch {
       setError("Something went wrong. Try again.");
     }
   };
 
 
-//   on resent  this handle  add the api here
+  // on resent  this handle  add the api here
   const handleResend = () => {
     setOtp(["", "", "", ""]);
     setError("");
@@ -104,13 +130,10 @@ export default function OtpVerify({ email, onVerified }: any) {
     inputsRef.current[0]?.focus();
   };
 
-
-
-
   return (
     <div className={styles.card}>
       <h2>Enter verification code</h2>
-      <p className={styles.email}>Sent to {email}</p>
+      <p className={styles.email}>Sent to {response.email}</p>
 
       <div
         className={`${styles.otpContainer} ${
@@ -133,9 +156,9 @@ export default function OtpVerify({ email, onVerified }: any) {
 
       {error && <p className={styles.errorText}>{error}</p>}
 
-      <button disabled={!isComplete} onClick={handleVerify}>
-        Continue
-      </button>
+      <button type="submit" className={type === "register"register.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={loginMutation.isPending}>
+        {loginMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
+      </button
 
       {time > 0 ? (
         <p className={styles.timer}>

@@ -1,30 +1,52 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from "./SignupEmail.module.css";
-import { EyeIcon } from "../../../components/icons";
+import { EyeIcon } from "../../../../components/icons";
+
+/** Note: Api Hooks */
+import useRegister from "../../../../hooks/server/useRegister";
+import type { ApiError } from "../../../../types/api/api.interfaces";
 
 type Form = {
-  name: string;
+  fullname: string;
   username: string;
   email: string;
   password: string;
-  zip?: string;
+  zipCode?: string;
   terms: boolean;
 };
 
 export default function SignupEmail({ onSubmit }: any) {
   const [showPassword, setShowPassword] = useState(false);
+  const [serverError,setServerError] = useState<string | null>(null);
 
+  const registerMutation = useRegister();
 
  const handleSignup = async (data: Form) => {
   try {
-    alert("jk")
     console.log("Signup form data:", data);
 
-    //  BACKEND WILL PLUG API HERE
+    // @note: Register Api Payload.
+    const registerationPayload = {
+      email:data.email,
+      fullname:data.fullname,
+      zipCode:Number(data.zipCode) || null,
+      password:data.password,
+      username:data.username
+    };
 
-    // After success:
-    onSubmit(data.email);   
+    registerMutation.mutate(registerationPayload,{
+      onError:(resErr) => {
+        const err = resErr.response?.data as ApiError || undefined;
+        console.log(err)
+        if(err){
+          setServerError(err.message);
+        }
+      },
+      onSuccess:(res) => {
+        onSubmit({email:data.email,userId:res.data.userId})
+      }
+    });
   } catch (err) {
     console.error(err);
   }
@@ -44,12 +66,14 @@ export default function SignupEmail({ onSubmit }: any) {
           onSubmit={handleSubmit(handleSignup)}
     >
       <h2>Sign up with email</h2>
+      
+      {serverError && (<p className={styles.serverErrorAuth} >{serverError}</p>)}
 
       {/* FULL NAME */}
       <div className={styles.field}>
         <input
           placeholder="Full name"
-          {...register("name", {
+          {...register("fullname", {
             required: "Name can’t be blank",
           })}
         />
@@ -142,7 +166,7 @@ export default function SignupEmail({ onSubmit }: any) {
       <div className={styles.field}>
         <input
           placeholder="ZIP code (optional)"
-          {...register("zip")}
+          {...register("zipCode")}
         />
         <p className={styles.help}>
           This will be used to calculate shipping and availability.

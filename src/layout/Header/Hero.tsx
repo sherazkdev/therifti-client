@@ -5,6 +5,11 @@ import { MoveLeft, MoveRight } from "../../components/icons";
 import bannerImg1 from "../../assets/images/Herobanner/HeroSection.png";
 import bannerImg2 from "../../assets/images/Herobanner/Desktop - 59.png";
 import bannerImg3 from "../../assets/images/Herobanner/Desktop - 60.png";
+import bannerImg4 from "../../assets/images/SingleProduct/Desktop - 59.png";
+
+type HeroProps = {
+  category?: string; // 👈 women | men | etc (later)
+};
 
 const slides = [
   {
@@ -24,17 +29,19 @@ const slides = [
   },
 ];
 
-const Hero = () => {
+const Hero = ({ category }: HeroProps) => {
   const [active, setActive] = useState(0);
 
-  // Auto slide
+  // ✅ Slider ONLY when no category
   useEffect(() => {
+    if (category) return;
+
     const timer = setInterval(() => {
       setActive((prev) => (prev + 1) % slides.length);
     }, 6000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [category]);
 
   const goPrev = () => {
     setActive((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
@@ -46,60 +53,74 @@ const Hero = () => {
 
   return (
     <section className={styles.hero}>
-      {/* ✅ Background Slides (stacked + smooth fade + zoom) */}
-      {slides.map((slide, index) => (
-        <div
-          key={index}
-          className={`${styles.heroBg} ${
-            index === active ? styles.activeSlide : ""
-          }`}
-          style={{
-            backgroundImage: `url(${slide.image})`,
-          }}
-        />
-      ))}
-
-      {/* ✅ Text animation on each slide change */}
-      <div key={active} className={styles.heroOverlay}>
-        <h1>{slides[active].title}</h1>
-        <p>{slides[active].subtitle}</p>
-
-        <button className={styles.heroBtn}>
-          Sell Now
-          <span className={styles.heroBtnArrow}>
-            <MoveRight size={13} />
-          </span>
-        </button>
-      </div>
-
-      {/* LEFT */}
-      <button
-        aria-label="Previous slide"
-        onClick={goPrev}
-        className={`${styles.heroArrow} ${styles.left}`}
-      >
-        <MoveLeft size={20} />
-      </button>
-
-      {/* RIGHT */}
-      <button
-        aria-label="Next slide"
-        onClick={goNext}
-        className={`${styles.heroArrow} ${styles.right}`}
-      >
-        <MoveRight size={20} />
-      </button>
-
-      {/* Dots */}
-      <div className={styles.heroDots}>
-        {slides.map((_, idx) => (
-          <span
-            key={idx}
-            onClick={() => setActive(idx)}
-            className={`${styles.dot} ${idx === active ? styles.activeDot : ""}`}
+      {/* ================= CATEGORY HERO ================= */}
+      {category && (
+        <>
+          <div
+            className={`${styles.heroBg} ${styles.activeSlide}`}
+            style={{ backgroundImage: `url(${bannerImg4})` }}
           />
-        ))}
-      </div>
+
+          <div className={styles.heroOverlay}>
+            <h1>Women Collection</h1>
+          </div>
+        </>
+      )}
+
+      {/* ================= HOME HERO ================= */}
+      {!category && (
+        <>
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              className={`${styles.heroBg} ${
+                index === active ? styles.activeSlide : ""
+              }`}
+              style={{ backgroundImage: `url(${slide.image})` }}
+            />
+          ))}
+
+          <div key={active} className={styles.heroOverlay}>
+            <h1>{slides[active].title}</h1>
+            <p>{slides[active].subtitle}</p>
+
+            <button className={styles.heroBtn}>
+              Sell Now
+              <span className={styles.heroBtnArrow}>
+                <MoveRight size={13} />
+              </span>
+            </button>
+          </div>
+
+          <button
+            aria-label="Previous slide"
+            onClick={goPrev}
+            className={`${styles.heroArrow} ${styles.left}`}
+          >
+            <MoveLeft size={20} />
+          </button>
+
+          <button
+            aria-label="Next slide"
+            onClick={goNext}
+            className={`${styles.heroArrow} ${styles.right}`}
+          >
+            <MoveRight size={20} />
+          </button>
+
+          <div className={styles.heroDots}>
+            {slides.map((_, idx) => (
+              <span
+                key={idx}
+                onClick={() => setActive(idx)}
+                className={`${styles.dot} ${
+                  idx === active ? styles.activeDot : ""
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 };

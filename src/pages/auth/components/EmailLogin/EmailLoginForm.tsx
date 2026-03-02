@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from "./EmailLoginForm.module.css";
-import { EyeIcon } from "../../../components/icons";
+import { EyeIcon } from "../../../../components/icons";
 
 /** @note: Hook */
-import useLogin from "../../../hooks/server/useLogin";
-import type { ApiError } from "../../../interfaces/api.interfaces";
+import useLogin from "../../../../hooks/server/useLogin";
+import type { ApiError } from "../../../../types/api/api.interfaces";
 
 type Form = {
   email: string;
@@ -37,10 +37,12 @@ export default function EmailLoginForm({ onForgot}: any) {
             }
           }
         },
+        onSuccess(res) {
+          console.log(res.data.user)
+        }
       });
     } catch (err) {
       console.log(err)
-      alert("Login failed");
     }
   };
 
@@ -48,7 +50,7 @@ export default function EmailLoginForm({ onForgot}: any) {
     <form className={styles.card} onSubmit={handleSubmit(handleLogin)}>
 
       <h2>Log in</h2>
-      {serverError && (<p className={styles.error} >{serverError}</p>)}
+      {serverError && (<p className={styles.serverErrorAuth} >{serverError}</p>)}
       {/* EMAIL */}
       <div className={styles.field}>
         <div className={styles.passwordRow}>
