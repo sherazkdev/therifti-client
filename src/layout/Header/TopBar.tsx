@@ -1,16 +1,10 @@
-import { useState, useRef } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./Topbar.module.css";
-import LogoIcon from "../../assets/icons/logo.png";
-import SearchIcon from "../../assets/icons/search.png";
+import LogoIcon from "../../assets/icons/logo.png"; // replace path if needed
+import SearchIcon from "../../assets/icons/search.png"; // replace
 import { useNavigate } from "react-router-dom";
 import { MoveRight } from "lucide-react";
-import { ArrowUpRight } from "lucide-react";
-import {
-  Bell,
-  Heart,
-  MessageCircle,
-  User,
-} from "lucide-react";
+import { ArrowUpRight, Bell, Heart, MessageCircle } from "lucide-react";
 
 const MOCK_SUGGESTIONS = [
   "mens clothes",
@@ -29,17 +23,16 @@ const TopBar = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [isLoggedIn] = useState(true); //  mock (backend will control later)
+  const [isLoggedIn] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  const filteredSuggestions = MOCK_SUGGESTIONS.filter(item =>
+  const filteredSuggestions = MOCK_SUGGESTIONS.filter((item) =>
     item.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
     <div className={styles.topBar}>
-      {/* LEFT SIDE */}
       <div className={styles.topLeft}>
         <img
           src={LogoIcon}
@@ -48,7 +41,6 @@ const TopBar = () => {
           onClick={() => navigate("/")}
         />
 
-        {/* SEARCH */}
         <div className={styles.searchWrapper} ref={wrapperRef}>
           <img src={SearchIcon} alt="Search" className={styles.searchIcon} />
 
@@ -64,7 +56,6 @@ const TopBar = () => {
             onBlur={() => setTimeout(() => setOpen(false), 150)}
           />
 
-          {/* SUGGESTIONS DROPDOWN */}
           {open && query && (
             <div className={styles.suggestionBox}>
               {filteredSuggestions.map((item, index) => (
@@ -81,7 +72,10 @@ const TopBar = () => {
                 </div>
               ))}
 
-              <div className={styles.searchAll}>
+              <div
+                className={styles.searchAll}
+                onClick={() => navigate(`/search?q=${encodeURIComponent(query)}`)}
+              >
                 Search "<strong>{query}</strong>"
               </div>
             </div>
@@ -89,10 +83,6 @@ const TopBar = () => {
         </div>
       </div>
 
-      {/* RIGHT SIDE */}
-      
-      
-      {/* RIGHT SIDE */}
       <div className={styles.topRight}>
         {!isLoggedIn ? (
           <>
@@ -108,34 +98,30 @@ const TopBar = () => {
             <button
               type="button"
               className={styles.startSelling}
-              onClick={() => navigate("/Sell")}
+              onClick={() => navigate("/sell")}
             >
               Start Selling
             </button>
           </>
         ) : (
           <>
-            {/* NOTIFICATION */}
             <button className={styles.iconBtn}>
               <Bell size={18} />
               <span className={styles.notificationDot}>1</span>
             </button>
 
-            {/* FAVORITES */}
             <button className={styles.iconBtn}>
               <Heart size={18} />
             </button>
 
-            {/* MESSAGES */}
             <button className={styles.iconBtn}>
               <MessageCircle size={18} />
             </button>
 
-            {/* PROFILE */}
             <div className={styles.profileWrapper}>
               <button
                 className={styles.profileBtn}
-                onClick={() => setProfileOpen(prev => !prev)}
+                onClick={() => setProfileOpen((p) => !p)}
               >
                 M
               </button>
@@ -155,7 +141,6 @@ const TopBar = () => {
               )}
             </div>
 
-            {/* SELL NOW */}
             <button
               className={styles.sellNowBtn}
               onClick={() => navigate("/sell")}
@@ -165,7 +150,6 @@ const TopBar = () => {
           </>
         )}
       </div>
-
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Hero.module.css";
-import { MoveLeft, MoveRight } from "../../components/icons";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import bannerImg1 from "../../assets/images/Herobanner/HeroSection.png";
 import bannerImg2 from "../../assets/images/Herobanner/Desktop - 59.png";
@@ -8,7 +8,7 @@ import bannerImg3 from "../../assets/images/Herobanner/Desktop - 60.png";
 import bannerImg4 from "../../assets/images/SingleProduct/Desktop - 59.png";
 
 type HeroProps = {
-  category?: string; // 👈 women | men | etc (later)
+  category?: string | null;
 };
 
 const slides = [
@@ -29,10 +29,10 @@ const slides = [
   },
 ];
 
-const Hero = ({ category }: HeroProps) => {
+const Hero: React.FC<HeroProps> = ({ category }) => {
   const [active, setActive] = useState(0);
 
-  // ✅ Slider ONLY when no category
+  // Slider only runs when NO category selected
   useEffect(() => {
     if (category) return;
 
@@ -43,8 +43,17 @@ const Hero = ({ category }: HeroProps) => {
     return () => clearInterval(timer);
   }, [category]);
 
+  // Reset slide when category changes
+  useEffect(() => {
+    if (category) {
+      setActive(0);
+    }
+  }, [category]);
+
   const goPrev = () => {
-    setActive((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+    setActive((prev) =>
+      prev === 0 ? slides.length - 1 : prev - 1
+    );
   };
 
   const goNext = () => {
@@ -54,7 +63,7 @@ const Hero = ({ category }: HeroProps) => {
   return (
     <section className={styles.hero}>
       {/* ================= CATEGORY HERO ================= */}
-      {category && (
+      {category ? (
         <>
           <div
             className={`${styles.heroBg} ${styles.activeSlide}`}
@@ -62,14 +71,14 @@ const Hero = ({ category }: HeroProps) => {
           />
 
           <div className={styles.heroOverlay}>
-            <h1>Women Collection</h1>
+            <h1>
+              {`${category.charAt(0).toUpperCase() + category.slice(1)} Collection`}
+            </h1>
           </div>
         </>
-      )}
-
-      {/* ================= HOME HERO ================= */}
-      {!category && (
+      ) : (
         <>
+          {/* ================= HOME SLIDER ================= */}
           {slides.map((slide, index) => (
             <div
               key={index}
@@ -87,7 +96,7 @@ const Hero = ({ category }: HeroProps) => {
             <button className={styles.heroBtn}>
               Sell Now
               <span className={styles.heroBtnArrow}>
-                <MoveRight size={13} />
+                <ChevronRight size={13} />
               </span>
             </button>
           </div>
@@ -97,7 +106,7 @@ const Hero = ({ category }: HeroProps) => {
             onClick={goPrev}
             className={`${styles.heroArrow} ${styles.left}`}
           >
-            <MoveLeft size={20} />
+            <ChevronLeft size={20} />
           </button>
 
           <button
@@ -105,7 +114,7 @@ const Hero = ({ category }: HeroProps) => {
             onClick={goNext}
             className={`${styles.heroArrow} ${styles.right}`}
           >
-            <MoveRight size={20} />
+            <ChevronRight size={20} />
           </button>
 
           <div className={styles.heroDots}>

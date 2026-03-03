@@ -1,7 +1,3 @@
-/* =====================================================
-   HERO SLIDER SECTION
-===================================================== */
-
 .hero {
   position: relative;
   width: 100%;
@@ -9,20 +5,15 @@
   overflow: hidden;
 }
 
-/* ✅ BACKGROUND SLIDES (stacked + premium fade + zoom) */
-
 .heroBg {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center;
-
   opacity: 0;
   transform: scale(1.03);
-
   transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1),
     transform 2.2s ease;
-
   will-change: opacity, transform;
 }
 
@@ -31,8 +22,6 @@
   transform: scale(1);
 }
 
-/* DARK OVERLAY */
-
 .hero::after {
   content: "";
   position: absolute;
@@ -40,8 +29,6 @@
   background: rgba(0, 0, 0, 0.35);
   z-index: 1;
 }
-
-/* ✅ CENTER CONTENT + animation */
 
 .heroOverlay {
   position: relative;
@@ -54,7 +41,6 @@
   text-align: center;
   color: white;
   padding: 0 1rem;
-
   animation: fadeUp 650ms ease;
 }
 
@@ -80,8 +66,6 @@
   font-size: 16px;
   opacity: 0.9;
 }
-
-/* CTA BUTTON */
 
 .heroBtn {
   margin-top: 28px;
@@ -111,8 +95,6 @@
   display: grid;
   place-items: center;
 }
-
-/* SLIDER ARROWS */
 
 .heroArrow {
   position: absolute;
@@ -147,8 +129,6 @@
   right: 26px;
 }
 
-/* SLIDER DOTS */
-
 .heroDots {
   position: absolute;
   bottom: 26px;
@@ -171,8 +151,6 @@
   background: white;
 }
 
-/* RESPONSIVE */
-
 @media (max-width: 1024px) {
   .heroOverlay h1 {
     font-size: 40px;
@@ -188,7 +166,6 @@
     font-size: 30px;
   }
 
-  /* ✅ Hide arrows on mobile */
   .heroArrow {
     display: none;
   }

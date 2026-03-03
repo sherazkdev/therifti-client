@@ -1,49 +1,46 @@
-// CategoryBar.tsx
+import React, { useState } from "react";
 import styles from "./CategoryBar.module.css";
-import { MapPin, Globe, ChevronDown } from "../../components/icons";
+import MegaMenu from "./MegaMenu";
+import type { Category } from "../../types/category";
 
-type CategoryBarProps = {
+type Props = {
+  categories: Category[];
+  onCategoryClick: (id: string, name?: string) => void;
   variant?: "overlay" | "solid";
 };
 
-const categories = [
-  "Women",
-  "Men",
-  "Kids",
-  "Collections",
-  "Electronics",
-  "Sports",
-  "Entertainment",
-  "Accessories",
-  "Our Platform",
-];
+const CategoryBar: React.FC<Props> = ({
+  categories,
+  onCategoryClick,
+  variant = "overlay",
+}) => {
+  const [active, setActive] = useState<Category | null>(null);
 
-const CategoryBar = ({ variant = "overlay" }: CategoryBarProps) => {
   return (
     <nav
       className={`${styles.categoryBar} ${
         variant === "solid" ? styles.solid : styles.overlay
       }`}
+      onMouseLeave={() => setActive(null)}
     >
       <ul className={styles.categoryList}>
-        {categories.map((item) => (
-          <li key={item} className={styles.categoryItem}>
-            {item}
+        {categories.map((cat) => (
+          <li
+            key={cat.id}
+            className={styles.categoryItem}
+            onMouseEnter={() => setActive(cat)}
+          >
+            {cat.name}
           </li>
         ))}
       </ul>
 
-      <div className={styles.categoryRight}>
-        <div className={styles.location}>
-          <MapPin size={14} />
-          <span>Rio, Brazil</span>
-          <ChevronDown size={14} />
-        </div>
-
-        <button className={styles.iconBtn}>
-          <Globe size={16} />
-        </button>
-      </div>
+      {active && (
+        <MegaMenu
+          category={active}
+          onCategoryClick={(id) => onCategoryClick(id, active?.name)}
+        />
+      )}
     </nav>
   );
 };

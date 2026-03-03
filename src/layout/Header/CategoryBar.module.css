@@ -1,10 +1,5 @@
-/* =====================================================
-   CATEGORY BAR
-   Transparent bar displayed over hero section
-===================================================== */
-
 .categoryBar {
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   width: 100%;
@@ -15,38 +10,28 @@
   z-index: 30;
 }
 
-/* ================================
-   VARIANTS (TOGGLE STYLES)
-================================ */
-
-/* HERO KE UPAR (DEFAULT) */
 .overlay {
   position: absolute;
   top: 0;
   left: 0;
   background: transparent;
+  transition: background 0.3s ease;
 }
 
-/* HERO NAHI HAI → BLACK BAR */
+/* When hovering entire navbar */
+.overlay:hover {
+  background: rgba(99, 96, 96, 0.85);
+}
+
 .solid {
-  position: relative; /* 🔴 VERY IMPORTANT */
+  position: relative;
   background: #000;
 }
 
-/* Text white rahe */
 .solid .categoryItem,
 .solid .location {
   color: white;
 }
-
-/* Icons visible */
-.solid .iconBtn {
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* =====================================================
-   LEFT SIDE: CATEGORY LIST
-===================================================== */
 
 .categoryList {
   display: flex;
@@ -69,10 +54,6 @@
   opacity: 1;
 }
 
-/* =====================================================
-   RIGHT SIDE: LOCATION + ICON
-===================================================== */
-
 .categoryRight {
   display: flex;
   align-items: center;
@@ -87,8 +68,6 @@
   color: white;
   cursor: pointer;
 }
-
-/* Globe icon button */
 
 .iconBtn {
   width: 30px;
@@ -106,9 +85,11 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* =====================================================
-   RESPONSIVE
-===================================================== */
+.solid {
+  position: relative;
+  background: #111;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
 
 @media (max-width: 768px) {
   .categoryBar {
