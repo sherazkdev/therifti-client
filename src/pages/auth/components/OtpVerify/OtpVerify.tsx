@@ -7,8 +7,9 @@ import type { ApiError } from "../../../../types/api/api.interfaces";
 
 /** @note: AuthProviders */
 import { AuthContext } from "../../../../contexts/auth/AuthContext";
+import type { OtpVerifyPropsInterface } from "./OtpVerify.types";
 
-export default function OtpVerify({ response, onVerified,type }: any) {
+export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsInterface) {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [time, setTime] = useState(10);      
   const [error, setError] = useState("");
@@ -95,11 +96,12 @@ export default function OtpVerify({ response, onVerified,type }: any) {
       const isValid = false; // for testing purppose only;
       const payload = {
         type,
-        userId:response.userId,
+        userId:otpRequest.userId as string,
         otp:Object.values(inputsRef.current)
             .map(input => input.value)
             .join('')
       };
+      console.log(payload)
       verifyVerifyRegisterationMutation.mutate(payload,{
         onError:(resErr) => {
           const err = resErr.response?.data as ApiError || undefined;
@@ -110,7 +112,7 @@ export default function OtpVerify({ response, onVerified,type }: any) {
         },
         onSuccess:(res) => {
           if(res.success === true && res.statusCode === 200){
-            handleSetUser(res.data)
+            onSuccess(res.data);
           }
         }
       })
@@ -133,7 +135,7 @@ export default function OtpVerify({ response, onVerified,type }: any) {
   return (
     <div className={styles.card}>
       <h2>Enter verification code</h2>
-      <p className={styles.email}>Sent to {response.email}</p>
+      <p className={styles.email}>Sent to {otpRequest.email}</p>
 
       <div
         className={`${styles.otpContainer} ${
@@ -156,9 +158,9 @@ export default function OtpVerify({ response, onVerified,type }: any) {
 
       {error && <p className={styles.errorText}>{error}</p>}
 
-      <button type="submit" className={type === "register"register.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={loginMutation.isPending}>
-        {loginMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
-      </button
+      <button type="submit" onClick={handleVerify} className={verifyVerifyRegisterationMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={verifyVerifyRegisterationMutation.isPending}>
+        {verifyVerifyRegisterationMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
+      </button>
 
       {time > 0 ? (
         <p className={styles.timer}>

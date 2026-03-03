@@ -1,23 +1,21 @@
 import { useForm } from "react-hook-form";
 import styles from "./ChangePassword.module.css";
 
-type Form = {
-  password: string;
-  confirmPassword: string;
-};
+/** Types */
+import type { ChangePasswordFormInterface, ChangePasswordPropsInterface } from "./ChatPassword.types";
 
-export default function ChangePassword({ onSuccess }: any) {
+export default function ChangePassword({ onSuccess }: ChangePasswordPropsInterface) {
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Form>();
+  } = useForm<ChangePasswordFormInterface>();
 
   const password = watch("password");
 
   // 👉 BACKEND WILL PLUG API HERE
-  const handleChangePassword = async (data: Form) => {
+  const handleChangePassword = async (data: ChangePasswordFormInterface) => {
     try {
       console.log("Change password:", data);
 
@@ -62,7 +60,7 @@ export default function ChangePassword({ onSuccess }: any) {
         type="password"
         {...register("confirmPassword", {
           required: "Confirm your password",
-          validate: (val) =>
+          validate: (val:string) =>
             val === password || "Passwords do not match",
         })}
       />

@@ -1,19 +1,17 @@
 import { useForm } from "react-hook-form";
 import styles from "./ForgotPassword.module.css";
 
-type Form = {
-  email: string;
-};
-
-export default function ForgotPassword({ onSubmit }: any) {
+/** Types */
+import type { ForgotPasswordFormInterface,ForgotPasswordPropsInterface } from "./ForgotPassword.types";
+export default function ForgotPassword({ onSubmit }: ForgotPasswordPropsInterface) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Form>();
+  } = useForm<ForgotPasswordFormInterface>();
 
   // 👉 BACKEND WILL PLUG API HERE
-  const handleForgotPassword = async (data: Form) => {
+  const handleForgotPassword = async (data:ForgotPasswordFormInterface) => {
     try {
       console.log("Forgot password email:", data.email);
 

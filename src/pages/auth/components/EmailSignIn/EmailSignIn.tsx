@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import styles from "./EmailLoginForm.module.css";
+import styles from "./EmailSignIn.module.css";
 import { EyeIcon } from "../../../../components/icons";
 
 /** @note: Hook */
 import useLogin from "../../../../hooks/server/useLogin";
+
+/** Types */
+import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "./EmailSignIn.types";
 import type { ApiError } from "../../../../types/api/api.interfaces";
 
-type Form = {
-  email: string;
-  password: string;
-};
-
-export default function EmailLoginForm({ onForgot}: any) {
+export default function EmailSignIn({ onForgot, onSuccess}: EmailLoginPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError,setServerError] = useState<string | null>(null);
 
@@ -20,14 +18,14 @@ export default function EmailLoginForm({ onForgot}: any) {
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors },
-  } = useForm<Form>();
+  } = useForm<EmailLoginFormInterface>();
 
 
   //handler that get the form response 
-  const handleLogin = async (data: Form) => {
+  const handleLogin = async (data: EmailLoginFormInterface) => {
     try {
+      console.log(data)
       loginMutation.mutate(data,{
         onError(err) {
           if(err.response && err.response.data){
@@ -38,7 +36,9 @@ export default function EmailLoginForm({ onForgot}: any) {
           }
         },
         onSuccess(res) {
-          console.log(res.data.user)
+          if(res.success === true && res.statusCode === 200){
+            onSuccess(res.data);
+          }
         }
       });
     } catch (err) {

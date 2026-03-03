@@ -41,9 +41,7 @@ export interface VerifyRegisterationAccountOtpInterface {
 };
 
 /** @note: Login response. */
-export interface LoginResponseInterface {
-  user:UserDocumentInterface
-}
+export type LoginResponseInterface = UserDocumentInterface;
 
 export interface RegisterResponseInterface {
   userId:string

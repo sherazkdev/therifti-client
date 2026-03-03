@@ -6,23 +6,15 @@ import { EyeIcon } from "../../../../components/icons";
 /** Note: Api Hooks */
 import useRegister from "../../../../hooks/server/useRegister";
 import type { ApiError } from "../../../../types/api/api.interfaces";
+import type { SignUpEmailPropsInterface, SignUpFormInterface } from "./SignUp.types";
 
-type Form = {
-  fullname: string;
-  username: string;
-  email: string;
-  password: string;
-  zipCode?: string;
-  terms: boolean;
-};
-
-export default function SignupEmail({ onSubmit }: any) {
+export default function SignupEmail({ onSubmit }: SignUpEmailPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError,setServerError] = useState<string | null>(null);
-
+  const { register,handleSubmit,formState: { errors, isValid },} = useForm<SignUpFormInterface>({mode: "onChange"});
   const registerMutation = useRegister();
 
- const handleSignup = async (data: Form) => {
+ const handleSignup = async (data: SignUpFormInterface) => {
   try {
     console.log("Signup form data:", data);
 
@@ -44,7 +36,7 @@ export default function SignupEmail({ onSubmit }: any) {
         }
       },
       onSuccess:(res) => {
-        onSubmit({email:data.email,userId:res.data.userId})
+        onSubmit({email:data.email,userId:res.data.userId,resetToken:null})
       }
     });
   } catch (err) {
@@ -52,13 +44,7 @@ export default function SignupEmail({ onSubmit }: any) {
   }
 };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<Form>({
-    mode: "onChange",
-  });
+
 
   return (
     <form
@@ -79,10 +65,10 @@ export default function SignupEmail({ onSubmit }: any) {
         />
         <p
           className={`${styles.help} ${
-            errors.name ? styles.errorText : ""
+            errors.fullname ? styles.errorText : ""
           }`}
         >
-          {errors.name?.message ||
+          {errors.fullname?.message ||
             "Your full name will not be visible publicly"}
         </p>
       </div>
@@ -198,13 +184,10 @@ export default function SignupEmail({ onSubmit }: any) {
       </div>
 
       {/* SUBMIT */}
-      <button
-        type="submit"
-        disabled={!isValid}
-        className={styles.submitBtn}
-      >
-        Continue
+      <button type="submit" className={registerMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={registerMutation.isPending}>
+        {registerMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
       </button>
+
     </form>
   );
 }

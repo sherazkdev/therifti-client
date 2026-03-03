@@ -1,36 +1,35 @@
-import styles from "./SignupSocial.module.css";
-
+import styles from "./SocialSignIn.module.css";
 import apple from "../../../../assets/icons/apple.svg";
 import google from "../../../../assets/icons/google.svg";
 import facebook from "../../../../assets/icons/facebook.svg";
 
 /** Types */
-import type { SignUpSocialPropsInterface } from "./SignUp.types";
+import type { SocialSignInPropsInterface } from "./SocialSignIn.types";
 
-export default function SignupSocial({ onEmailSignUp,onSignInClick }: SignUpSocialPropsInterface) {
+export default function SocialSignIn({ onEmailSignUp,onSignInClick }: SocialSignInPropsInterface) {
   return (
     <div className={styles.card}>
-      <h2>Join and sell pre-loved clothes with no fees</h2>
+      <h2>Welcome back!</h2>
 
       <button>
         <img src={google} /> Continue with Google
       </button>
+
       <button>
         <img src={apple} /> Continue with Apple
       </button>
+
       <button>
         <img src={facebook} /> Continue with Facebook
       </button>
 
       <p className={styles.link} onClick={onEmailSignUp}>
-        Or register with <span>email</span>
+        Or log in with <span>email</span>
       </p>
 
       <p className={styles.linkSmall}>
-        Already have an account? <span onClick={onSignInClick}>Log in</span>
+        Don’t have an account? <span onClick={onSignInClick}>Sign up</span>
       </p>
-
-          
     </div>
   );
 }

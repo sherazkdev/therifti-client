@@ -13,6 +13,23 @@
   margin-bottom: 22px;
 }
 
+.submitBtnIsFetching {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ddd;
+  color: white;
+  border: none;
+  padding: 13px;
+  margin-top: 10px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+
 /* FIELD */
 
 .field {

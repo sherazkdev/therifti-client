@@ -1,122 +1,149 @@
-import { useState } from "react";
-import styles from "./LoginPage.module.css";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import styles from "./Auth.module.css";
 
-import SocialLogin from "./components/SocialLogin/SocialLogin";
-import EmailLoginForm from "./components/EmailLogin/EmailLoginForm";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 import OtpVerify from "./components/OtpVerify/OtpVerify";
-import SignupSocial from "./components/SignUp/SignupSocial";
+import EmailSignIn from "./components/EmailSignIn/EmailSignIn";
 import SignupEmail from "./components/SignUp/SignupEmail";
 import ChangePassword from "./components/ChangePassword/ChangePassword";
 
-type Step =
-  | "login-social"
-  | "login-email"
-  | "forgot"
-  | "otp"
-  | "change-password"
-  | "signup-social"
-  | "signup-email";
+/** Interfaces */
+import type { OtpRequestInterface,AuthFlow,AuthSteps, SocialAuthInterface } from "./Auth.types";
+import SocialAuth from "./components/SocialAuth/SocialAuth";
 
-type OtpFlow = "FORGOT" | "SIGNUP" | "LOGIN";
+/** Contexts*/
+import { AuthContext } from "../../contexts/auth/AuthContext";
 
-interface response {
-  email:string | null,
-  userId:string | null
-}
-
-const LoginPage = () => {
-  const [step, setStep] = useState<Step>("login-social");
-  const [response, setResponse] = useState<response>({email:null,userId:null});
-  const [otpFlow, setOtpFlow] = useState<OtpFlow>("LOGIN");
+const AuthPage = () => {
+  const [step, setStep] = useState<AuthSteps>("SOCIAL-AUTH");
+  const [otpRequest, setOtpRequest] = useState<OtpRequestInterface>({email:null,userId:null,resetToken:null});
+  const [authFlow, setAuthFlow] = useState<AuthFlow>("SIGNIN");
   
+  /** Note: Contexts */
+  const {handleSetUser} = useContext(AuthContext);
+
+  /** Note: Redirection */
+  const Redirect = useNavigate();
+
+  /** Note: Handle click on forgot account */
+  const handleClickOnForgot = () => setStep("FORGOT");
+
+  /** Note: Handle Forgot on submit */
+  const handleForgotOnSubmit = () => {};
+
+  /** Note: Handle Login on success */
+  const handleSignInOnSuccess = (userDocument:any) => {
+    handleSetUser(userDocument);
+    Redirect("/",{replace:true});
+  }
+
+  /** Note: Handle Otp on Submit */
+  const handleOtpOnSuccess = (userDocument:any) => {
+    if(authFlow === "SIGNUP") {
+      handleSetUser(userDocument);
+      Redirect("/",{replace:true});
+    }else if(authFlow === "FORGOT"){
+      alert("Note: Handle Submit otp Submited");
+    }
+  };
+
+  /** Note: Handle change password on success */
+  const handleChangePasswordOnSuccess = () => {};
+
+  /** Note: Handle signUp on sumit */
+  const handleSignUpSubmit = (otpRequest:OtpRequestInterface) => {
+    const {email,resetToken,userId} = otpRequest;
+    setOtpRequest({email,resetToken,userId});
+    /** @note:Verify Otp form. */
+    setStep("OTP");
+    return;
+  };
+
+  /** Note: Handle on Social auth */
+  const handleOnSocialAuth = (type:SocialAuthInterface) => {
+    if(type === "GOOGLE"){
+      // window.open(import.meta.env.VITE_SERVER_URL + "/auth/google","_blank","width=/500px;height=200px");
+      window.location.href = import.meta.env.VITE_SERVER_URL + "/auth/google";
+      window.close();
+    }else if(type === "FACEBOOK"){
+      window.location.href = import.meta.env.VITE_SERVER_URL + "/auth/facebook";
+    }
+  };
+
+  /** Note: handle on Switch Auth*/
+  const handleOnSwitchAuth = () => {
+    setAuthFlow((prev) =>
+      prev === "SIGNIN" ? "SIGNUP" : "SIGNIN"
+    );
+  };
+
+  /** Note: Handle on email click */
+  const handleOnEmailClick = () => {
+    if (authFlow === "SIGNIN") {
+      setStep("SIGNIN-EMAIL");
+      // setAuthFlow(null);
+    } else {
+      setStep("SIGNUP-EMAIL");
+      // setAuthFlow(null);
+    }
+  };
   return (
     <div className={styles.page}>
         
-      {/* SOCIAL LOGIN */}
-      {step === "login-social" && (
-        <SocialLogin
-          onEmail={() => setStep("login-email")}
-          onSignup={() => setStep("signup-social")}
+      {/* SOCIAL Auth */}
+      {step === "SOCIAL-AUTH" && (
+        <SocialAuth 
+          onEmailClick={handleOnEmailClick}
+          onSocialAuth={handleOnSocialAuth}
+          onSwitchMode={handleOnSwitchAuth}
+          type={authFlow}
+
         />
       )}
 
-      {/* LOGIN EMAIL */}
-      {step === "login-email" && (
-        <EmailLoginForm
-          onForgot={() => setStep("forgot")}
-          onSuccess={({email,userId}: response) => {
-            setResponse({email:email,userId:userId});
-            setOtpFlow("");
-            setStep("otp");
-          }}
+      {/* SignIn EMAIL */}
+      {step === "SIGNIN-EMAIL" && (
+        <EmailSignIn
+          onForgot={handleClickOnForgot}
+          onSuccess={handleSignInOnSuccess
+
+          }
         />
       )}
 
       {/* FORGOT PASSWORD */}
-      {step === "forgot" && (
+      {step === "FORGOT" && (
         <ForgotPassword
-          onSubmit={({email,userId}: response) => {
-            setResponse({email:email,userId:userId});
-            setOtpFlow("forgot");
-            setStep("otp");
-          }}
+          onSubmit={handleForgotOnSubmit}
         />
       )}
 
       {/* OTP */}
-      {step === "otp" && (
+      {step === "OTP" && (
         <OtpVerify
-          response={response}
-          type={otpFlow}
-          onVerified={() => {
-            if (otpFlow === "forgot") {
-              setStep("change-password");
-            }
-
-            if (otpFlow === "signup") {
-              alert("Signup OTP verified — go to dashboard next");
-              setStep("login-social"); // TEMP
-            }
-
-            if (otpFlow === "login") {
-              alert("Login OTP verified — backend next");
-              setStep("login-social"); // TEMP
-            }
-          }}
+          otpRequest={otpRequest}
+          type={authFlow}
+          onSuccess={handleOtpOnSuccess}
         />
       )}
 
       {/* CHANGE PASSWORD */}
-      {step === "change-password" && (
+      {step === "CHANGE-PASSWORD" && (
         <ChangePassword
-          onSuccess={() => {
-            alert("Password changed — go login");
-            setStep("login-email");
-          }}
-        />
-      )}
-
-      {/* SIGNUP SOCIAL */}
-      {step === "signup-social" && (
-        <SignupSocial
-          onEmail={() => setStep("signup-email")}
-          onLogin={() => setStep("login-social")}
+          onSuccess={handleChangePasswordOnSuccess}
+          otpRequest={otpRequest}
         />
       )}
 
       {/* SIGNUP EMAIL */}
-      {step === "signup-email" && (
+      {step === "SIGNUP-EMAIL" && (
         <SignupEmail
-          onSubmit={({email,userId}: response) => {
-            setResponse({email:email,userId:userId});
-            setOtpFlow("signup");
-            setStep("otp");
-          }}
+          onSubmit={handleSignUpSubmit}
         />
       )}
     </div>
   );
 };
 
-export default LoginPage;
+export default AuthPage;
