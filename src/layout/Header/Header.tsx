@@ -17,9 +17,10 @@ const Header = ({ showHero = true, category }: HeaderProps) => {
       <TopBar />
 
       <div className={styles.overlayArea}>
-        <CategoryBar />
+          {/*TOGGLE yahn sy ho ga */}
+        <CategoryBar variant={showHero ? "overlay" : "solid"} />
 
-        {showHero && <Hero category={category} />}
+        {showHero && <Hero category={"men"} />}
       </div>
     </header>
   );

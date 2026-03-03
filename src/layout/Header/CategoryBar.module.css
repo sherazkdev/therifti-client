@@ -15,6 +15,35 @@
   z-index: 30;
 }
 
+/* ================================
+   VARIANTS (TOGGLE STYLES)
+================================ */
+
+/* HERO KE UPAR (DEFAULT) */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+}
+
+/* HERO NAHI HAI → BLACK BAR */
+.solid {
+  position: relative; /* 🔴 VERY IMPORTANT */
+  background: #000;
+}
+
+/* Text white rahe */
+.solid .categoryItem,
+.solid .location {
+  color: white;
+}
+
+/* Icons visible */
+.solid .iconBtn {
+  background: rgba(255, 255, 255, 0.15);
+}
+
 /* =====================================================
    LEFT SIDE: CATEGORY LIST
 ===================================================== */

@@ -6,7 +6,6 @@ import SellItem from "../../components/SellNow/SellItem";
 const Sell = () => {
   return (
     <>
-   
     <Header showHero={false}/>
     <SellItem/>
     <PromoFooter/>

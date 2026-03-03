@@ -1,6 +1,10 @@
-//category bar option 
+// CategoryBar.tsx
 import styles from "./CategoryBar.module.css";
 import { MapPin, Globe, ChevronDown } from "../../components/icons";
+
+type CategoryBarProps = {
+  variant?: "overlay" | "solid";
+};
 
 const categories = [
   "Women",
@@ -14,10 +18,13 @@ const categories = [
   "Our Platform",
 ];
 
-const CategoryBar = () => {
+const CategoryBar = ({ variant = "overlay" }: CategoryBarProps) => {
   return (
-    <nav className={styles.categoryBar}>
-      {/* LEFT: categories */}
+    <nav
+      className={`${styles.categoryBar} ${
+        variant === "solid" ? styles.solid : styles.overlay
+      }`}
+    >
       <ul className={styles.categoryList}>
         {categories.map((item) => (
           <li key={item} className={styles.categoryItem}>
@@ -26,7 +33,6 @@ const CategoryBar = () => {
         ))}
       </ul>
 
-      {/* RIGHT: location + globe */}
       <div className={styles.categoryRight}>
         <div className={styles.location}>
           <MapPin size={14} />
