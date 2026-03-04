@@ -1,0 +1,27 @@
+.card {
+  border: 1px solid #eee;
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card h4 {
+  font-size: 16px;
+}
+
+.card p {
+  font-size: 13px;
+  color: #666;
+}
+
+.follow {
+  margin-top: 10px;
+  background: black;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}

@@ -2,11 +2,11 @@ import { useParams } from "react-router-dom";
 import { categories } from "../../data/categories";
 import Header from "../../layout/Header/Header";
 import Hero from "../../components/Hero/Hero";
-import SearchResults from "../../components/SingleProductSearch/SearchResults";
+import SearchResults from "../../components/SingleCategorySearch/SearchResults";
 import MainFooter from "../../components/mainFooter/MainFooter";
 import PromoFooter from "../../components/Promofooter/PromoFooter";
 
-const SingleProduct = () => {
+const SingleCategory = () => {
   const { categoryId } = useParams();
 
   let parentName: string | null = null;
@@ -42,4 +42,4 @@ const SingleProduct = () => {
   );
 };
 
-export default SingleProduct;
+export default SingleCategory;

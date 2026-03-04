@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./SearchResults.module.css";
 import ProductCard from "../productcard/ProductCard"; // Adjust import path if needed
-import { ChevronDown } from "../../components/icons";
+import { ChevronDown } from "../icons";
 import { Shirt, ChevronLeft } from "lucide-react";
 
 /* ---------------- TYPES ---------------- */

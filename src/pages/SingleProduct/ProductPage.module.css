@@ -1,0 +1,26 @@
+.container {
+  max-width: 1240px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.topSection {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 40px;
+  align-items: start;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .topSection {
+    grid-template-columns: 1fr;
+  }
+}
