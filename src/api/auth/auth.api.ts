@@ -1,4 +1,4 @@
-import { type ForgotAccountInterface, type LoginAccountInterface, type LoginApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountTokenAndChangePasswordInterface, type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpInterface, type VerifyRegisterationAccountOtpResponse } from "./auth.types";
+import { type ForgotAccountApiResponse, type ForgotAccountInterface, type LoginAccountInterface, type LoginApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountOtpApiResponse, type VerifyForgotAccountResetTokenAndChangePasswordInterface, type VerifyForgotAccountResetTokenApiResponse,  type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpApiResponse, type VerifyRegisterationAccountOtpInterface } from "./auth.types";
 import type ApiServices from "../../services/api.services";
 
 class AuthServices {
@@ -23,21 +23,28 @@ class AuthServices {
         return response;
     };
 
-    public async ForgotAccount(forgotAccountObj:ForgotAccountInterface){
-        
+    public async ForgotAccount(forgotAccountObj:ForgotAccountInterface):Promise<ForgotAccountApiResponse>{
+        const response = await this.apiServices.Post<ForgotAccountApiResponse>("/auth/forgot-password",forgotAccountObj);
+        return response;
     };
     
-    public async VerifyOtpForgotAccountVerification(verifyObj:VerifyOtpForgotAccountVerificationInterface){};
+    public async VerifyOtpForgotAccountVerification(verifyObj:VerifyOtpForgotAccountVerificationInterface):Promise<VerifyForgotAccountOtpApiResponse>{
+        const response = await this.apiServices.Post<VerifyForgotAccountOtpApiResponse>("/auth/verify-forgot-otp",verifyObj);
+        return response;
+    };
 
-    public async VerifyForgotAccountTokenAndChangePassword(verifyObj:VerifyForgotAccountTokenAndChangePasswordInterface){};
+    public async VerifyForgotAccountResetTokenAndChangePassword(verifyObj:VerifyForgotAccountResetTokenAndChangePasswordInterface):Promise<VerifyForgotAccountResetTokenApiResponse>{
+        const response = await this.apiServices.Patch<VerifyForgotAccountResetTokenApiResponse>("/auth/reset-password",verifyObj);
+        return response;
+    };
 
     public async RegisterAccount(registerAccountObj:RegisterAccountInterface):Promise<RegisterApiResponse>{
         const response = await this.apiServices.Post<RegisterApiResponse>("/auth/register",registerAccountObj);
         return response;
     };
 
-    public async VerifyRegisterationAccountOtp(verifyObj:VerifyRegisterationAccountOtpInterface):Promise<VerifyRegisterationAccountOtpResponse>{
-        const response = await this.apiServices.Patch<VerifyRegisterationAccountOtpResponse>("/auth/registeration-otp-verifier",verifyObj);
+    public async VerifyRegisterationAccountOtp(verifyObj:VerifyRegisterationAccountOtpInterface):Promise<VerifyRegisterationAccountOtpApiResponse>{
+        const response = await this.apiServices.Patch<VerifyRegisterationAccountOtpApiResponse>("/auth/registeration-otp-verifier",verifyObj);
         return response;
     };
 

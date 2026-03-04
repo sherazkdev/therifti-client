@@ -14,6 +14,7 @@ import SocialAuth from "./components/SocialAuth/SocialAuth";
 
 /** Contexts*/
 import { AuthContext } from "../../contexts/auth/AuthContext";
+import type { UserDocumentInterface } from "../../types/auth/auth.types";
 
 const AuthPage = () => {
   const [step, setStep] = useState<AuthSteps>("SOCIAL-AUTH");
@@ -30,7 +31,12 @@ const AuthPage = () => {
   const handleClickOnForgot = () => setStep("FORGOT");
 
   /** Note: Handle Forgot on submit */
-  const handleForgotOnSubmit = () => {};
+  const handleForgotOnSubmit = (optObject:OtpRequestInterface) => {
+    const {email,resetToken,userId} = optObject;
+    setAuthFlow("FORGOT");
+    setOtpRequest({email,resetToken,userId});
+    setStep("OTP");
+  };
 
   /** Note: Handle Login on success */
   const handleSignInOnSuccess = (userDocument:any) => {
@@ -39,12 +45,14 @@ const AuthPage = () => {
   }
 
   /** Note: Handle Otp on Submit */
-  const handleOtpOnSuccess = (userDocument:any) => {
+  const handleOtpOnSuccess = (userDocument?:UserDocumentInterface | null ,resetToken?:string | null) => {
     if(authFlow === "SIGNUP") {
-      handleSetUser(userDocument);
+      handleSetUser(userDocument as UserDocumentInterface);
       Redirect("/",{replace:true});
     }else if(authFlow === "FORGOT"){
       alert("Note: Handle Submit otp Submited");
+      setOtpRequest( (prev) => ({...prev,resetToken:resetToken as string}))
+      setStep("CHANGE-PASSWORD");
     }
   };
 

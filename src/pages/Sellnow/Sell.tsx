@@ -6,13 +6,12 @@ import SellItem from "../../components/SellNow/SellItem";
 const Sell = () => {
   return (
     <>
-   
-    <Header showHero={false}/>
-    <SellItem/>
-    <PromoFooter/>
-    <MainFooter/>
+      <Header variant="solid" /> 
+      <SellItem/>
+      <PromoFooter/>
+      <MainFooter/>
     </>
   )
 }
 
-export default Sell
+export default Sell;

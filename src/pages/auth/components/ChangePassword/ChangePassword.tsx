@@ -4,7 +4,11 @@ import styles from "./ChangePassword.module.css";
 /** Types */
 import type { ChangePasswordFormInterface, ChangePasswordPropsInterface } from "./ChatPassword.types";
 
-export default function ChangePassword({ onSuccess }: ChangePasswordPropsInterface) {
+/** Hooks */
+import useVerifyForgotAccountResetTokenAndChangePassword from "../../../../hooks/server/useVerifyForgotAccountResetTokenAndChangePassword";
+import type { ApiError } from "../../../../types/api/api.interfaces";
+
+export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordPropsInterface) {
   const {
     register,
     handleSubmit,
@@ -13,14 +17,35 @@ export default function ChangePassword({ onSuccess }: ChangePasswordPropsInterfa
   } = useForm<ChangePasswordFormInterface>();
 
   const password = watch("password");
+  const resetPasswordMutation = useVerifyForgotAccountResetTokenAndChangePassword();
 
-  // 👉 BACKEND WILL PLUG API HERE
+  // BACKEND WILL PLUG API HERE
   const handleChangePassword = async (data: ChangePasswordFormInterface) => {
     try {
-      console.log("Change password:", data);
+      const {confirmPassword} = data;
 
-      alert("Password changed successfully (mock)");
+      const changePasswordPayload = {
+        password:confirmPassword,
+        userId:otpRequest.userId as string,
+        resetToken:otpRequest.resetToken as string
+      };
+      console.log(changePasswordPayload);
 
+      resetPasswordMutation.mutate(changePasswordPayload,{
+        onError(err) {
+          if(err.response && err.response.data){
+            const Error = err.response.data as ApiError || undefined;
+            if(Error){
+              console.log(Error);
+            }
+          }
+        },
+        onSuccess(res) {
+          if(res.success === true && res.statusCode === 200){
+            console.log(res);
+          }
+        }
+      })
       // later:
       // await api.post("/auth/reset-password", data);
       // onSuccess();
@@ -71,7 +96,9 @@ export default function ChangePassword({ onSuccess }: ChangePasswordPropsInterfa
         </p>
       )}
 
-      <button type="submit">Submit</button>
+      <button type="submit" className={resetPasswordMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={resetPasswordMutation.isPending}>
+        {resetPasswordMutation.isPending ? (<div className="spinner"></div>) : "Submit"}
+      </button>
     </form>
   );
 }

@@ -19,9 +19,9 @@ export interface VerifyOtpForgotAccountVerificationInterface {
 };
 
 /** @note: Verify forgot account resetToken and changePassword. */
-export interface VerifyForgotAccountTokenAndChangePasswordInterface {
+export interface VerifyForgotAccountResetTokenAndChangePasswordInterface {
   password:string,
-  email:string,
+  userId:string,
   resetToken:string
 };
 
@@ -43,6 +43,10 @@ export interface VerifyRegisterationAccountOtpInterface {
 /** @note: Login response. */
 export type LoginResponseInterface = UserDocumentInterface;
 
+export interface ForgotAccountResponse {
+  userId:string
+}
+
 export interface RegisterResponseInterface {
   userId:string
 };
@@ -54,6 +58,14 @@ export interface LoginApiResponse {
   statusCode: number;
   data: LoginResponseInterface;
 };
+
+/** Note: Forgot account ApiResponse */
+export interface ForgotAccountApiResponse {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data: ForgotAccountResponse;
+}
 
 /** Note: Register user and verify otp */
 export interface RegisterApiResponse {
@@ -69,4 +81,25 @@ export interface VerifyRegisterationAccountOtpApiResponse {
   message: string;
   statusCode: number;
   data:UserDocumentInterface
+};
+
+/** Note: Verify Forgot Account OtpResponse */
+export interface VerifyForgotAccountOtpResponse {
+  resetToken:string
+};
+
+/** Note: Verify Forgot AccountOtp Api Response */
+export interface VerifyForgotAccountOtpApiResponse {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data:VerifyForgotAccountOtpResponse
+};
+
+/** Note: Reset Password Response */
+export interface VerifyForgotAccountResetTokenApiResponse {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data:[]
 }

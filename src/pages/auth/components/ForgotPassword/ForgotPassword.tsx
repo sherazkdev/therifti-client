@@ -1,26 +1,37 @@
 import { useForm } from "react-hook-form";
 import styles from "./ForgotPassword.module.css";
 
+/** Note: Forgot account use hook */
+import useForgot from "../../../../hooks/server/useForgot";
+
 /** Types */
 import type { ForgotPasswordFormInterface,ForgotPasswordPropsInterface } from "./ForgotPassword.types";
-export default function ForgotPassword({ onSubmit }: ForgotPasswordPropsInterface) {
+export default function ForgotPassword({ onSubmit, }: ForgotPasswordPropsInterface) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ForgotPasswordFormInterface>();
 
+  const forgotMutation = useForgot();
+
   // 👉 BACKEND WILL PLUG API HERE
   const handleForgotPassword = async (data:ForgotPasswordFormInterface) => {
     try {
-      console.log("Forgot password email:", data.email);
+      const forgotAccuntPayload:ForgotPasswordFormInterface = data;
+      
+      /** @note: Api Calling */
+      forgotMutation.mutate(forgotAccuntPayload,{
+        onError:(err) => {
+          console.log(err.response);
+        },
+        onSuccess:(res) => {
+          if(res.statusCode === 200 && res.success === true){
+            onSubmit({email:data.email,resetToken:null,userId:res.data.userId});
+          }
+        }
+      })
 
-      // MOCK SUCCESS
-      alert(`Password reset requested for ${data.email}`);
-
-      // later:
-      // await api.post("/auth/forgot-password", data);
-      onSubmit(data.email);   //move to the next page
     } catch {
       alert("Something went wrong. Try again.");
     }

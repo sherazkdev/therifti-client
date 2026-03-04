@@ -1,0 +1,112 @@
+/* ==============================
+   MEGA MENU CONTAINER
+============================== */
+.menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  display: flex;
+  padding: 28px 5%;
+  gap: 70px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==============================
+   LEFT PANEL
+============================== */
+.left {
+  width: 240px;
+  border-right: 1px solid #eee;
+  padding-right: 20px;
+}
+
+
+/* ==============================
+   SEE ALL
+============================== */
+.seeAll {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+/* ==============================
+   SECOND LEVEL ITEMS
+============================== */
+.secondItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #444;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.leftItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hover Effect */
+.secondItem:hover {
+  color: #000;
+}
+
+/* Active Item */
+.active {
+  background: #f3f3f3;
+  font-weight: 600;
+  color: #000;
+}
+
+
+/* ==============================
+   RIGHT PANEL (THIRD LEVEL)
+============================== */
+.right {
+  display: grid;
+
+  /* Fill vertically first */
+  grid-auto-flow: column;
+
+  /* 8 items per column */
+  grid-template-rows: repeat(8, auto);
+
+  gap: 12px 60px;
+
+  /* Fixed height so it doesn't grow infinitely */
+  max-height: 320px;
+  min-width: 220px;
+}
+
+
+/* ==============================
+   THIRD LEVEL ITEMS
+============================== */
+.thirdItem {
+  font-size: 15px;
+  font-weight: 400;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.thirdItem:hover {
+  color: #000;
+  transform: translateX(4px);
+}

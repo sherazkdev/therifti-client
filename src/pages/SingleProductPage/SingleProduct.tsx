@@ -9,7 +9,7 @@ import PromoFooter from "../../components/Promofooter/PromoFooter";
 const SingleProduct = () => {
   return (  
     <>
-    <Header/>
+    <Header />
     <SearchResults/>
     <PromoFooter/>
     <MainFooter/>

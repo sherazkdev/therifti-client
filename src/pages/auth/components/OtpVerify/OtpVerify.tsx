@@ -3,6 +3,7 @@ import styles from "./OtpVerify.module.css";
 
 /** Hooks */
 import useVerifyRegisterationOtp from "../../../../hooks/server/useVerifyRegisterationOtp";
+import useVerifyForgotAccountOtp from "../../../../hooks/server/useVerifyForgotAccountOtp";
 import type { ApiError } from "../../../../types/api/api.interfaces";
 
 /** @note: AuthProviders */
@@ -16,7 +17,9 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
 
   const inputsRef = useRef<HTMLInputElement[]>([]);
   const verifyVerifyRegisterationMutation = useVerifyRegisterationOtp();
-  
+  const verifyForgotAccountOtpMutation = useVerifyForgotAccountOtp();
+  const isLoading = (type === "SIGNUP" && verifyVerifyRegisterationMutation.isPending) || (type === "FORGOT" && verifyForgotAccountOtpMutation.isPending);
+
   /** Note: Contexts */
   const {handleSetUser} = useContext(AuthContext);
 
@@ -89,35 +92,48 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
   const isComplete = otp.every((d) => d !== "");
 
 
-
   // plug in the real API inside handleVerify    on continue this handle 
   const handleVerify = async () => {
     try {
       const isValid = false; // for testing purppose only;
       const payload = {
-        type,
         userId:otpRequest.userId as string,
         otp:Object.values(inputsRef.current)
             .map(input => input.value)
             .join('')
       };
-      console.log(payload)
-      verifyVerifyRegisterationMutation.mutate(payload,{
-        onError:(resErr) => {
-          const err = resErr.response?.data as ApiError || undefined;
-          console.log(err)
-          if(err){
-            setError(err.message);
+      if(type === "SIGNUP"){
+        verifyVerifyRegisterationMutation.mutate(payload,{
+          onError:(resErr) => {
+            const err = resErr.response?.data as ApiError || undefined;
+            console.log(err)
+            if(err){
+              setError(err.message);
+            }
+          },
+          onSuccess:(res) => {
+            if(res.success === true && res.statusCode === 200){
+              onSuccess(res.data,null);
+            }
           }
-        },
-        onSuccess:(res) => {
-          if(res.success === true && res.statusCode === 200){
-            onSuccess(res.data);
+        })
+      }else if(type === "FORGOT"){
+        verifyForgotAccountOtpMutation.mutate(payload,{
+          onError:(resErr) => {
+            const err = resErr.response?.data as ApiError || undefined;
+            console.log(err)
+            if(err){
+              setError(err.message);
+            }
+          },
+          onSuccess:(res) => {
+            if(res.success === true && res.statusCode === 200){
+              onSuccess(null,res.data.resetToken);
+            }
           }
-        }
-      })
+        })
+      }
 
-      // onVerified(otp.join(""));
     } catch {
       setError("Something went wrong. Try again.");
     }
@@ -158,8 +174,8 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
 
       {error && <p className={styles.errorText}>{error}</p>}
 
-      <button type="submit" onClick={handleVerify} className={verifyVerifyRegisterationMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={verifyVerifyRegisterationMutation.isPending}>
-        {verifyVerifyRegisterationMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
+      <button type="submit" onClick={handleVerify} className={isLoading? styles.submitBtnIsFetching : styles.submitBtn} disabled={isLoading}>
+        {isLoading ? (<div className="spinner"></div>) : "Continue"}
       </button>
 
       {time > 0 ? (
