@@ -37,7 +37,6 @@ const SingleProduct = () => {
       <Header variant="overlay" />
       <Hero category={parentName} />
       <SearchResults />
-      <PromoFooter />
       <MainFooter />
     </>
   );
