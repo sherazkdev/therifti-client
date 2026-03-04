@@ -5,7 +5,7 @@ import type { Category } from "../../types/category";
 
 type Props = {
   categories: Category[];
-  onCategoryClick: (id: string, name?: string) => void;
+  onCategoryClick: (id: string, parentName?: string) => void;
   variant?: "overlay" | "solid";
 };
 
@@ -23,22 +23,27 @@ const CategoryBar: React.FC<Props> = ({
       }`}
       onMouseLeave={() => setActive(null)}
     >
+      {/* ================= PARENT CATEGORY LIST ================= */}
       <ul className={styles.categoryList}>
         {categories.map((cat) => (
           <li
             key={cat.id}
             className={styles.categoryItem}
             onMouseEnter={() => setActive(cat)}
+            onClick={() => onCategoryClick(cat.id, cat.name)}  //  Parent click
           >
             {cat.name}
           </li>
         ))}
       </ul>
 
+      {/* ================= MEGA MENU ================= */}
       {active && (
         <MegaMenu
           category={active}
-          onCategoryClick={(id) => onCategoryClick(id, active?.name)}
+          onCategoryClick={(id) =>
+            onCategoryClick(id, active.name)   // Pass parent name always
+          }
         />
       )}
     </nav>

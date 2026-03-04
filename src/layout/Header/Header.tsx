@@ -4,33 +4,42 @@ import CategoryBar from "./CategoryBar";
 import styles from "./Topbar.module.css";
 import { categories } from "../../data/categories";
 import type { Category } from "../../types/category";
+import { useNavigate } from "react-router-dom";
+
+
 
 type HeaderProps = {
   variant?: "overlay" | "solid";
   onParentCategorySelect?: (name: string) => void;
 };
 
-const Header = ({ 
+const Header = ({
   variant = "overlay",
   onParentCategorySelect
 }: HeaderProps) => {
 
   const [selectedParent, setSelectedParent] = useState<string | null>(null);
 
-  const handleCategoryClick = (id: string) => {
-    const parent = categories.find(cat => cat.id === id);
+const navigate = useNavigate();
 
-    if (parent) {
-      setSelectedParent(parent.name);
-      onParentCategorySelect?.(parent.name);
-    }
+// const handleCategoryClick = (id: string, name?: string) => {
 
-    const payload = {
-      categoryId: id,
-    };
+//   const payload = {
+//     categoryId: id,
+//   };
 
-    console.log("Header Payload:", payload);
-  };
+//   console.log("Header Payload:", payload);
+
+//   if (name) {
+//     navigate(`/category/${name.toLowerCase()}`);
+//   }
+// };
+
+const handleCategoryClick = (id: string, Name?: string) => {
+  console.log("Header Payload:", { categoryId: id , itemName: Name || null});
+
+  navigate(`/category/${id}`);
+};
 
   return (
     <header className={styles.header}>

@@ -13,7 +13,9 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<LoginPage/>}/>
       <Route path="/sell" element={<Sell/>}/>
-      <Route path="/category/:category" element={<SingleProduct />} />
+      {/* <Route path="/category/:categoryName" element={<SingleProduct/>}/> */} //route by name 
+
+      <Route path="/category/:categoryId" element={<SingleProduct />} />  //route by id 
 
       
 

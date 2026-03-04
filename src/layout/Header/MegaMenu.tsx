@@ -36,10 +36,10 @@ const MegaMenu = ({ category, onCategoryClick }: Props) => {
           return (
             <div
               key={child.id}
-              className={`${styles.secondItem} ${
-                activeChild?.id === child.id ? styles.active : ""
-              }`}
+              className={`${styles.secondItem} ${activeChild?.id === child.id ? styles.active : ""
+                }`}
               onMouseEnter={() => setActiveChild(child)}
+              onClick={() => onCategoryClick(child.id)}   
             >
               <div className={styles.leftItem}>
                 {Icon && <Icon size={18} />}

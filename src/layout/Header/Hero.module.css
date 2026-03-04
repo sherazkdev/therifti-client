@@ -1,0 +1,201 @@
+/* =====================================================
+   HERO SLIDER SECTION
+===================================================== */
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 630px;
+  overflow: hidden;
+}
+
+/* ✅ BACKGROUND SLIDES (stacked + premium fade + zoom) */
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+
+  opacity: 0;
+  transform: scale(1.03);
+
+  transition: opacity 1.4s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 2.2s ease;
+
+  will-change: opacity, transform;
+}
+
+.activeSlide {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* DARK OVERLAY */
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1;
+}
+
+/* ✅ CENTER CONTENT + animation */
+
+.heroOverlay {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  padding: 0 1rem;
+
+  animation: fadeUp 650ms ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.heroOverlay h1 {
+  font-size: 4rem;
+  font-weight: 700;
+  max-width: 900px;
+}
+
+.heroOverlay p {
+  margin-top: 14px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+/* CTA BUTTON */
+
+.heroBtn {
+  margin-top: 28px;
+  background: white;
+  color: black;
+  padding: 12px 38px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  border: none;
+}
+
+.heroBtn:focus {
+  outline: none;
+}
+
+.heroBtnArrow {
+  width: 25px;
+  height: 25px;
+  background: rgb(119, 117, 117);
+  color: white;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+/* SLIDER ARROWS */
+
+.heroArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  border: none;
+  backdrop-filter: blur(6px);
+}
+
+.heroArrow:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.heroArrow:focus {
+  outline: none;
+}
+
+.left {
+  left: 26px;
+}
+
+.right {
+  right: 26px;
+}
+
+/* SLIDER DOTS */
+
+.heroDots {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 10px;
+}
+
+.dot {
+  width: 28px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.activeDot {
+  background: white;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1024px) {
+  .heroOverlay h1 {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 440px;
+  }
+
+  .heroOverlay h1 {
+    font-size: 30px;
+  }
+
+  /* ✅ Hide arrows on mobile */
+  .heroArrow {
+    display: none;
+  }
+}
+
+@media (min-width: 1400px) {
+  .hero {
+    height: 740px;
+  }
+}
