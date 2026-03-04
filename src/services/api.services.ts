@@ -1,4 +1,5 @@
 import axios,{type AxiosInstance, type AxiosResponse} from "axios";
+import { getAccessToken } from "../api/auth/auth";
 
 class ApiServices {
     private api:AxiosInstance;
@@ -10,7 +11,15 @@ class ApiServices {
             baseURL,
             withCredentials:true,
             timeout:10000
-        }); 
+        });
+
+        this.api.interceptors.request.use( async (config) => {
+            const accessToken = getAccessToken();
+            if(accessToken){
+                config.headers["Authorization"] = `Bearer ${accessToken}`;
+            }
+            return config;
+        },err => Promise.reject(err));
     }
     
     /**

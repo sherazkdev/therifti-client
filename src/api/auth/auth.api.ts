@@ -1,4 +1,4 @@
-import { type ForgotAccountApiResponse, type ForgotAccountInterface, type LoginAccountInterface, type LoginApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountOtpApiResponse, type VerifyForgotAccountResetTokenAndChangePasswordInterface, type VerifyForgotAccountResetTokenApiResponse,  type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpApiResponse, type VerifyRegisterationAccountOtpInterface } from "./auth.types";
+import { type ForgotAccountApiResponse, type ForgotAccountInterface, type LoggedInUserApiResponse, type LoginAccountInterface, type LoginApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountOtpApiResponse, type VerifyForgotAccountResetTokenAndChangePasswordInterface, type VerifyForgotAccountResetTokenApiResponse,  type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpApiResponse, type VerifyRegisterationAccountOtpInterface } from "./auth.types";
 import type ApiServices from "../../services/api.services";
 
 class AuthServices {
@@ -49,6 +49,11 @@ class AuthServices {
     };
 
     public async LogoutAccount(){};
+
+    public async CurrentUser():Promise<LoggedInUserApiResponse> {
+        const response = await this.apiServices.Get<LoggedInUserApiResponse>("/auth/current-user");
+        return response;
+    }
 }
 
 export default AuthServices;

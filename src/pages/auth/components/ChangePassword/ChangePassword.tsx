@@ -5,8 +5,10 @@ import styles from "./ChangePassword.module.css";
 import type { ChangePasswordFormInterface, ChangePasswordPropsInterface } from "./ChatPassword.types";
 
 /** Hooks */
-import useVerifyForgotAccountResetTokenAndChangePassword from "../../../../hooks/server/useVerifyForgotAccountResetTokenAndChangePassword";
+import useVerifyForgotAccountResetTokenAndChangePassword from "../../../../hooks/server/auth/useVerifyForgotAccountResetTokenAndChangePassword";
 import type { ApiError } from "../../../../types/api/api.interfaces";
+import { useState } from "react";
+import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
 
 export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordPropsInterface) {
   const {
@@ -15,6 +17,8 @@ export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordP
     watch,
     formState: { errors },
   } = useForm<ChangePasswordFormInterface>();
+  const [serverError,setServerError] = useState<string | null>(null);
+  const [isPasswordChanges,setIsPasswordChanged] = useState<boolean>(false);
 
   const password = watch("password");
   const resetPasswordMutation = useVerifyForgotAccountResetTokenAndChangePassword();
@@ -29,28 +33,29 @@ export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordP
         userId:otpRequest.userId as string,
         resetToken:otpRequest.resetToken as string
       };
-      console.log(changePasswordPayload);
 
       resetPasswordMutation.mutate(changePasswordPayload,{
         onError(err) {
           if(err.response && err.response.data){
             const Error = err.response.data as ApiError || undefined;
-            if(Error){
-              console.log(Error);
+            if(Error){              
+              if(Error.errorCode === "VALIDATION_FAILED"){
+                setServerError(Error.message);
+                return;
+              }
+              setServerError(AUTH_ERROR_MESSAGES[Error.errorCode])
+              return;
             }
           }
         },
         onSuccess(res) {
           if(res.success === true && res.statusCode === 200){
-            console.log(res);
+            setIsPasswordChanged(true);
           }
         }
       })
-      // later:
-      // await api.post("/auth/reset-password", data);
-      // onSuccess();
-    } catch {
-      alert("Failed to change password");
+    } catch(err:any) {
+      return;
     }
   };
 
@@ -60,45 +65,50 @@ export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordP
       onSubmit={handleSubmit(handleChangePassword)}
     >
       <h2>Change password</h2>
+      {!isPasswordChanges ? (
+        <>
+          {/* NEW PASSWORD */}
+          <input
+            placeholder="New password"
+            type="password"
+            {...register("password", {
+              required: "Password required",
+              pattern: {
+                value: /^(?=.*[A-Za-z])(?=.*\d).{7,}$/,
+                message:
+                  "Enter at least 7 characters, including at least 1 letter and at least 1 number",
+              },
+            })}
+          />
 
-      {/* NEW PASSWORD */}
-      <input
-        placeholder="New password"
-        type="password"
-        {...register("password", {
-          required: "Password required",
-          pattern: {
-            value: /^(?=.*[A-Za-z])(?=.*\d).{7,}$/,
-            message:
-              "Enter at least 7 characters, including at least 1 letter and at least 1 number",
-          },
-        })}
-      />
+          {errors.password && (
+            <p className={styles.error}>{errors.password.message}</p>
+          )}
 
-      {errors.password && (
-        <p className={styles.error}>{errors.password.message}</p>
+          {/* CONFIRM PASSWORD */}
+          <input
+            placeholder="Reenter your new password"
+            type="password"
+            {...register("confirmPassword", {
+              required: "Confirm your password",
+              validate: (val:string) =>
+                val === password || "Passwords do not match",
+            })}
+          />
+
+          {errors.confirmPassword && (
+            <p className={styles.error}>
+              {errors.confirmPassword.message}
+            </p>
+          )}
+
+          <button type="submit" className={resetPasswordMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={resetPasswordMutation.isPending}>
+            {resetPasswordMutation.isPending ? (<div className="spinner"></div>) : "Submit"}
+          </button>
+        </>
+      ): (
+        <p>Your password has been changed successfully.</p>
       )}
-
-      {/* CONFIRM PASSWORD */}
-      <input
-        placeholder="Reenter your new password"
-        type="password"
-        {...register("confirmPassword", {
-          required: "Confirm your password",
-          validate: (val:string) =>
-            val === password || "Passwords do not match",
-        })}
-      />
-
-      {errors.confirmPassword && (
-        <p className={styles.error}>
-          {errors.confirmPassword.message}
-        </p>
-      )}
-
-      <button type="submit" className={resetPasswordMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={resetPasswordMutation.isPending}>
-        {resetPasswordMutation.isPending ? (<div className="spinner"></div>) : "Submit"}
-      </button>
     </form>
   );
 }

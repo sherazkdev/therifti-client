@@ -28,6 +28,7 @@
     "@tiptap/extensions": "^3.19.0",
     "@tiptap/pm": "^3.19.0",
     "axios": "^1.13.6",
+    "expo-secure-store": "^55.0.8",
     "lodash.throttle": "^4.1.1",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",

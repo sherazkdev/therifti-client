@@ -1,9 +1,9 @@
-import { type ForgotAccountApiResponse, type ForgotAccountInterface } from "../../api/auth/auth.types";
+import { type ForgotAccountApiResponse, type ForgotAccountInterface } from "../../../api/auth/auth.types";
 import { useMutation } from "@tanstack/react-query";
 
 /** Services */
-import AuthServices from "../../api/auth/auth.api";
-import ApiServices from "../../services/api.services";
+import AuthServices from "../../../api/auth/auth.api";
+import ApiServices from "../../../services/api.services";
 import type { AxiosError } from "axios";
 
 /** @note: Server url. */

@@ -41,7 +41,13 @@ export interface VerifyRegisterationAccountOtpInterface {
 };
 
 /** @note: Login response. */
-export type LoginResponseInterface = UserDocumentInterface;
+export type LoginResponseInterface = {
+  user:UserDocumentInterface,
+  tokens:{
+    refreshToken:string,
+    accessToken:string
+  }
+};
 
 export interface ForgotAccountResponse {
   userId:string
@@ -75,12 +81,21 @@ export interface RegisterApiResponse {
   data:RegisterResponseInterface
 };
 
+/** Note: Verify Registeration AccountOtp Response.*/
+export interface VerifyRegisterationAccountOtpResponse {
+  user:UserDocumentInterface,
+  tokens:{
+    refreshToken:string,
+    accessToken:string
+  }
+}
+
 /** Note: Verify Registeration AccountOtp Response. */
 export interface VerifyRegisterationAccountOtpApiResponse {
   success: boolean;
   message: string;
   statusCode: number;
-  data:UserDocumentInterface
+  data:VerifyRegisterationAccountOtpResponse
 };
 
 /** Note: Verify Forgot Account OtpResponse */
@@ -102,4 +117,16 @@ export interface VerifyForgotAccountResetTokenApiResponse {
   message: string;
   statusCode: number;
   data:[]
+};
+
+/** Note: LoggedIn User Response */
+export type LoggedInUserResponse = UserDocumentInterface;
+
+/** Note: LoggedIn User Api Response */
+export interface LoggedInUserApiResponse {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data:LoggedInUserResponse
 }
+

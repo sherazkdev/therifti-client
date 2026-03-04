@@ -4,8 +4,8 @@ import styles from "./Auth.module.css";
 
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 import OtpVerify from "./components/OtpVerify/OtpVerify";
-import EmailSignIn from "./components/EmailSignIn/EmailSignIn";
-import SignupEmail from "./components/SignUp/SignupEmail";
+import SignUp from "./components/SignUp/SignUp";
+import EmailSignIn from "./components/SignIn/SignIn";
 import ChangePassword from "./components/ChangePassword/ChangePassword";
 
 /** Interfaces */
@@ -146,7 +146,7 @@ const AuthPage = () => {
 
       {/* SIGNUP EMAIL */}
       {step === "SIGNUP-EMAIL" && (
-        <SignupEmail
+        <SignUp
           onSubmit={handleSignUpSubmit}
         />
       )}

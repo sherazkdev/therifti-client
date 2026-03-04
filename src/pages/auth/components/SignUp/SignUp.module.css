@@ -13,34 +13,18 @@
   margin-bottom: 22px;
 }
 
-.submitBtnIsFetching {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #ddd;
-  color: white;
-  border: none;
-  padding: 13px;
-  margin-top: 10px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
 
 /* FIELD */
 
 .field {
-  margin-bottom: 25px;
+  margin-bottom: 0;
 }
 
 .field input {
   width: 100%;
   border: none;
   border-bottom: 1px solid #ddd;
-  padding: 12px 0;
+  padding: 10px 0;
   font-size: 14px;
   -webkit-box-shadow: 0 0 0px 1000px white inset;
   transition: background-color 5000s ease-in-out 0s;

@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import styles from "./SignupEmail.module.css";
+import styles from "./Signup.module.css";
 import { EyeIcon } from "../../../../components/icons";
 
 /** Note: Api Hooks */
-import useRegister from "../../../../hooks/server/useRegister";
+import useRegister from "../../../../hooks/server/auth/useRegister";
 import type { ApiError } from "../../../../types/api/api.interfaces";
 import type { SignUpEmailPropsInterface, SignUpFormInterface } from "./SignUp.types";
+import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
 
-export default function SignupEmail({ onSubmit }: SignUpEmailPropsInterface) {
+export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError,setServerError] = useState<string | null>(null);
   const { register,handleSubmit,formState: { errors, isValid },} = useForm<SignUpFormInterface>({mode: "onChange"});
+  
   const registerMutation = useRegister();
+  const isLoading = registerMutation.isPending;
 
- const handleSignup = async (data: SignUpFormInterface) => {
+  const handleSignup = async (data: SignUpFormInterface) => {
   try {
-    console.log("Signup form data:", data);
 
     // @note: Register Api Payload.
     const registerationPayload = {
@@ -30,9 +32,13 @@ export default function SignupEmail({ onSubmit }: SignUpEmailPropsInterface) {
     registerMutation.mutate(registerationPayload,{
       onError:(resErr) => {
         const err = resErr.response?.data as ApiError || undefined;
-        console.log(err)
         if(err){
-          setServerError(err.message);
+          if(err.errorCode === "VALIDATION_FAILED"){
+            setServerError(err.message);
+            return;
+          }
+          setServerError(AUTH_ERROR_MESSAGES[err.errorCode]);
+          return;
         }
       },
       onSuccess:(res) => {
@@ -42,9 +48,7 @@ export default function SignupEmail({ onSubmit }: SignUpEmailPropsInterface) {
   } catch (err) {
     console.error(err);
   }
-};
-
-
+  };
 
   return (
     <form
@@ -184,9 +188,10 @@ export default function SignupEmail({ onSubmit }: SignUpEmailPropsInterface) {
       </div>
 
       {/* SUBMIT */}
-      <button type="submit" className={registerMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={registerMutation.isPending}>
-        {registerMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
+      <button type="submit" className={isLoading ? "submitBtnIsFetching" : styles.submitBtn} disabled={isLoading}>
+        {isLoading ? (<div className="spinner"></div>) : "Continue"}
       </button>
+
 
     </form>
   );

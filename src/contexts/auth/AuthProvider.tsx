@@ -1,8 +1,10 @@
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState,useEffect } from "react";
 import { AuthContext } from "./AuthContext";
 
 /** Types */
 import type { UserDocumentInterface } from "../../types/auth/auth.types";
+import useUser from "../../hooks/server/auth/useUser";
+import { AxiosError } from "axios";
 
 export const AuthProvider = ({ children }:{children:ReactNode}) => {
   const [user, setUser] = useState<UserDocumentInterface | null>(null);
@@ -15,7 +17,31 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
       setIsAuthenticated(true);
   };
 
-  
+  /** Note: Check User is Authenticated */
+  const { data, refetch, isLoading} = useUser();
+
+  useEffect( () => {
+    const handleFetchAuthenticatedUser = async ():Promise<void> => {
+      try {
+        refetch();
+      } catch (e:any) {
+        if(e instanceof AxiosError){
+          console.log(e);
+        }
+      }
+    };
+
+    /** Cleanup Timer */
+    const timer = setTimeout(handleFetchAuthenticatedUser,100);
+    return () => clearTimeout(timer);
+  },[isAuthenticated]);
+
+  useEffect( () => {
+    if(data){
+      console.log(data);
+      handleSetUser(data);
+    }
+  },[data])
 
   return (
     <AuthContext.Provider value={{handleSetUser,isAuthenticated,user}}>

@@ -1,43 +1,53 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import styles from "./EmailSignIn.module.css";
+import styles from "./SignIn.module.css";
 import { EyeIcon } from "../../../../components/icons";
 
 /** @note: Hook */
-import useLogin from "../../../../hooks/server/useLogin";
+import useLogin from "../../../../hooks/server/auth/useLogin";
 
 /** Types */
-import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "./EmailSignIn.types";
+import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "./SignIn.types";
 import type { ApiError } from "../../../../types/api/api.interfaces";
+import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
+import { saveRefreshToken,saveAccessToken } from "../../../../api/auth/auth"; 
 
-export default function EmailSignIn({ onForgot, onSuccess}: EmailLoginPropsInterface) {
+export default function SignIn({ onForgot, onSuccess}: EmailLoginPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError,setServerError] = useState<string | null>(null);
-
-  const loginMutation = useLogin();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<EmailLoginFormInterface>();
 
+  const loginMutation = useLogin();
+  const isLoading = loginMutation.isPending;
+  
 
   //handler that get the form response 
   const handleLogin = async (data: EmailLoginFormInterface) => {
     try {
-      console.log(data)
       loginMutation.mutate(data,{
         onError(err) {
           if(err.response && err.response.data){
             const Error = err.response.data as ApiError || undefined;
             if(Error){
-              setServerError(Error.message);
+              if(Error.errorCode === "VALIDATION_FAILED"){
+                setServerError(Error.message);
+                return;
+              }
+              setServerError(AUTH_ERROR_MESSAGES[Error.errorCode]);
+              return;
             }
           }
         },
         onSuccess(res) {
           if(res.success === true && res.statusCode === 200){
-            onSuccess(res.data);
+              const {user,tokens:{accessToken,refreshToken}} = res.data;
+              saveRefreshToken(refreshToken);
+              saveAccessToken(accessToken);
+              onSuccess(user);
           }
         }
       });
@@ -103,8 +113,8 @@ export default function EmailSignIn({ onForgot, onSuccess}: EmailLoginPropsInter
       </div>
 
       {/* SUBMIT */}
-      <button type="submit" className={loginMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={loginMutation.isPending}>
-        {loginMutation.isPending ? (<div className="spinner"></div>) : "Continue"}
+      <button type="submit" className={isLoading ? "submitBtnIsFetching" : styles.submitBtn} disabled={isLoading}>
+        {isLoading ? (<div className="spinner"></div>) : "Continue"}
       </button>
 
       <span className={styles.link} onClick={onForgot}>

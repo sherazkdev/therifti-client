@@ -2,13 +2,15 @@ import { useEffect, useRef, useState,useContext } from "react";
 import styles from "./OtpVerify.module.css";
 
 /** Hooks */
-import useVerifyRegisterationOtp from "../../../../hooks/server/useVerifyRegisterationOtp";
-import useVerifyForgotAccountOtp from "../../../../hooks/server/useVerifyForgotAccountOtp";
+import useVerifyRegisterationOtp from "../../../../hooks/server/auth/useVerifyRegisterationOtp";
+import useVerifyForgotAccountOtp from "../../../../hooks/server/auth/useVerifyForgotAccountOtp";
 import type { ApiError } from "../../../../types/api/api.interfaces";
+import { saveRefreshToken,saveAccessToken } from "../../../../api/auth/auth"; 
 
 /** @note: AuthProviders */
 import { AuthContext } from "../../../../contexts/auth/AuthContext";
 import type { OtpVerifyPropsInterface } from "./OtpVerify.types";
+import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
 
 export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsInterface) {
   const [otp, setOtp] = useState(["", "", "", ""]);
@@ -108,12 +110,20 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
             const err = resErr.response?.data as ApiError || undefined;
             console.log(err)
             if(err){
-              setError(err.message);
+              if(err.errorCode === "VALIDATION_FAILED"){
+                setError(err.errorCode);
+                return;
+              }
+              setError(AUTH_ERROR_MESSAGES[err.errorCode]);
+              return;
             }
           },
           onSuccess:(res) => {
             if(res.success === true && res.statusCode === 200){
-              onSuccess(res.data,null);
+              const {user,tokens:{accessToken,refreshToken}} = res.data;
+              saveRefreshToken(refreshToken);
+              saveAccessToken(accessToken);
+              onSuccess(user,null);
             }
           }
         })
@@ -121,9 +131,13 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
         verifyForgotAccountOtpMutation.mutate(payload,{
           onError:(resErr) => {
             const err = resErr.response?.data as ApiError || undefined;
-            console.log(err)
             if(err){
-              setError(err.message);
+              if(err.errorCode === "VALIDATION_FAILED"){
+                setError(err.errorCode);
+                return;
+              }
+              setError(AUTH_ERROR_MESSAGES[err.errorCode]);
+              return;
             }
           },
           onSuccess:(res) => {
@@ -174,7 +188,7 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
 
       {error && <p className={styles.errorText}>{error}</p>}
 
-      <button type="submit" onClick={handleVerify} className={isLoading? styles.submitBtnIsFetching : styles.submitBtn} disabled={isLoading}>
+      <button type="submit" onClick={handleVerify} className={isLoading ? "submitBtnIsFetching" : styles.submitBtn} disabled={isLoading}>
         {isLoading ? (<div className="spinner"></div>) : "Continue"}
       </button>
 

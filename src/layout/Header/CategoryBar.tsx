@@ -1,11 +1,14 @@
+
+
 import React, { useState } from "react";
 import styles from "./CategoryBar.module.css";
 import MegaMenu from "./MegaMenu";
 import type { Category } from "../../types/category";
+import { MapPin, Globe } from "lucide-react";
 
 type Props = {
   categories: Category[];
-  onCategoryClick: (id: string, name?: string) => void;
+  onCategoryClick: (id: string, parentName?: string) => void;
   variant?: "overlay" | "solid";
 };
 
@@ -23,22 +26,43 @@ const CategoryBar: React.FC<Props> = ({
       }`}
       onMouseLeave={() => setActive(null)}
     >
+      {/* ================= LEFT SIDE CATEGORY LIST ================= */}
       <ul className={styles.categoryList}>
         {categories.map((cat) => (
           <li
             key={cat.id}
             className={styles.categoryItem}
             onMouseEnter={() => setActive(cat)}
+            onClick={() => {
+              onCategoryClick(cat.id, cat.name);
+              setActive(null); 
+            }}
           >
-            {cat.name}
+            {cat.title}
           </li>
         ))}
       </ul>
 
+      {/* ================= RIGHT SIDE (LOCATION + GLOBE) ================= */}
+      <div className={styles.categoryRight}>
+        <div className={styles.location}>
+          <MapPin size={16} />
+          <span>Rio, Brazil</span>
+        </div>
+
+        <button className={styles.iconBtn}>
+          <Globe size={16} />
+        </button>
+      </div>
+
+      {/* ================= MEGA MENU ================= */}
       {active && (
         <MegaMenu
           category={active}
-          onCategoryClick={(id) => onCategoryClick(id, active?.name)}
+          onCategoryClick={(id) => {
+            onCategoryClick(id, active.name);
+            setActive(null); 
+          }}
         />
       )}
     </nav>
