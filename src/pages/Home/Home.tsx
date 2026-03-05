@@ -3,7 +3,6 @@ import FeaturedCategories from "../../components/featured-categories/FeaturedCat
 import TopPicks from "../../components/homeSearch/TopPicks";
 import MainFooter from "../../components/mainFooter/MainFooter";
 import PromoFooter from "../../components/Promofooter/PromoFooter";
-import Header from "../../layout/Header/Header";
 import Hero from "../../components/Hero/Hero";
 
 const Home = () => {
@@ -12,11 +11,6 @@ const Home = () => {
 
   return (
    <>
-     <Header 
-       variant="overlay"
-       onParentCategorySelect={setParentCategory}
-     />
-
      <Hero category={parentCategory} />
      <FeaturedCategories/>
      <TopPicks/>

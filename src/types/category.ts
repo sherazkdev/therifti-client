@@ -1,6 +1,6 @@
 export interface Category {
-  id: string;
-  name: string;
+  _id: string;
+  title: string;
   icon?: any;  // only for second level
   children?: Category[];
 }

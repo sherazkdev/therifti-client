@@ -1,6 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 
+/** Note: Layouts */
+import MainLayout from "./layouts/Main/mainLayout";
+
 const Home = lazy(() => import("./pages/Home/Home"));
 const LoginPage = lazy(() => import("./pages/auth/Auth"));
 const Sell = lazy(() => import("./pages/Sellnow/Sell"));
@@ -12,17 +15,18 @@ function App() {
     <Suspense fallback={<div>Loading...</div>}>
 
       <Routes>
-
-        <Route path="/" element={<Home />} />
-
-        <Route path="/login" element={<LoginPage />} />
-
-        <Route path="/sell" element={<Sell />} />
-
-        <Route path="/category/:categoryId" element={<SingleCategory />} />
-
-        <Route path="/product/:productId" element={<ProductPage />} />
-
+        
+        {/* Main Layout */}
+        <Route element={<MainLayout />}>  
+      
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/sell" element={<Sell />} />
+          <Route path="/category/:categoryId" element={<SingleCategory />} />
+          <Route path="/product/:productId" element={<ProductPage />} />
+          <Route path="*" element={<h1> Not Found </h1>} />
+        </Route>
+      
       </Routes>
 
     </Suspense>

@@ -2,17 +2,13 @@
 
 import React, { useState } from "react";
 import styles from "./CategoryBar.module.css";
-import MegaMenu from "./MegaMenu";
-import type { Category } from "../../types/category";
+import MegaMenu from "../MegaMenu/MegaMenu";
+import type { Category } from "../../../types/category";
 import { MapPin, Globe } from "lucide-react";
+import type { CategoryPropsInterface } from "./Category.types";
 
-type Props = {
-  categories: Category[];
-  onCategoryClick: (id: string, parentName?: string) => void;
-  variant?: "overlay" | "solid";
-};
 
-const CategoryBar: React.FC<Props> = ({
+const CategoryBar: React.FC<CategoryPropsInterface> = ({
   categories,
   onCategoryClick,
   variant = "overlay",
@@ -30,11 +26,11 @@ const CategoryBar: React.FC<Props> = ({
       <ul className={styles.categoryList}>
         {categories.map((cat) => (
           <li
-            key={cat.id}
+            key={cat._id}
             className={styles.categoryItem}
             onMouseEnter={() => setActive(cat)}
             onClick={() => {
-              onCategoryClick(cat.id, cat.name);
+              onCategoryClick(cat._id, cat.title);
               setActive(null); 
             }}
           >
@@ -60,7 +56,7 @@ const CategoryBar: React.FC<Props> = ({
         <MegaMenu
           category={active}
           onCategoryClick={(id) => {
-            onCategoryClick(id, active.name);
+            onCategoryClick(id, active.title);
             setActive(null); 
           }}
         />

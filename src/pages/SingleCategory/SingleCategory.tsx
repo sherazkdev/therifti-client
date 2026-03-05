@@ -1,10 +1,7 @@
 import { useParams } from "react-router-dom";
 import { categories } from "../../data/categories";
-import Header from "../../layout/Header/Header";
 import Hero from "../../components/Hero/Hero";
 import SearchResults from "../../components/SingleCategorySearch/SearchResults";
-import MainFooter from "../../components/mainFooter/MainFooter";
-import PromoFooter from "../../components/Promofooter/PromoFooter";
 
 const SingleCategory = () => {
   const { categoryId } = useParams();
@@ -13,20 +10,20 @@ const SingleCategory = () => {
 
   categories.forEach((parent) => {
     // If parent clicked
-    if (parent.id === categoryId) {
-      parentName = parent.name;
+    if (parent._id === categoryId) {
+      parentName = parent.title;
     }
 
     // If second-level clicked
     parent.children?.forEach((child) => {
-      if (child.id === categoryId) {
-        parentName = parent.name;
+      if (child._id === categoryId) {
+        parentName = parent.title;
       }
 
       // If third-level clicked
       child.children?.forEach((sub) => {
-        if (sub.id === categoryId) {
-          parentName = parent.name;
+        if (sub._id === categoryId) {
+          parentName = parent.title;
         }
       });
     });
@@ -34,10 +31,8 @@ const SingleCategory = () => {
 
   return (
     <>
-      <Header variant="overlay" />
       <Hero category={parentName} />
       <SearchResults />
-      <MainFooter />
     </>
   );
 };

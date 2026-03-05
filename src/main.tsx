@@ -6,6 +6,10 @@ import App from "./App";
 import "./styles/globals.css";
 import { AuthProvider } from "./contexts/auth/AuthProvider";
 
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
 /** Note: Created Client. */
 const queryClient = new QueryClient();
 
