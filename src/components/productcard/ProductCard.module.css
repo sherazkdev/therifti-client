@@ -2,11 +2,11 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%; /* Ensures it fills whatever grid column it is placed in */
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-/* Added a subtle lift effect when hovering over the card */
 .card:hover {
   transform: translateY(-4px);
 }
@@ -17,11 +17,12 @@
 
 .media {
   position: relative;
+  width: 100%;
+  aspect-ratio: 3/4; /* This replaces height: 220px for flawless scaling on all devices */
   border-radius: 8px;
   overflow: hidden;
   background: #f8f8f8;
-  border: 1px solid #efefef; /* Defines the edge slightly better */
-  height: 220px;
+  border: 1px solid #efefef; 
 }
 
 .img {
@@ -32,7 +33,6 @@
   display: block;
 }
 
-/* Centered the placeholder content so the fallback icon looks intentional */
 .placeholder {
   width: 100%;
   height: 100%;
@@ -66,7 +66,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0 2px; /* Slight padding so text doesn't touch the absolute edge */
+  padding: 0 2px;
 }
 
 .row {
@@ -80,7 +80,6 @@
   font-size: 14px;
   font-weight: 500;
   color: #111;
-  /* Truncates extra long brand names with "..." */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -90,7 +89,7 @@
   font-size: 14px;
   font-weight: 600;
   color: #111;
-  flex-shrink: 0; /* Prevents the price from shrinking if the brand name is long */
+  flex-shrink: 0; 
 }
 
 .meta {
@@ -98,9 +97,35 @@
   color: #6b6b6b;
 }
 
+/* ==================================================== */
+/* --- MASTER SKELETON LOADER --- */
+/* ==================================================== */
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.skeletonPulse {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite linear forwards;
+}
+
+.skeletonText {
+  height: 14px;
+  border-radius: 4px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
-  .media {
-    height: 200px;
+  /* No need to change height anymore, aspect-ratio handles it perfectly! */
+  .brand, .price {
+    font-size: 13px;
+  }
+  .meta {
+    font-size: 11px;
   }
 }

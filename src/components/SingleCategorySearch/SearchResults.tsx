@@ -1,9 +1,9 @@
-// SearchResults.tsx (backend-ready + extended filters + breadcrumbs)
+// SearchResults.tsx (backend-ready + extended filters + breadcrumbs + Skeletons)
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./SearchResults.module.css";
 import ProductCard from "../productcard/ProductCard"; // Adjust import path if needed
-import { ChevronDown } from "../../components/icons";
+import { ChevronDown } from "../icons";
 import { Shirt, ChevronLeft } from "lucide-react";
 
 /* ---------------- TYPES ---------------- */
@@ -15,7 +15,6 @@ export type CategoryNode = {
   options?: string[];
 };
 
-// Added new drop options
 type Drop = "category" | "price" | "size" | "sort" | "condition" | "brand" | "color" | "pattern" | "material" | null;
 
 export type Product = {
@@ -51,7 +50,6 @@ const CATEGORY_TREE_FALLBACK: CategoryNode[] = [
 
 const SORT_OPTIONS = ["Recommended", "Newest", "Price: Low to High", "Price: High to Low"];
 
-// NEW FILTER OPTIONS
 const SIZE_OPTIONS = ["XXXS / 2", "XXX / 4", "XS / 6", "S / 8", "M / 10", "L / 12", "XL / 14"];
 const CONDITION_OPTIONS = ["New with tags", "Like new", "Good", "Fair"];
 const BRAND_OPTIONS = ["River Island", "Mango", "Topman", "Nike", "Adidas", "Zara", "ASOS"];
@@ -108,7 +106,6 @@ type FetchProductsResponse =
   | { items: Product[]; total: number }
   | { items: Product[]; hasMore: boolean };
 
-// Backend Payload now accepts all new filters
 type ProductFiltersPayload = {
   page: number;
   pageSize: number;
@@ -152,11 +149,9 @@ const SearchResults = () => {
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>(CATEGORY_TREE_FALLBACK);
   const [catStack, setCatStack] = useState<string[]>([]);
 
-  // Selected values
   const [selectedPath, setSelectedPath] = useState<string>("All");
   const [selectedCatOptions, setSelectedCatOptions] = useState<Record<string, string[]>>({});
   
-  // States for all the filters
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -170,15 +165,13 @@ const SearchResults = () => {
 
   const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(null);
 
-  // Pagination + products
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [totalItems, setTotalItems] = useState(1200); // Used for the "1200 items" text
+  const [totalItems, setTotalItems] = useState(1200);
 
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [loadingCats, setLoadingCats] = useState(false);
-  const [useDemoMode, setUseDemoMode] = useState(true); // Defaulted to true for testing
 
   const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -192,7 +185,6 @@ const SearchResults = () => {
 
   /* ---------- INITIAL LOAD ---------- */
   useEffect(() => {
-    // Basic category mock fetch (you can connect real backend here later)
     setLoadingCats(true);
     setTimeout(() => {
       setCategoryTree(CATEGORY_TREE_FALLBACK);
@@ -201,8 +193,9 @@ const SearchResults = () => {
   }, []);
 
   useEffect(() => {
-    setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
-    setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
+    // Initial dummy fetch with loading state
+    fetchProductsWithCurrentFilters(1, "replace");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -234,7 +227,6 @@ const SearchResults = () => {
     });
   };
 
-  // Helper to toggle any standard string array state
   const toggleArrayState = (
     val: string,
     state: string[],
@@ -243,6 +235,7 @@ const SearchResults = () => {
     setState((prev) => (prev.includes(val) ? prev.filter((x) => x !== val) : [...prev, val]));
   };
 
+  /* ---------- BACKEND-READY PRODUCT FETCH ---------- */
   /* ---------- BACKEND-READY PRODUCT FETCH ---------- */
   type FilterOverrides = {
     categoryKey?: string | null;
@@ -256,6 +249,11 @@ const SearchResults = () => {
   ) => {
     try {
       setLoadingProducts(true);
+
+      // ---> NEW LOGIC: Clear products immediately if applying a new filter to show Skeletons <---
+      if (mode === "replace") {
+        setProducts([]);
+      }
 
       const activeCatKey = overrides && "categoryKey" in overrides ? overrides.categoryKey : appliedCategoryKey;
       let finalCategoryKey = activeCatKey ?? undefined;
@@ -279,6 +277,7 @@ const SearchResults = () => {
         materials: selectedMaterials.length ? selectedMaterials : undefined,
       };
 
+      // ---> RESTORED: Vital for backend developer debugging! <---
       console.group("🟢 FETCH PRODUCTS PAYLOAD");
       console.log("Final Payload sent to backend:", payload);
       console.groupEnd();
@@ -304,29 +303,31 @@ const SearchResults = () => {
 
       setPage(nextPage);
     } catch (error) {
-      console.log("🔴 API Fetch Failed. Injecting fake data to test UI.");
-      
-      if (mode === "append") {
-        const fakeData = Array.from({ length: 8 }).map((_, i) => ({
-          id: `fake-${Date.now()}-${i}`,
-          brand: BRAND_OPTIONS[Math.floor(Math.random() * BRAND_OPTIONS.length)],
-          meta: "Test · Good",
-          price: "$99",
-          likes: "1k"
-        }));
-        setProducts((prev) => [...prev, ...fakeData]);
-        setHasMore(true); 
-        setPage(nextPage); 
-      } else if (mode === "replace") {
-         setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
-         setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
-         setTotalItems(1200);
-         setPage(1);
-      }
-    } finally {
-      setLoadingProducts(false);
+      // Fake delay to show off the skeleton loading!
+      setTimeout(() => {
+        if (mode === "append") {
+          const fakeData = Array.from({ length: 8 }).map((_, i) => ({
+            id: `fake-${Date.now()}-${i}`,
+            brand: BRAND_OPTIONS[Math.floor(Math.random() * BRAND_OPTIONS.length)],
+            meta: "Test · Good",
+            price: "$99",
+            likes: "1k"
+          }));
+          setProducts((prev) => [...prev, ...fakeData]);
+          setHasMore(true); 
+          setPage(nextPage); 
+        } else if (mode === "replace") {
+           setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+           setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
+           setTotalItems(1200);
+           setPage(1);
+        }
+        setLoadingProducts(false); // Stop loading after fake data is ready
+      }, 1000); 
     }
   };
+
+ 
 
   const applyCategorySelection = async (stackToApply?: string[]) => {
     const stack = stackToApply ?? catStack;
@@ -369,7 +370,6 @@ const SearchResults = () => {
     });
   };
 
-  // Helper to render simple list dropdowns cleanly
   const renderListDropdown = (title: string, options: string[], state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => (
     <div className={styles.dropdown}>
       <div className={styles.ddHeader}>{title}</div>
@@ -404,7 +404,7 @@ const SearchResults = () => {
         </button>
       </div>
 
-      {/* Filters */}
+      {/* Filters (Code unchanged above Grid...) */}
       <div className={styles.filters} ref={panelRef}>
         <button
           className={`${styles.pill} ${styles.allPill} ${selectedPath === "All" ? styles.pillActive : ""}`}
@@ -420,11 +420,7 @@ const SearchResults = () => {
 
         {/* Category */}
         <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "category" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("category")}
-          >
+          <button className={`${styles.pill} ${open === "category" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("category")}>
             {selectedPath === "All" ? "Category" : selectedPath} <ChevronDown size={16}/>
           </button>
           {open === "category" && (
@@ -433,15 +429,7 @@ const SearchResults = () => {
                 <div className={styles.menuList}>
                   <div className={styles.ddHeader}>Category{loadingCats ? " (Loading…)" : ""}</div>
                   {categoryTree.map((c) => (
-                    <button
-                      key={c.key}
-                      className={styles.menuItem}
-                      type="button"
-                      onClick={() => {
-                        if (c.children?.length) goIntoCategory(c.key);
-                        else void applyCategorySelection([c.key]);
-                      }}
-                    >
+                    <button key={c.key} className={styles.menuItem} type="button" onClick={() => { if (c.children?.length) goIntoCategory(c.key); else void applyCategorySelection([c.key]); }}>
                       <span className={styles.menuLeft}>
                         <span className={styles.iconBox}><Shirt size={16} /></span>
                         <span className={styles.menuLabel}>{c.label}</span>
@@ -455,15 +443,10 @@ const SearchResults = () => {
               {showCategoryScreen && (
                 <div className={styles.menuScreen}>
                   <div className={styles.menuTop}>
-                    <button className={styles.backBtn} type="button" onClick={goBackCategory}>
-                      <ChevronLeft size={16} />
-                    </button>
+                    <button className={styles.backBtn} type="button" onClick={goBackCategory}><ChevronLeft size={16} /></button>
                     <div className={styles.menuTitle}>{currentCatNode?.label ?? "Category"}</div>
-                    <button className={styles.applyBtn} type="button" onClick={() => void applyCategorySelection()}>
-                      Apply
-                    </button>
+                    <button className={styles.applyBtn} type="button" onClick={() => void applyCategorySelection()}>Apply</button>
                   </div>
-
                   {currentCatNode?.children?.length ? (
                     <div className={styles.menuList}>
                       {currentCatNode.children.map((child) => (
@@ -523,49 +506,14 @@ const SearchResults = () => {
         </div>
 
         {/* Dynamic Filters */}
-        <div className={styles.dropWrap}>
-          <button className={`${styles.pill} ${open === "size" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("size")}>
-            Size <ChevronDown size={16} />
-          </button>
-          {open === "size" && renderListDropdown("Sizes", SIZE_OPTIONS, selectedSizes, setSelectedSizes)}
-        </div>
+        <div className={styles.dropWrap}><button className={`${styles.pill} ${open === "size" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("size")}>Size <ChevronDown size={16} /></button>{open === "size" && renderListDropdown("Sizes", SIZE_OPTIONS, selectedSizes, setSelectedSizes)}</div>
+        <div className={styles.dropWrap}><button className={`${styles.pill} ${open === "condition" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("condition")}>Condition <ChevronDown size={16} /></button>{open === "condition" && renderListDropdown("Condition", CONDITION_OPTIONS, selectedConditions, setSelectedConditions)}</div>
+        <div className={styles.dropWrap}><button className={`${styles.pill} ${open === "brand" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("brand")}>Brand <ChevronDown size={16} /></button>{open === "brand" && renderListDropdown("Brands", BRAND_OPTIONS, selectedBrands, setSelectedBrands)}</div>
+        <div className={styles.dropWrap}><button className={`${styles.pill} ${open === "color" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("color")}>Color <ChevronDown size={16} /></button>{open === "color" && renderListDropdown("Colors", COLOR_OPTIONS, selectedColors, setSelectedColors)}</div>
+        <div className={styles.dropWrap}><button className={`${styles.pill} ${open === "pattern" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("pattern")}>Pattern <ChevronDown size={16} /></button>{open === "pattern" && renderListDropdown("Patterns", PATTERN_OPTIONS, selectedPatterns, setSelectedPatterns)}</div>
+        <div className={styles.dropWrap}><button className={`${styles.pill} ${open === "material" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("material")}>Material <ChevronDown size={16} /></button>{open === "material" && renderListDropdown("Materials", MATERIAL_OPTIONS, selectedMaterials, setSelectedMaterials)}</div>
 
-        <div className={styles.dropWrap}>
-          <button className={`${styles.pill} ${open === "condition" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("condition")}>
-            Condition <ChevronDown size={16} />
-          </button>
-          {open === "condition" && renderListDropdown("Condition", CONDITION_OPTIONS, selectedConditions, setSelectedConditions)}
-        </div>
-
-        <div className={styles.dropWrap}>
-          <button className={`${styles.pill} ${open === "brand" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("brand")}>
-            Brand <ChevronDown size={16} />
-          </button>
-          {open === "brand" && renderListDropdown("Brands", BRAND_OPTIONS, selectedBrands, setSelectedBrands)}
-        </div>
-
-        <div className={styles.dropWrap}>
-          <button className={`${styles.pill} ${open === "color" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("color")}>
-            Color <ChevronDown size={16} />
-          </button>
-          {open === "color" && renderListDropdown("Colors", COLOR_OPTIONS, selectedColors, setSelectedColors)}
-        </div>
-
-        <div className={styles.dropWrap}>
-          <button className={`${styles.pill} ${open === "pattern" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("pattern")}>
-            Pattern <ChevronDown size={16} />
-          </button>
-          {open === "pattern" && renderListDropdown("Patterns", PATTERN_OPTIONS, selectedPatterns, setSelectedPatterns)}
-        </div>
-
-        <div className={styles.dropWrap}>
-          <button className={`${styles.pill} ${open === "material" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("material")}>
-            Material <ChevronDown size={16} />
-          </button>
-          {open === "material" && renderListDropdown("Materials", MATERIAL_OPTIONS, selectedMaterials, setSelectedMaterials)}
-        </div>
-
-        {/* Sort By (Kept on the left alongside the other pills as requested) */}
+        {/* Sort By */}
         <div className={styles.dropWrap}>
           <button className={`${styles.pill} ${open === "sort" ? styles.pillOpen : ""}`} type="button" onClick={() => toggleOpen("sort")}>
             Sort By <ChevronDown size={16} />
@@ -575,16 +523,7 @@ const SearchResults = () => {
               <div className={styles.ddHeader}>Sort</div>
               <div className={styles.menuList}>
                 {SORT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    className={styles.menuItem}
-                    onClick={async () => {
-                      setSortValue(opt);
-                      setOpen(null);
-                      await fetchProductsWithCurrentFilters(1, "replace", { sort: opt });
-                    }}
-                  >
+                  <button key={opt} type="button" className={styles.menuItem} onClick={async () => { setSortValue(opt); setOpen(null); await fetchProductsWithCurrentFilters(1, "replace", { sort: opt }); }}>
                     <span className={styles.menuLeft}><span className={styles.menuLabel}>{opt}</span></span>
                     <span className={`${styles.rightBox} ${sortValue === opt ? styles.rightBoxOn : ""}`}>{sortValue === opt ? "✓" : ""}</span>
                   </button>
@@ -603,25 +542,52 @@ const SearchResults = () => {
         <div className={styles.itemCount}>{totalItems} items</div>
       </div>
 
-      {/* Products Grid */}
+      {/* ---> NEW: SMART SKELETON PRODUCTS GRID <--- */}
       <div className={styles.grid}>
+        
+        {/* 1. FRESH SEARCH: If loading and array is empty, show a full grid of 8 skeletons */}
+        {loadingProducts && products.length === 0 && (
+          Array.from({ length: 8 }).map((_, idx) => (
+            <ProductCard key={`skel-main-${idx}`} isLoading={true} brand="" meta="" price="" />
+          ))
+        )}
+
+        {/* 2. REAL CARDS: Map through actual products */}
         {products.map((p, index) => (
-          <ProductCard 
-            key={`${p.id}-${index}`} 
-            image={p.image} 
-            brand={p.brand} 
-            meta={p.meta} 
-            price={p.price} 
-            likes={p.likes} 
+          <ProductCard
+            key={`${p.id}-${index}`}
+            image={p.image}
+            brand={p.brand}
+            meta={p.meta}
+            price={p.price}
+            likes={p.likes}
           />
         ))}
+
+        {/* 3. PAGINATION: If loading but we already have products, show 4 skeletons at the bottom */}
+        {loadingProducts && products.length > 0 && (
+          Array.from({ length: 4 }).map((_, idx) => (
+            <ProductCard key={`skel-append-${idx}`} isLoading={true} brand="" meta="" price="" />
+          ))
+        )}
+
       </div>
 
       {/* Footer / pagination */}
       <div className={styles.footer}>
-        <button className={styles.seeMore} type="button" onClick={() => fetchProductsWithCurrentFilters(page + 1, "append")} disabled={!hasMore || loadingProducts}>
-          {loadingProducts ? "Loading…" : hasMore ? "See More" : "No More Products"}
-        </button>
+        {/* If no products and not loading, show a fallback message instead of See More */}
+        {!loadingProducts && products.length === 0 ? (
+          <p>No products found for these filters.</p>
+        ) : (
+          <button 
+            className={styles.seeMore} 
+            type="button" 
+            onClick={() => fetchProductsWithCurrentFilters(page + 1, "append")} 
+            disabled={!hasMore || loadingProducts}
+          >
+            {loadingProducts ? "Loading…" : hasMore ? "See More" : "No More Products"}
+          </button>
+        )}
       </div>
     </section>
   );

@@ -1,11 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { UploadCloud, Plus, X, ChevronDown, RotateCw , Camera } from "lucide-react";
 import styles from "./SellItem.module.css";
 import CategoryDropdown from "./CategoryDropdown";
 import PhotoTipsModal from "./PhotoTipsModal";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 /* ---------------- TYPES ---------------- */
 
@@ -670,7 +668,7 @@ const sanitizeDecimal = (input: string) => {
 
         <div className={styles.formGroup}>
           <label>Description</label>
-
+{/* 
           <CKEditor 
           editor={ClassicEditor as any}
             data=""
@@ -680,8 +678,8 @@ const sanitizeDecimal = (input: string) => {
             onChange={(_, editor) => {
               const data = editor.getData();
               setValue("description", data, { shouldValidate: true });
-            }}
-          />
+            }} */}
+          {/* /> */}
 
           {errors.description && (
             <span className={styles.error}>{errors.description.message}</span>

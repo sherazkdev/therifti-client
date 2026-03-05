@@ -1,18 +1,26 @@
 import { Routes, Route } from "react-router-dom";
-import { lazy } from "react";
+import Home from "./pages/Home/Home";
+import LoginPage from "./pages/auth/LoginPage";
+import Sell from "./pages/Sellnow/Sell";
+import SingleProduct from "./pages/SingleProductPage/SingleProduct";
 
-const HomePage = lazy( () => import("./pages/Home/Home"));
-const LoginPage = lazy( () => import("./pages/auth/Auth"));
-const SellPage = lazy( () => import("./pages/Sellnow/Sell"));
-const SingleCategory = lazy( () => import("./pages/SingleCategory/SingleCategory"));
+
+
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />}/>
-      <Route path="/sell" element={<SellPage />}/>
-      <Route path="/category/:category" element={<SingleCategory />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<LoginPage/>}/>
+      <Route path="/sell" element={<Sell/>}/>
+      {/* <Route path="/category/:categoryName" element={<SingleProduct/>}/> */} //route by name 
+
+      <Route path="/category/:categoryId" element={<SingleProduct />} />  //route by id 
+
+      
+
+      
+
     </Routes>
   );
 }

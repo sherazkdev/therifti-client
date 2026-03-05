@@ -1,37 +1,54 @@
 import { useState } from "react";
 import styles from "./ProductCard.module.css";
 import { Heart } from "../../components/icons";
-import { ImageOff } from "lucide-react"; // Added a nice fallback icon
+import { ImageOff } from "lucide-react";
 
 type ProductCardProps = {
   image?: string;
-  brand: string;
+  brand?: string;
   meta?: string;
-  price: string;
+  price?: string;
   likes?: string;
+  isLoading?: boolean; // <-- Added loading prop
 };
 
 const ProductCard = ({
   image,
-  brand,
+  brand = "",
   meta = "M30 . Good",
-  price,
+  price = "",
   likes = "1.2k",
+  isLoading,
 }: ProductCardProps) => {
-  // Track if the image URL provided by the backend is broken/returns a 404
   const [imageError, setImageError] = useState(false);
 
+  // --- MASTER SKELETON LAYOUT ---
+  if (isLoading) {
+    return (
+      <article className={styles.card}>
+        <div className={`${styles.media} ${styles.skeletonPulse}`} />
+        <div className={styles.info}>
+          <div className={styles.row}>
+            <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} style={{ width: '60%' }} />
+            <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} style={{ width: '25%' }} />
+          </div>
+          <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} style={{ width: '40%', marginTop: '4px' }} />
+        </div>
+      </article>
+    );
+  }
+
+  // --- REAL CONTENT ---
   return (
     <article className={styles.card}>
       <div className={styles.media}>
-        {/* Only show the image if the URL exists AND it hasn't failed to load */}
         {image && !imageError ? (
           <img 
             className={styles.img} 
             src={image} 
             alt={brand} 
-            loading="lazy" // Performance boost for pagination
-            onError={() => setImageError(true)} // Instantly switch to placeholder if broken
+            loading="lazy" 
+            onError={() => setImageError(true)} 
           />
         ) : (
           <div className={styles.placeholder}>

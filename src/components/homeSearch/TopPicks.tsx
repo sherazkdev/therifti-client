@@ -1,6 +1,4 @@
-
-
-// TopPicks.tsx (backend-ready + payload simplified + state lag fixed)
+// TopPicks.tsx (backend-ready + payload simplified + state lag fixed + Skeletons)
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./TopPicks.module.css";
@@ -8,7 +6,6 @@ import ProductCard from "../productcard/ProductCard";
 import { ChevronDown } from "../../components/icons";
 import { Shirt } from "lucide-react";
 import { ChevronLeft } from 'lucide-react';
-
 
 /* ---------------- TYPES ---------------- */
 export type CategoryNode = {
@@ -201,12 +198,12 @@ const TopPicks = () => {
   }, []);
 
   useEffect(() => {
-    setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
-    setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
-
     const loadInitialProducts = async () => {
       try {
         setLoadingProducts(true);
+        // Instant clear for skeletons
+        setProducts([]);
+
         const payload: ProductFiltersPayload = {
           page: 1,
           pageSize: PAGE_SIZE,
@@ -221,10 +218,14 @@ const TopPicks = () => {
           setHasMore(resp.total > resp.items.length);
         }
         setUseDemoMode(false);
+        setLoadingProducts(false); // Stop loading on success
       } catch {
-        // fallback
-      } finally {
-        setLoadingProducts(false);
+        // Force a delay so the skeletons are visible during demo mode
+        setTimeout(() => {
+          setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+          setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
+          setLoadingProducts(false); // Stop loading after fake data sets
+        }, 1000);
       }
     };
     loadInitialProducts();
@@ -271,7 +272,6 @@ const TopPicks = () => {
     sort?: string;
   };
 
-  //payload for fetching products based on current filters, with ability to override specific ones (used for category selection and sort changes)
   const fetchProductsWithCurrentFilters = async (
     nextPage: number,
     mode: "replace" | "append",
@@ -288,6 +288,11 @@ const TopPicks = () => {
 
     try {
       setLoadingProducts(true);
+
+      // ---> NEW LOGIC: Clear products immediately if applying a new filter to show Skeletons <---
+      if (mode === "replace") {
+        setProducts([]);
+      }
 
       const activeCatKey = overrides && "categoryKey" in overrides ? overrides.categoryKey : appliedCategoryKey;
       let finalCategoryKey = activeCatKey ?? undefined;
@@ -308,7 +313,7 @@ const TopPicks = () => {
         sizes: selectedSizes.length ? selectedSizes : undefined,
       };
 
-      console.group("🟢 FETCH PRODUCTS PAYLOAD");
+      console.group("FETCH PRODUCTS PAYLOAD");
       console.log("Final Payload sent to backend:", payload);
       console.groupEnd();
 
@@ -330,31 +335,29 @@ const TopPicks = () => {
       }
 
       setPage(nextPage);
+      setLoadingProducts(false); // Stop loading on success
     } catch (error) {
-      console.log("🔴 API Fetch Failed. Injecting fake data to test UI.");
+      console.log(" API Fetch Failed. Injecting fake data to test UI.");
       
-      // 👇 THIS WILL RUN WHEN THE BACKEND FAILS 👇
-      if (mode === "append") {
-        const fakeData = [
-          { id: `fake-${Date.now()}-1`, brand: "Test Brand 1", meta: "Test", price: "$99", likes: "1k" },
-          { id: `fake-${Date.now()}-2`, brand: "Test Brand 2", meta: "Test", price: "$99", likes: "1k" },
-          { id: `fake-${Date.now()}-3`, brand: "Test Brand 3", meta: "Test", price: "$99", likes: "1k" },
-          { id: `fake-${Date.now()}-4`, brand: "Test Brand 4", meta: "Test", price: "$99", likes: "1k" },
-        ];
-        
-        // Append the fake data to the grid
-        setProducts((prev) => [...prev, ...fakeData]);
-        setHasMore(true); 
-        setPage(nextPage); 
-      } else if (mode === "replace") {
-         // ✅ BEST UX: Put the original default products back on the screen
-         setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
-         setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
-         setPage(1);
-      }
-
-    } finally {
-      setLoadingProducts(false);
+      // Delay so you can actually see the skeleton shimmer!
+      setTimeout(() => {
+        if (mode === "append") {
+          const fakeData = [
+            { id: `fake-${Date.now()}-1`, brand: "Test Brand 1", meta: "Test", price: "$99", likes: "1k" },
+            { id: `fake-${Date.now()}-2`, brand: "Test Brand 2", meta: "Test", price: "$99", likes: "1k" },
+            { id: `fake-${Date.now()}-3`, brand: "Test Brand 3", meta: "Test", price: "$99", likes: "1k" },
+            { id: `fake-${Date.now()}-4`, brand: "Test Brand 4", meta: "Test", price: "$99", likes: "1k" },
+          ];
+          setProducts((prev) => [...prev, ...fakeData]);
+          setHasMore(true); 
+          setPage(nextPage); 
+        } else if (mode === "replace") {
+           setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
+           setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
+           setPage(1);
+        }
+        setLoadingProducts(false); // Stop loading after fake data sets
+      }, 1000);
     }
   };
 
@@ -369,7 +372,6 @@ const TopPicks = () => {
     setOpen(null);
     setCatStack([]);
 
-    // Pass the exact new key directly into the fetch
     await fetchProductsWithCurrentFilters(1, "replace", { categoryKey: lastKey });
   };
 
@@ -390,7 +392,6 @@ const TopPicks = () => {
     setOpen(null);
     setCatStack([]);
     
-    // Pass the null key and default sort directly into the fetch
     await fetchProductsWithCurrentFilters(1, "replace", { 
       categoryKey: null, 
       sort: SORT_OPTIONS[0] 
@@ -647,7 +648,6 @@ const TopPicks = () => {
                     onClick={async () => {
                       setSortValue(opt);
                       setOpen(null);
-                      // Pass the new sort value directly
                       await fetchProductsWithCurrentFilters(1, "replace", { sort: opt });
                     }}
                   >
@@ -665,12 +665,20 @@ const TopPicks = () => {
         </div>
       </div>
 
-      {/* Products */}
-       {/* Products */}
+      {/* ---> NEW: SMART SKELETON PRODUCTS GRID <--- */}
       <div className={styles.grid}>
+        
+        {/* 1. FRESH SEARCH: If loading and array is empty, show 8 skeletons */}
+        {loadingProducts && products.length === 0 && (
+          Array.from({ length: 8 }).map((_, idx) => (
+            <ProductCard key={`skel-main-${idx}`} isLoading={true} brand="" meta="" price="" />
+          ))
+        )}
+
+        {/* 2. REAL CARDS: Map through actual products */}
         {products.map((p, index) => (
           <ProductCard 
-            key={`${p.id}-${index}`} // <-- THIS IS CRITICAL FOR THE TEST TO WORK
+            key={`${p.id}-${index}`} 
             image={p.image} 
             brand={p.brand} 
             meta={p.meta} 
@@ -678,13 +686,26 @@ const TopPicks = () => {
             likes={p.likes} 
           />
         ))}
+
+        {/* 3. PAGINATION: If loading but we already have products, show 4 skeletons at the bottom */}
+        {loadingProducts && products.length > 0 && (
+          Array.from({ length: 4 }).map((_, idx) => (
+            <ProductCard key={`skel-append-${idx}`} isLoading={true} brand="" meta="" price="" />
+          ))
+        )}
+
       </div>
 
       {/* Footer / pagination */}
       <div className={styles.footer}>
-        <button className={styles.seeMore} type="button" onClick={onSeeMore} disabled={!hasMore || loadingProducts}>
-          {loadingProducts ? "Loading…" : hasMore ? "See More" : "No More Products"}
-        </button>
+        {/* Hide 'See More' if there are no products loaded at all */}
+        {!loadingProducts && products.length === 0 ? (
+          <p>No products found for these filters.</p>
+        ) : (
+          <button className={styles.seeMore} type="button" onClick={onSeeMore} disabled={!hasMore || loadingProducts}>
+            {loadingProducts ? "Loading…" : hasMore ? "See More" : "No More Products"}
+          </button>
+        )}
       </div>
     </section>
   );
