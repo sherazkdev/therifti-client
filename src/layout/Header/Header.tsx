@@ -18,27 +18,20 @@ const Header = ({
   onParentCategorySelect
 }: HeaderProps) => {
 
-  const [selectedParent, setSelectedParent] = useState<string | null>(null);
+ 
 
 const navigate = useNavigate();
 
-// const handleCategoryClick = (id: string, name?: string) => {
-
-//   const payload = {
-//     categoryId: id,
-//   };
-
-//   console.log("Header Payload:", payload);
-
-//   if (name) {
-//     navigate(`/category/${name.toLowerCase()}`);
-//   }
-// };
 
 const handleCategoryClick = (id: string, Name?: string) => {
-  console.log("Header Payload:", { categoryId: id , itemName: Name || null});
 
-  navigate(`/category/${id}`);
+  console.log("CLICKED CATEGORY:", Name);
+
+  if (onParentCategorySelect && Name) {
+    onParentCategorySelect(Name);
+  }
+
+
 };
 
   return (

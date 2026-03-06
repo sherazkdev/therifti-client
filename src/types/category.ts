@@ -1,6 +1,7 @@
-export interface Category {
+export type Category = {
   id: string;
   name: string;
-  icon?: any;  // only for second level
+  title: string;   
   children?: Category[];
-}
+  icon?: any;
+};
