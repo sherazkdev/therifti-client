@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
 import styles from './ProductCard.module.css';
-import type { Product } from './types';
+import type { Product } from '../types';
 
 interface Props {
   product: Product;
