@@ -439,39 +439,6 @@ textarea {
   accent-color: #000;
 }
 
-/* ================================
-   CKEditor (CSS Modules safe)
-================================== */
-:global(.ck-editor__editable) {
-  min-height: 280px;
-}
-
-/* lists */
-:global(.ck-editor__editable ul) {
-  list-style: disc;
-  padding-left: 22px;
-}
-
-:global(.ck-editor__editable ol) {
-  list-style: decimal;
-  padding-left: 22px;
-}
-
-:global(.ck-editor__editable li) {
-  margin: 4px 0;
-}
-
-/* remove blue focus */
-:global(.ck.ck-editor__main > .ck-editor__editable) {
-  border-color: #ccc !important;
-  box-shadow: none !important;
-}
-
-:global(.ck.ck-editor__main > .ck-editor__editable.ck-focused) {
-  border-color: #ccc !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
 
 /* ================================
    RESPONSIVE (TABLET)

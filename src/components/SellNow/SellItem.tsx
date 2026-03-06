@@ -1,35 +1,14 @@
-import { lazy, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { UploadCloud, Plus, X, ChevronDown, RotateCw , Camera } from "lucide-react";
+import { UploadCloud, Plus, X, ChevronDown, RotateCw, Camera } from "lucide-react";
 import styles from "./SellItem.module.css";
 import CategoryDropdown from "./CategoryDropdown";
 import PhotoTipsModal from "./PhotoTipsModal";
 
-/* ---------------- TYPES ---------------- */
+// Types alag file se aa rahi hain
+import type { SelectedCategory, FormValues, ListingStatus, MultiProps } from "./SellItem.types";
 
-type SelectedCategory = {
-  path: string[];
-};
-
-type FormValues = {
-  title: string;
-  price: number;
-  description: string;
-  parcelSize: string;
-};
-
-type ListingStatus = "PUBLISHED" | "DRAFT"; // backend ne DRAPT bola hai (same use kar raha hun)
-/* ---------------- MULTI SELECT ---------------- */
-
-type MultiProps = {
-  label: string;
-  options: string[];
-  selected: string[];
-  setSelected: (val: string[]) => void;
-  error?: string;
-  singleSelect?: boolean;
-  maxSelect?: number;
-};
+/* ---------------- MULTI SELECT COMPONENT ---------------- */
 
 const MultiSelectDropdown = ({
   label,
@@ -82,14 +61,15 @@ const MultiSelectDropdown = ({
           {selected.length
             ? selected.join(", ")
             : label === "Material"
-              ? "Select upto 3 Material"
-              : label === "Color"
-                ? "Select up to 2 colors"
-                : `Select ${label.toLowerCase()}`}
+            ? "Select upto 3 Material"
+            : label === "Color"
+            ? "Select up to 2 colors"
+            : `Select ${label.toLowerCase()}`}
         </span>
         <ChevronDown size={16} />
       </div>
 
+      {/* ERROR MESSAGE UI (Red text) */}
       {error && <span className={styles.error}>{error}</span>}
 
       {open && (
@@ -125,7 +105,7 @@ const MultiSelectDropdown = ({
   );
 };
 
-/* ---------------- MAIN ---------------- */
+/* ---------------- MAIN COMPONENT ---------------- */
 
 const SellItem = () => {
   const {
@@ -135,12 +115,8 @@ const SellItem = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  // PRICE DISPLAY (for $0.00 -> $5.00)
   const [priceDisplay, setPriceDisplay] = useState("");
 
-
-
-  // register hidden "price" field (we will update it via setValue)
   useEffect(() => {
     register("price", {
       required: "Price is required",
@@ -148,47 +124,31 @@ const SellItem = () => {
     });
   }, [register]);
 
-  // Manually register CKEditor description field for react-hook-form validation
-  useEffect(() => {
-    register("description", {
-      required: "Description is required",
-      validate: (v) =>
-        (typeof v === "string" && v.replace(/<[^>]*>/g, "").trim().length > 0) ||
-        "Description is required",
-    });
-  }, [register]);
-    
-// keep digits + 1 dot + max 2 decimals
-const sanitizeDecimal = (input: string) => {
-  let s = input.replace(/[^0-9.]/g, "");
-  const dot = s.indexOf(".");
+  const sanitizeDecimal = (input: string) => {
+    let s = input.replace(/[^0-9.]/g, "");
+    const dot = s.indexOf(".");
 
-  if (dot !== -1) {
-    const intPart = s.slice(0, dot);
-    let decPart = s.slice(dot + 1).replace(/\./g, "");
-    decPart = decPart.slice(0, 2); // max 2 decimals
-    s = intPart + "." + decPart;
-  }
-  return s;
-};
+    if (dot !== -1) {
+      const intPart = s.slice(0, dot);
+      let decPart = s.slice(dot + 1).replace(/\./g, "");
+      decPart = decPart.slice(0, 2); 
+      s = intPart + "." + decPart;
+    }
+    return s;
+  };
 
   const handlePriceChange = (raw: string) => {
-    // remove $ if user edits it
     raw = raw.replace(/^\$/, "");
-
     const cleaned = sanitizeDecimal(raw);
 
-    // allow empty (so user can delete)
     if (cleaned === "") {
       setPriceDisplay("");
       setValue("price", undefined as unknown as number, { shouldValidate: true });
       return;
     }
 
-    // allow "." and "5." while typing (don’t force toFixed yet)
     setPriceDisplay(`$${cleaned}`);
 
-    // only set numeric value if it’s a valid number (not just "." or ends with ".")
     if (cleaned === "." || cleaned.endsWith(".")) {
       setValue("price", undefined as unknown as number, { shouldValidate: true });
       return;
@@ -210,7 +170,6 @@ const sanitizeDecimal = (input: string) => {
     const n = Number(raw);
     if (Number.isNaN(n)) return;
 
-    // format only on blur
     setPriceDisplay(`$${n.toFixed(2)}`);
     setValue("price", n, { shouldValidate: true });
   };
@@ -220,11 +179,6 @@ const sanitizeDecimal = (input: string) => {
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [dragging, setDragging] = useState(false);
-
-  // NEW
-  const [imageError, setImageError] = useState("");
-
-  // ROTATION (NEW)
   const [rotations, setRotations] = useState<number[]>([]);
 
   const [category, setCategory] = useState<SelectedCategory | null>(null);
@@ -235,18 +189,29 @@ const sanitizeDecimal = (input: string) => {
   const [materials, setMaterials] = useState<string[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
 
-  /* ---------- ERRORS ---------- */
+  const [materialsList, setMaterialsList] = useState<string[]>([
+    "Cotton",
+    "Polyester",
+    "Wool",
+    "Leather",
+    "Denim",
+  ]);
 
+  /* ---------- ERRORS STATES ---------- */
+  const [imageError, setImageError] = useState("");
   const [categoryError, setCategoryError] = useState("");
   const [brandError, setBrandError] = useState("");
   const [sizeError, setSizeError] = useState("");
   const [materialError, setMaterialError] = useState("");
+  
+  // Nayi error states (Condition aur Color ke liye)
+  const [conditionError, setConditionError] = useState("");
+  const [colorError, setColorError] = useState("");
+  
   const [showPhotoTips, setShowPhotoTips] = useState(false);
 
-  /* ---------- IMAGE ---------- */
-
   const MAX_IMAGES = 4;
-  const MAX_FILE_SIZE = 9 * 1024 * 1024; // 9MB
+  const MAX_FILE_SIZE = 9 * 1024 * 1024; 
 
   const isFileDrag = (e: React.DragEvent) => {
     return Array.from(e.dataTransfer.types || []).includes("Files");
@@ -260,10 +225,8 @@ const sanitizeDecimal = (input: string) => {
     const all = Array.from(files);
     const onlyImages = all.filter((file) => file.type.startsWith("image/"));
     const nonImagesCount = all.length - onlyImages.length;
-
     const tooLarge = onlyImages.filter((f) => f.size > MAX_FILE_SIZE);
     const valid = onlyImages.filter((f) => f.size <= MAX_FILE_SIZE);
-
     const existingKeys = new Set(images.map(fileKey));
     const uniqueValid = valid.filter((f) => !existingKeys.has(fileKey(f)));
 
@@ -282,19 +245,14 @@ const sanitizeDecimal = (input: string) => {
     } else if (tooLarge.length > 0) {
       setImageError("One or more images are larger than 9MB and were rejected.");
     } else if (uniqueValid.length > remaining) {
-      setImageError(
-        `Only ${remaining} more image(s) can be added (max ${MAX_IMAGES}).`
-      );
+      setImageError(`Only ${remaining} more image(s) can be added (max ${MAX_IMAGES}).`);
     } else if (selected.length === 0 && valid.length > 0) {
       setImageError("These images were already added (duplicates).");
     }
 
     if (selected.length) {
       setImages((prev) => [...prev, ...selected]);
-      setPreviews((prev) => [
-        ...prev,
-        ...selected.map((f) => URL.createObjectURL(f)),
-      ]);
+      setPreviews((prev) => [...prev, ...selected.map((f) => URL.createObjectURL(f))]);
       setRotations((prev) => [...prev, ...selected.map(() => 0)]);
     }
 
@@ -308,7 +266,6 @@ const sanitizeDecimal = (input: string) => {
     setRotations(rotations.filter((_, idx) => idx !== i));
   };
 
-  // funtion setas main image bana dy ga
   const setAsMain = (index: number) => {
     if (index === 0) return;
 
@@ -329,7 +286,6 @@ const sanitizeDecimal = (input: string) => {
     setRotations(rotCopy);
   };
 
-  // ROTATE (NEW)
   const rotateImage = (index: number) => {
     setRotations((prev) =>
       prev.map((deg, i) => (i === index ? (deg + 90) % 360 : deg))
@@ -340,41 +296,50 @@ const sanitizeDecimal = (input: string) => {
     return () => previews.forEach((p) => URL.revokeObjectURL(p));
   }, [previews]);
 
-  /* ---------- SUBMIT ---------- */
-
+  /* ---------- SUBMIT VALIDATION ---------- */
   const onSubmit = (data: FormValues, status: ListingStatus) => {
-
-  //category main last item select 
-   const lastCategory = category?.path?.[category.path.length - 1] || "";
-
+    const lastCategory = category?.path?.[category.path.length - 1] || "";
     let hasError = false;
 
+    // Har field ki checking yahan ho rahi hai
     if (!images.length) {
       setImageError("At least 1 image is required (max 4).");
       hasError = true;
     }
-
     if (!category) {
       setCategoryError("Category is required");
       hasError = true;
     }
-    if (!brand.length) {
-      setBrandError("Brand is required");
-      hasError = true;
-    }
-    if (!sizes.length) {
-      setSizeError("Size is required");
-      hasError = true;
-    }
-    if (!materials.length) {
-      setMaterialError("Material is required");
-      hasError = true;
+    
+    // Sirf tab check karein jab category select ho chuki ho
+    if (category) {
+      if (!brand.length) {
+        setBrandError("Brand is required");
+        hasError = true;
+      }
+      if (!sizes.length) {
+        setSizeError("Size is required");
+        hasError = true;
+      }
+      if (!materials.length) {
+        setMaterialError("Material is required");
+        hasError = true;
+      }
+      if (!condition.length) {
+        setConditionError("Condition is required");
+        hasError = true;
+      }
+      if (!colors.length) {
+        setColorError("Color is required");
+        hasError = true;
+      }
     }
 
     if (hasError) return;
 
+    // Sab clear hai toh API / console main jaye ga
     console.log({
-      status, 
+      status,
       title: data.title,
       price: data.price,
       description: data.description,
@@ -390,30 +355,18 @@ const sanitizeDecimal = (input: string) => {
     });
   };
 
-
   const submitWithStatus = (status: ListingStatus) =>
-  handleSubmit((data) => onSubmit(data, status))();
-
-  /* ---------- OPTIONS ---------- */
+    handleSubmit((data) => onSubmit(data, status))();
 
   const brands = ["Nike", "Zara", "H&M", "Adidas"];
   const conditions = ["New with tags", "Very good", "Good"];
   const colorsList = ["Black", "White", "Red", "Blue"];
-  const materialsList = [
-    "Cotton",
-    "Denim",
-    "faizan",
-    "hassan",
-    "abikesh",
-    "kaleshi",
-  ];
   const sizesList = ["S", "M", "L", "XL"];
 
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Sell an Item</h2>
 
-      {/* UPLOAD */}
       <div
         className={styles.uploadWrapper}
         onDragOver={(e) => {
@@ -456,7 +409,6 @@ const sanitizeDecimal = (input: string) => {
           </div>
         ) : (
           <>
-          
             <div className={styles.imageList}>
               {previews.map((src, i) => (
                 <div key={src} className={styles.imageItem}>
@@ -470,21 +422,12 @@ const sanitizeDecimal = (input: string) => {
                   />
 
                   {i !== 0 && (
-                    <button
-                      type="button"
-                      className={styles.setMainBtn}
-                      onClick={() => setAsMain(i)}
-                    >
+                    <button type="button" className={styles.setMainBtn} onClick={() => setAsMain(i)}>
                       Set Main
                     </button>
                   )}
 
-                  <button
-                    type="button"
-                    title="Rotate"
-                    className={styles.rotateBtn}
-                    onClick={() => rotateImage(i)}
-                  >
+                  <button type="button" title="Rotate" className={styles.rotateBtn} onClick={() => rotateImage(i)}>
                     <RotateCw size={18} />
                   </button>
 
@@ -505,18 +448,12 @@ const sanitizeDecimal = (input: string) => {
                     </span>
                   )}
 
-                  <X
-                    className={styles.removeIcon}
-                    onClick={() => removeImage(i)}
-                  />
+                  <X className={styles.removeIcon} onClick={() => removeImage(i)} />
                 </div>
               ))}
 
               {images.length < MAX_IMAGES && (
-                <div
-                  className={styles.addImage}
-                  onClick={() => fileRef.current?.click()}
-                >
+                <div className={styles.addImage} onClick={() => fileRef.current?.click()}>
                   <Plus />
                   <input
                     ref={fileRef}
@@ -529,55 +466,31 @@ const sanitizeDecimal = (input: string) => {
                 </div>
               )}
             </div>
-            
           </>
         )}
       </div>
-       
+
       {imageError && <div className={styles.imageErrorOutside}>{imageError}</div>}
 
-      {/* PHOTO QUALITY TIP */}
       <div className={styles.photoTip}>
         <Camera size={18} />
         <p>
           Catch Your Buyers’ Eye — Use Quality Photos.{" "}
-          <span
-            className={styles.learnMore}
-            onClick={() => setShowPhotoTips(true)}
-          >
+          <span className={styles.learnMore} onClick={() => setShowPhotoTips(true)}>
             Learn More
           </span>
         </p>
       </div>
 
       <form onSubmit={(e) => e.preventDefault()}>
-        {/* TITLE + MATERIAL */}
         <div className={styles.row}>
-          <div className={styles.formGroup}>
+          <div className={styles.formGroup} style={{ flex: 1 }}>
             <label>Title</label>
-            <input
-              placeholder="Enter item title"
-              {...register("title", { required: "Title is required" })}
-            />
-            {errors.title && (
-              <span className={styles.error}>{errors.title.message}</span>
-            )}
+            <input placeholder="Enter item title" {...register("title", { required: "Title is required" })} />
+            {errors.title && <span className={styles.error}>{errors.title.message}</span>}
           </div>
-
-          <MultiSelectDropdown
-            label="Material"
-            options={materialsList}
-            selected={materials}
-            setSelected={(v) => {
-              setMaterials(v);
-              setMaterialError("");
-            }}
-            error={materialError}
-            maxSelect={3}
-          />
         </div>
 
-        {/* CATEGORY + PRICE */}
         <div className={styles.row}>
           <div className={styles.formGroup}>
             <CategoryDropdown
@@ -586,15 +499,11 @@ const sanitizeDecimal = (input: string) => {
                 setCategoryError("");
               }}
             />
-            {categoryError && (
-              <span className={styles.error}>{categoryError}</span>
-            )}
+            {categoryError && <span className={styles.error}>{categoryError}</span>}
           </div>
 
           <div className={styles.formGroup}>
             <label>Price</label>
-
-            {/* visible input (formatted) */}
             <input
               type="text"
               inputMode="decimal"
@@ -603,22 +512,26 @@ const sanitizeDecimal = (input: string) => {
               onChange={(e) => handlePriceChange(e.target.value)}
               onBlur={handlePriceBlur}
             />
-
-            {/* hidden registered field to keep RHF validation/messages */}
             <input type="hidden" {...register("price")} />
-
-            {errors.price && (
-              <span className={styles.error}>
-                {errors.price.message as string}
-              </span>
-            )}
+            {errors.price && <span className={styles.error}>{errors.price.message as string}</span>}
           </div>
         </div>
 
-        {/* AFTER CATEGORY */}
         {category && (
           <>
             <div className={styles.row}>
+              <MultiSelectDropdown
+                label="Material"
+                options={materialsList}
+                selected={materials}
+                setSelected={(v) => {
+                  setMaterials(v);
+                  setMaterialError(""); // error hatane ke liye
+                }}
+                error={materialError} // error show karne ke liye
+                maxSelect={3}
+              />
+
               <MultiSelectDropdown
                 label="Brand"
                 options={brands}
@@ -630,25 +543,35 @@ const sanitizeDecimal = (input: string) => {
                 error={brandError}
                 singleSelect
               />
-
-              <MultiSelectDropdown
-                label="Condition"
-                options={conditions}
-                selected={condition}
-                setSelected={setCondition}
-                singleSelect
-              />
             </div>
 
             <div className={styles.row}>
               <MultiSelectDropdown
+                label="Condition"
+                options={conditions}
+                selected={condition}
+                setSelected={(v) => {
+                  setCondition(v);
+                  setConditionError(""); // error hatane ke liye
+                }}
+                error={conditionError} // error show karne ke liye
+                singleSelect
+              />
+
+              <MultiSelectDropdown
                 label="Color"
                 options={colorsList}
                 selected={colors}
-                setSelected={setColors}
+                setSelected={(v) => {
+                  setColors(v);
+                  setColorError(""); // error hatane ke liye
+                }}
+                error={colorError} // error show karne ke liye
                 maxSelect={2}
               />
+            </div>
 
+            <div className={styles.row}>
               <MultiSelectDropdown
                 label="Size"
                 options={sizesList}
@@ -664,26 +587,15 @@ const sanitizeDecimal = (input: string) => {
           </>
         )}
 
-        {/* DESCRIPTION */}
-
         <div className={styles.formGroup}>
           <label>Description</label>
-{/* 
-          <CKEditor 
-          editor={ClassicEditor as any}
-            data=""
-            config={{
-              toolbar: [ "undo", "redo","|","bold", "italic","|","bulletedList", "numberedList","|","removeFormat"]
-             }}
-            onChange={(_, editor) => {
-              const data = editor.getData();
-              setValue("description", data, { shouldValidate: true });
-            }} */}
-          {/* /> */}
-
-          {errors.description && (
-            <span className={styles.error}>{errors.description.message}</span>
-          )}
+          <textarea
+            placeholder="Describe your item in detail..."
+            rows={5}
+            {...register("description", { required: "Description is required" })}
+            style={{ padding: "10px", borderRadius: "8px", border: "1px solid #ccc", width: "100%", fontFamily: "inherit" }}
+          />
+          {errors.description && <span className={styles.error}>{errors.description.message}</span>}
         </div>
 
         <div className={styles.formGroup}>
@@ -692,61 +604,35 @@ const sanitizeDecimal = (input: string) => {
           <div className={styles.parcelList}>
             <label className={styles.parcelRow}>
               <span>5kg</span>
-              <input
-                type="radio"
-                value="5kg"
-                {...register("parcelSize", { required: "Parcel size is required" })}
-              />
+              <input type="radio" value="5kg" {...register("parcelSize", { required: "Parcel size is required" })} />
             </label>
 
             <label className={styles.parcelRow}>
               <span>10kg</span>
-              <input
-                type="radio"
-                value="10kg"
-                {...register("parcelSize", { required: "Parcel size is required" })}
-              />
+              <input type="radio" value="10kg" {...register("parcelSize", { required: "Parcel size is required" })} />
             </label>
 
             <label className={styles.parcelRow}>
               <span>15kg</span>
-              <input
-                type="radio"
-                value="15kg"
-                {...register("parcelSize", { required: "Parcel size is required" })}
-              />
+              <input type="radio" value="15kg" {...register("parcelSize", { required: "Parcel size is required" })} />
             </label>
           </div>
 
-          {errors.parcelSize && (
-            <span className={styles.error}>{errors.parcelSize.message}</span>
-          )}
+          {errors.parcelSize && <span className={styles.error}>{errors.parcelSize.message}</span>}
         </div>
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.draftBtn}
-            onClick={() => submitWithStatus("DRAFT")}
-          >
+          <button type="button" className={styles.draftBtn} onClick={() => submitWithStatus("DRAFT")}>
             Save Draft
           </button>
 
-          <button
-            type="button"
-            className={styles.submitBtn}
-            onClick={() => submitWithStatus("PUBLISHED")}
-          >
+          <button type="button" className={styles.submitBtn} onClick={() => submitWithStatus("PUBLISHED")}>
             Upload
           </button>
         </div>
-
       </form>
 
-      {showPhotoTips && (
-        <PhotoTipsModal onClose={() => setShowPhotoTips(false)} />
-      )}
-
+      {showPhotoTips && <PhotoTipsModal onClose={() => setShowPhotoTips(false)} />}
     </div>
   );
 };
