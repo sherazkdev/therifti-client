@@ -39,7 +39,7 @@
     border-color 0.18s ease;
 }
 
-.isLoad {
+isLoad {
   opacity: 0.5;
 }
 /* Hover polish */
