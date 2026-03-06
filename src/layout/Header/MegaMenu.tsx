@@ -17,47 +17,44 @@ const MegaMenu = ({ category, onCategoryClick }: Props) => {
     <div className={styles.menu}>
       {/* LEFT SIDE */}
       <div className={styles.left}>
+
         {/* SEE ALL */}
         <div
-          className={`${styles.seeAll} ${
-            !activeChild ? styles.active : ""
-          }`}
+          className={`${styles.seeAll} ${!activeChild ? styles.active : ""}`}
           onMouseEnter={() => setActiveChild(null)}
-          onClick={() => onCategoryClick(category.id)}
+          onClick={() => onCategoryClick(category._id)}
         >
           <LayoutGrid size={18} />
           <span>See all</span>
         </div>
 
         {/* SECOND LEVEL */}
-        {category.children?.map((child) => {
-          const Icon = child.icon;
-
-          return (
-            <div
-              key={child.id}
-              className={`${styles.secondItem} ${activeChild?.id === child.id ? styles.active : ""
-                }`}
-              onMouseEnter={() => setActiveChild(child)}
-              onClick={() => onCategoryClick(child.id)}   
-            >
-              <div className={styles.leftItem}>
-                {Icon && <Icon size={18} />}
-                <span>{child.name}</span>
-              </div>
-              <ChevronRight size={16} />
+        {category.children?.map((child) => (
+          <div
+            key={child._id}
+            className={`${styles.secondItem} ${
+              activeChild?._id === child._id ? styles.active : ""
+            }`}
+            onMouseEnter={() => setActiveChild(child)}
+            onClick={() => onCategoryClick(child._id)}
+          >
+            <div className={styles.leftItem}>
+              {/* icon optional */}
+              <span>{child.title}</span>
             </div>
-          );
-        })}
+
+            <ChevronRight size={16} />
+          </div>
+        ))}
       </div>
 
       {/* RIGHT SIDE (THIRD LEVEL) */}
       <div className={styles.right}>
         {activeChild?.children?.map((sub) => (
           <div
-            key={sub.id}
+            key={sub._id}
             className={styles.thirdItem}
-            onClick={() => onCategoryClick(sub.id)}
+            onClick={() => onCategoryClick(sub._id)}
           >
             {sub.title}
           </div>

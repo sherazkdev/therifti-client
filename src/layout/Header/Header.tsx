@@ -21,11 +21,9 @@ const Header = ({
  
 
 const navigate = useNavigate();
-
-
 const handleCategoryClick = (id: string, Name?: string) => {
 
-  console.log("CLICKED CATEGORY:", Name);
+  console.log("CLICKED CATEGORY:", Name  , " ID = " , id);
 
   if (onParentCategorySelect && Name) {
     onParentCategorySelect(Name);
@@ -40,7 +38,7 @@ const handleCategoryClick = (id: string, Name?: string) => {
 
       <div className={styles.overlayArea}>
         <CategoryBar
-          categories={categories as Category[]}
+          categories={categories}
           onCategoryClick={handleCategoryClick}
           variant={variant}
         />
