@@ -1,5 +1,3 @@
-
-
 import React, { useState } from "react";
 import styles from "./CategoryBar.module.css";
 import MegaMenu from "../MegaMenu/MegaMenu";
@@ -22,7 +20,7 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
       }`}
       onMouseLeave={() => setActive(null)}
     >
-      {/* ================= LEFT SIDE CATEGORY LIST ================= */}
+      {/* LEFT SIDE CATEGORY LIST */}
       <ul className={styles.categoryList}>
         {categories.map((cat) => (
           <li
@@ -39,7 +37,7 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
         ))}
       </ul>
 
-      {/* ================= RIGHT SIDE (LOCATION + GLOBE) ================= */}
+      {/* RIGHT SIDE */}
       <div className={styles.categoryRight}>
         <div className={styles.location}>
           <MapPin size={16} />
@@ -51,7 +49,7 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
         </button>
       </div>
 
-      {/* ================= MEGA MENU ================= */}
+      {/* MEGA MENU */}
       {active && (
         <MegaMenu
           category={active}

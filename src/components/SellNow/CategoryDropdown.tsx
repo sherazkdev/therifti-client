@@ -7,18 +7,8 @@ import {
 } from "lucide-react";
 import styles from "./CategoryDropdown.module.css";
 
-/* ---------------- TYPES ---------------- */
 
-export type CategoryNode = {
-  id: string;
-  label: string;
-  icon?: string;
-  children?: CategoryNode[];
-};
-
-export type SelectedCategory = {
-  path: string[];
-};
+import type { CategoryNode, SelectedCategory } from "./CategoryDropdown.types";
 
 /* ---------------- PROPS ---------------- */
 
@@ -73,8 +63,7 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
   const [path, setPath] = useState<CategoryNode[]>([]);
 
   // items currently visible in menu
-  const [currentItems, setCurrentItems] =
-    useState<CategoryNode[]>(MOCK_CATEGORIES);
+  const [currentItems, setCurrentItems] = useState<CategoryNode[]>(MOCK_CATEGORIES);
 
   // depth of currentItems
   const [currentDepth, setCurrentDepth] = useState(0);
@@ -83,17 +72,13 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
-      if (
-        ref.current &&
-        !ref.current.contains(e.target as Node)
-      ) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     };
 
     document.addEventListener("mousedown", close);
-    return () =>
-      document.removeEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
   /* -------- RESET MENU ON OPEN -------- */
@@ -107,8 +92,7 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
       return;
     }
 
-    const parent =
-      path.length > 1 ? path[path.length - 2] : null;
+    const parent = path.length > 1 ? path[path.length - 2] : null;
 
     setCurrentItems(parent?.children || MOCK_CATEGORIES);
     setCurrentDepth(path.length - 1);
@@ -117,11 +101,7 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
   /* -------- SELECT -------- */
 
   const handleSelect = (item: CategoryNode) => {
-    // 🔑 slice path up to current depth, then add new item
-    const newPath = [
-      ...path.slice(0, currentDepth),
-      item,
-    ];
+    const newPath = [...path.slice(0, currentDepth), item];
 
     if (item.children && item.children.length) {
       setPath(newPath);
@@ -129,6 +109,10 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
       setCurrentDepth(currentDepth + 1);
     } else {
       setPath(newPath);
+      
+     
+      console.log("Selected Category ID:", item.id);
+    
       onSelectCategory({
         path: newPath.map((p) => p.label),
       });
@@ -148,25 +132,18 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
     if (newDepth === 0) {
       setCurrentItems(MOCK_CATEGORIES);
     } else {
-      setCurrentItems(
-        newPath[newDepth - 1].children || []
-      );
+      setCurrentItems(newPath[newDepth - 1].children || []);
     }
   };
 
   const displayValue =
-    path.length > 0
-      ? path.map((p) => p.label).join(" → ")
-      : "Select Category";
+    path.length > 0 ? path.map((p) => p.label).join(" → ") : "Select Category";
 
   return (
     <div className={styles.wrapper} ref={ref}>
       <label className={styles.label}>Category</label>
 
-      <div
-        className={styles.display}
-        onClick={() => setOpen((p) => !p)}
-      >
+      <div className={styles.display} onClick={() => setOpen((p) => !p)}>
         <span>{displayValue}</span>
         <ChevronDown size={18} />
       </div>
@@ -187,17 +164,12 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
 
           {/* BACK */}
           {currentDepth > 0 && (
-            <div
-              className={styles.back}
-              onClick={handleBack}
-            >
+            <div className={styles.back} onClick={handleBack}>
               <div className={styles.headerLeft}>
                 <span className={styles.iconBox}>
                   <ChevronLeft size={18} />
                 </span>
-                <span>
-                  {path[currentDepth - 1].label}
-                </span>
+                <span>{path[currentDepth - 1].label}</span>
               </div>
             </div>
           )}
@@ -214,9 +186,7 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
                 {item.label}
               </div>
 
-              {item.children && (
-                <ChevronRight size={16} />
-              )}
+              {item.children && <ChevronRight size={16} />}
             </div>
           ))}
         </div>

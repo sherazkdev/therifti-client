@@ -11,13 +11,12 @@ const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
 
   return (
     <div className={styles.menu}>
-      {/* LEFT SIDE */}
+      {/* LEFT S_idE */}
       <div className={styles.left}>
+
         {/* SEE ALL */}
         <div
-          className={`${styles.seeAll} ${
-            !activeChild ? styles.active : ""
-          }`}
+          className={`${styles.seeAll} ${!activeChild ? styles.active : ""}`}
           onMouseEnter={() => setActiveChild(null)}
           onClick={() => onCategoryClick(category._id)}
         >
@@ -47,7 +46,7 @@ const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
         })}
       </div>
 
-      {/* RIGHT SIDE (THIRD LEVEL) */}
+      {/* RIGHT S_idE (THIRD LEVEL) */}
       <div className={styles.right}>
         {activeChild?.children?.map((sub) => (
           <div
