@@ -5,6 +5,7 @@ import { AuthContext } from "./AuthContext";
 import type { UserDocumentInterface } from "../../types/auth/auth.types";
 import useUser from "../../hooks/server/auth/useUser";
 import { AxiosError } from "axios";
+import type { ApiError } from "../../types/api/api.interfaces";
 
 export const AuthProvider = ({ children }:{children:ReactNode}) => {
   const [user, setUser] = useState<UserDocumentInterface | null>(null);
@@ -18,7 +19,7 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
   };
 
   /** Note: Check User is Authenticated */
-  const { data, refetch, isLoading} = useUser();
+  const { data, refetch, isLoading,error} = useUser();
 
   useEffect( () => {
     const handleFetchAuthenticatedUser = async ():Promise<void> => {
@@ -36,12 +37,23 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
     return () => clearTimeout(timer);
   },[isAuthenticated]);
 
+
   useEffect( () => {
+    console.log(data);
     if(data){
       console.log(data);
       handleSetUser(data);
     }
-  },[data])
+  },[data]);
+
+  useEffect( () => {
+    if(error?.response?.data){
+      const err = error.response.data as ApiError || undefined;
+      if(err){
+        console.log(err)
+      }
+    }
+  },[error])
 
   return (
     <AuthContext.Provider value={{handleSetUser,isAuthenticated,user}}>

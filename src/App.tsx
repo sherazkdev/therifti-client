@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 
 /** Note: Layouts */
 import MainLayout from "./layouts/Main/mainLayout";
+import SessionRefresh from "./pages/SessionRefresh/SessionRefresh";
 
 const Home = lazy(() => import("./pages/Home/Home"));
 const LoginPage = lazy(() => import("./pages/auth/Auth"));
@@ -26,6 +27,7 @@ function App() {
           <Route path="/product/:productId" element={<ProductPage />} />
           <Route path="*" element={<h1> Not Found </h1>} />
         </Route>
+          <Route path="/11" element={<SessionRefresh />} />
       
       </Routes>
 

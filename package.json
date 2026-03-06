@@ -21,6 +21,7 @@
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-helmet": "^6.1.0",
     "react-hook-form": "^7.71.2",
     "react-hotkeys-hook": "^5.2.4",
     "react-router-dom": "^7.13.0"
@@ -32,6 +33,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
+    "@types/react-helmet": "^6.1.11",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",

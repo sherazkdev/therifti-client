@@ -16,6 +16,7 @@ const MainLayout = () => {
         "/product": "solid",
         "/category": "overlay",
         "/login": "solid",
+        "/sell": "solid",
     };
     
     const variant = headerVariants[router.pathname || "overlay"];
