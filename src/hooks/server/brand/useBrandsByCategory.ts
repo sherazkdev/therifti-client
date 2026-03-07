@@ -12,10 +12,10 @@ const BaseURL = import.meta.env.VITE_SERVER_URL;
 const apiServices = new ApiServices(BaseURL);
 const brandServices = new BrandServices(apiServices);
 
-const useBrandsByCategoryId = (categoryId:string) => {
+const useBrandsByCategoryId = (categoryId?:string) => {
     return useQuery<GetBrandsByCategoryApiResponse,AxiosError>({
         queryKey:["brands",categoryId],
-        queryFn:() => brandServices.getBrandsByCategory(categoryId),
+        queryFn:() => brandServices.getBrandsByCategory(categoryId!),
         enabled:!!categoryId
     })
 };

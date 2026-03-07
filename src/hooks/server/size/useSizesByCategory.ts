@@ -12,10 +12,10 @@ const BaseURL = import.meta.env.VITE_SERVER_URL;
 const apiServices = new ApiServices(BaseURL);
 const sizeServices = new SizeServices(apiServices);
 
-const useSizesByCategory = (categoryId:string) => {
+const useSizesByCategory = (categoryId?:string) => {
     return useQuery<GetSizesByCategoryApiResponse,AxiosError>({
         queryKey:["sizes",categoryId],
-        queryFn:() => sizeServices.getSizesByCategory(categoryId),
+        queryFn:() => sizeServices.getSizesByCategory(categoryId!),
         enabled:!!categoryId
     })
 };

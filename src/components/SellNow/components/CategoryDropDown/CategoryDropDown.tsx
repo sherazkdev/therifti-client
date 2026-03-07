@@ -1,77 +1,31 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  ChevronDown,
-  ChevronRight,
-  ChevronLeft,
-  TextSelect,
-} from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+
+/** Types */
+import type {CategoryDropDownProps} from "./CategoryDropdown.types";
+import type { CategoryDocument } from "../../../../types/category/category.types";
+
+/** Categories dummy data */
+import { categories } from "../../../../data/categories";
+
+/** Styles */
 import styles from "./CategoryDropdown.module.css";
+import { ChevronDown, ChevronLeft, ChevronRight, TextSelect } from "lucide-react";
 
-
-import type { CategoryNode, SelectedCategory } from "./components/CategoryDropDown/CategoryDropDown.types";
-import type { Category } from "../../types/category";
-import { categories } from "../../data/categories";
-
-/* ---------------- PROPS ---------------- */
-
-type Props = {
-  onSelectCategory: (cat: SelectedCategory) => void;
-};
-
-/* ---------------- MOCK DATA ---------------- */
-
-// const MOCK_CATEGORIES: CategoryNode[] = [
-//   {
-//     id: "women",
-//     label: "Women",
-//     children: [
-//       {
-//         id: "women-clothing",
-//         label: "Clothing",
-//         children: [
-//           { id: "dresses", label: "Dresses" },
-//           { id: "tops", label: "Tops" },
-//         ],
-//       },
-//       { id: "women-shoes", label: "Shoes" },
-//       { id: "women-bags", label: "Bags" },
-//     ],
-//   },
-//   {
-//     id: "men",
-//     label: "Men",
-//     children: [
-//       {
-//         id: "men-clothing",
-//         label: "Clothing",
-//         children: [
-//           { id: "shirts", label: "Shirts" },
-//           { id: "pants", label: "Pants" },
-//         ],
-//       },
-//       { id: "men-shoes", label: "Shoes" },
-//     ],
-//   },
-// ];
-
-/* ---------------- COMPONENT ---------------- */
-
-const CategoryDropdown = ({ onSelectCategory }: Props) => {
+const CategoryDropdown = ({ onSelectCategory }: CategoryDropDownProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
 
   // FULL selected path
-  const [path, setPath] = useState<Category[]>([]);
+  const [path, setPath] = useState<CategoryDocument[]>([]);
 
   // items currently visible in menu
-  const [currentItems, setCurrentItems] = useState<Category[]>(categories);
+  const [currentItems, setCurrentItems] = useState<CategoryDocument[]>(categories);
 
   // depth of currentItems
   const [currentDepth, setCurrentDepth] = useState(0);
 
   /* -------- CLOSE ON OUTSIDE CLICK -------- */
-
   useEffect(() => {
     const close = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -84,7 +38,6 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
   }, []);
 
   /* -------- RESET MENU ON OPEN -------- */
-
   useEffect(() => {
     if (!open) return;
 
@@ -106,7 +59,7 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
 
   /* -------- SELECT -------- */
 
-  const handleSelect = (item: Category) => {
+  const handleSelect = (item: CategoryDocument) => {
     const newPath = [...path.slice(0, currentDepth), item];
 
     if (item.children && item.children.length) {
@@ -200,5 +153,3 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
     </div>
   );
 };
-
-export default CategoryDropdown;

@@ -12,10 +12,10 @@ const BaseURL = import.meta.env.VITE_SERVER_URL;
 const apiServices = new ApiServices(BaseURL);
 const materialServices = new MaterialServices(apiServices);
 
-const useMaterialsByCategory = (categoryId:string) => {
+const useMaterialsByCategory = (categoryId?:string) => {
     return useQuery<GetMaterialsByCategoryApiResponse,AxiosError>({
         queryKey:["materials",categoryId],
-        queryFn:() => materialServices.getMaterialsByCategory(categoryId),
+        queryFn:() => materialServices.getMaterialsByCategory(categoryId!),
         enabled:!!categoryId
     })
 };
