@@ -1,6 +1,6 @@
 import { useState } from "react";
-import TopBar from "./TopBar";
-import CategoryBar from "./CategoryBar";
+import TopBar from "../../components/Header/TopBar/TopBar";
+import CategoryBar from "../../components/Header/Category/CategoryBar";
 import styles from "./Topbar.module.css";
 import { categories } from "../../data/categories";
 import type { Category } from "../../types/category";

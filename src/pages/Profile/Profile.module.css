@@ -1,0 +1,349 @@
+/* Profile.module.css */
+
+.profilePage {
+  width: 90%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #111;
+}
+
+/* --- Header Section --- */
+.profileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  border: 1px solid #eaeaea; /* Clean edge like modern apps */
+}
+
+.profileInfo {
+  display: flex;
+  gap: 24px;
+}
+
+.profileAvatar {
+  width: 120px;   
+  height: 120px;   
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eaeaea; 
+}
+
+.profileDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profileName {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.profileMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: #666;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* --- Header Actions (Follow + Options) --- */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.activeBtn {
+  background-color: #090a0a; /* Vinted-style Teal */
+  color: #fff;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.activeBtn:hover {
+  background-color: #252a2b;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.iconBtn:hover {
+  background-color: #f5f5f5;
+  color: #111;
+}
+
+/* --- Tabs Section --- */
+.profileTabs {
+  display: flex;
+  gap: 30px;
+  border-bottom: 1px solid #eaeaea;
+  margin-bottom: 30px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  padding: 0 0 12px 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.tabActive {
+  color: #111;
+}
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #007782; /* Active tab match with Follow button */
+}
+
+/* --- Filters Section --- */
+.filterSection {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filterSelect {
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+}
+
+.productCount {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* --- Listing Grid Section --- */
+.listingGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.itemCard {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #eaeaea;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.itemCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.itemImageWrapper {
+  position: relative;
+  aspect-ratio: 3/4;
+  background-color: #f9f9f9;
+}
+
+.itemImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  padding: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.itemInfo {
+  padding: 12px;
+}
+
+.itemStats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.bumpBtn {
+  width: 100%;
+  padding: 8px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.bumpBtn:hover {
+  background: #eaeaea;
+}
+
+/* --- Reviews Section --- */
+.reviewsSection {
+  max-width: 800px;
+}
+
+.reviewsHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.reviewRating {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.reviewStars {
+  color: #f5c518;
+  display: flex;
+  gap: 2px;
+}
+
+.reviewCard {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #eaeaea;
+  margin-bottom: 16px;
+}
+
+.reviewUser {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.reviewAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f0f0f0;
+}
+
+.reviewText {
+  color: #444;
+  line-height: 1.5;
+  font-size: 15px;
+  margin: 0;
+}
+
+/* --- Mobile Responsiveness --- */
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  .profilePage {
+    padding: 20px 16px;
+  }
+
+  .profileHeader {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    padding: 24px 20px; /* Thori padding barha di taake card jaisa feel aaye */
+  }
+
+  .profileInfo {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .profileMeta {
+    justify-content: center;
+  }
+
+  
+  .headerActions {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .activeBtn {
+    flex: 1; 
+    width: 100%;
+  }
+
+  .iconBtn {
+    flex-shrink: 0; 
+    background-color: #f9f9f9; 
+    border: 1px solid #eaeaea;
+  }
+
+  .listingGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .filterSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filterSelect {
+    width: 100%;
+  }
+}
