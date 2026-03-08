@@ -10,13 +10,3 @@ export type FormValues = {
 };
 
 export type ListingStatus = "PUBLISHED" | "DRAFT";
-
-export type MultiProps = {
-  label: string;
-  options: string[];
-  selected: string[];
-  setSelected: (val: string[]) => void;
-  error?: string;
-  singleSelect?: boolean;
-  maxSelect?: number;
-};

@@ -1,8 +1,9 @@
+import type { CategoryDocument } from "../../../../types/category/category.types";
 
 export type SelectedCategory = {
   path: string[];
 };
 
 export interface CategoryDropDownProps  {
-  onSelectCategory: (cat: SelectedCategory) => void;
+  handleCategoryOnChange:(category:CategoryDocument) => void
 };

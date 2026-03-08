@@ -1,5 +1,6 @@
 import axios,{type AxiosInstance, type AxiosResponse} from "axios";
 import { getAccessToken } from "../api/auth/auth";
+import { useNavigate } from "react-router-dom";
 
 class ApiServices {
     private api:AxiosInstance;
@@ -20,6 +21,17 @@ class ApiServices {
             }
             return config;
         },err => Promise.reject(err));
+
+        this.api.interceptors.response.use( async (response) => response,
+            (err) => {
+                const Redirect = useNavigate();
+                if(err.response?.data?.messages?.includes("jwt expired")){
+                    /** To Session Refresh */
+                    Redirect("/session-refresh");
+                }
+                return Promise.reject(err);
+            }
+        )
     }
     
     /**

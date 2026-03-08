@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 100%; /* Ensures it fills whatever grid column it is placed in */
+  width: 100%; 
+  /* 👇 Yahan se max-width aur margin hata diya hai taa keh gaps na aayein */
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
@@ -18,7 +19,7 @@
 .media {
   position: relative;
   width: 100%;
-  aspect-ratio: 3/4; /* This replaces height: 220px for flawless scaling on all devices */
+  aspect-ratio: 4/5; /*  3/4 thora zyada lamba tha, 4/5 thora balanced aur pyara lagega */
   border-radius: 8px;
   overflow: hidden;
   background: #f8f8f8;
@@ -28,11 +29,10 @@
 .img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover; /* 👈 YEH SAB SE ZAROORI HAI: Is se white space khatam ho jayega aur image poore box mein fit hogi */
+  object-position: top; /* 👈 Kapron ki images hamesha top se achi lagti hain */
   display: block;
 }
-
 .placeholder {
   width: 100%;
   height: 100%;
@@ -119,13 +119,98 @@
   border-radius: 4px;
 }
 
-/* Responsive */
+/* ================= MOBILE ================= */
 @media (max-width: 600px) {
-  /* No need to change height anymore, aspect-ratio handles it perfectly! */
-  .brand, .price {
+
+  .card {
+    gap: 8px;
+  }
+
+  .brand,
+  .price {
     font-size: 13px;
   }
+
   .meta {
     font-size: 11px;
   }
+
+  .likeBadge {
+    right: 8px;
+    bottom: 8px;
+    padding: 3px 5px;
+    font-size: 11px;
+  }
+
+}
+
+
+/* ================= TABLET ================= */
+@media (min-width: 601px) and (max-width: 1024px) {
+
+  .card {
+    gap: 9px;
+  }
+
+  .brand {
+    font-size: 14px;
+  }
+
+  .price {
+    font-size: 14px;
+  }
+
+  .meta {
+    font-size: 12px;
+  }
+
+  .likeBadge {
+    right: 9px;
+    bottom: 9px;
+  }
+
+}
+
+
+/* ================= LAPTOP ================= */
+@media (min-width: 1025px) and (max-width: 1440px) {
+
+  .card {
+    gap: 10px;
+  }
+
+  .brand {
+    font-size: 15px;
+  }
+
+  .price {
+    font-size: 15px;
+  }
+
+  .meta {
+    font-size: 12px;
+  }
+
+}
+
+
+/* ================= DESKTOP / LARGE SCREENS ================= */
+@media (min-width: 1441px) {
+
+  .card {
+    gap: 12px;
+  }
+
+  .brand {
+    font-size: 16px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+
+  .meta {
+    font-size: 13px;
+  }
+
 }

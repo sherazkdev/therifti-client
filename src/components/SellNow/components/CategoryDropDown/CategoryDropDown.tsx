@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type FC } from "react";
 
 /** Types */
-import type {CategoryDropDownProps} from "./CategoryDropdown.types";
+import type {CategoryDropDownProps} from "./CategoryDropDown.types";
 import type { CategoryDocument } from "../../../../types/category/category.types";
 
 /** Categories dummy data */
@@ -11,7 +11,8 @@ import { categories } from "../../../../data/categories";
 import styles from "./CategoryDropdown.module.css";
 import { ChevronDown, ChevronLeft, ChevronRight, TextSelect } from "lucide-react";
 
-const CategoryDropdown = ({ onSelectCategory }: CategoryDropDownProps) => {
+const CategoryDropdown: FC<CategoryDropDownProps> = ({handleCategoryOnChange}) => {
+  
   const ref = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
@@ -53,10 +54,6 @@ const CategoryDropdown = ({ onSelectCategory }: CategoryDropDownProps) => {
     setCurrentDepth(path.length - 1);
   }, [open]);
 
-  useEffect( () => {
-    console.log("paht",path)
-  },[path])
-
   /* -------- SELECT -------- */
 
   const handleSelect = (item: CategoryDocument) => {
@@ -68,13 +65,7 @@ const CategoryDropdown = ({ onSelectCategory }: CategoryDropDownProps) => {
       setCurrentDepth(currentDepth + 1);
     } else {
       setPath(newPath);
-      
-     
-      console.log("Selected Category ID:", item._id);
-    
-      onSelectCategory({
-        path: newPath.map((p) => p.title),
-      });
+      handleCategoryOnChange(item)
       setOpen(false);
     }
   };
@@ -153,3 +144,5 @@ const CategoryDropdown = ({ onSelectCategory }: CategoryDropDownProps) => {
     </div>
   );
 };
+
+export default CategoryDropdown;

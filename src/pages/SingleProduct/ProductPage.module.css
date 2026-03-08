@@ -1,6 +1,7 @@
 .pageWrapper {
   width: 90%;
-  max-width: 1200px;
+  max-width: 100%;
+  margin: 0 auto;
   margin: 40px auto;
   font-family: "Poppins", sans-serif;
   color: #222;
@@ -240,30 +241,6 @@
   flex-shrink: 0;
 }
 
-/* Responsive Breakpoints */
-/* @media (max-width: 1024px) {
-  .topContainer, .memberSection {
-    gap: 24px;
-  }
-}
-
-@media (max-width: 850px) {
-  .topContainer, .memberSection {
-    flex-direction: column;
-  }
-  
-  .memberRight {
-    width: 100%;
-    order: -1; 
-  }
-}
-
-@media (max-width: 480px) {
-  .pageWrapper {
-    width: 95%;
-    margin: 20px auto;
-  }
-} */
 
 
 

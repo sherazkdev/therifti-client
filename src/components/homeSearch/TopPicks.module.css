@@ -323,11 +323,10 @@
 /* Product grid */
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 24px;
   margin-top: 4px;
 }
-
 /* Footer */
 .footer {
   display: flex;
@@ -360,43 +359,14 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .grid {
+    /* Mobile par zaroori 2 columns aur gap kam karna */
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
   }
   .dropdown {
     width: 280px;
   }
 }
-
-/* ✅ Mobile improved: filters scroll horizontally (better UX) */
-/* @media (max-width: 600px) {
-  .filters {
-    flex-wrap: wrap;
-    overflow: visible;
-    gap: 8px;
-  }
-
-  .pill {
-    min-height: 38px;
-  }
-
-  .dropWrap {
-    width: auto;
-  }
-
-  .dropdown {
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    width: min(92vw, 360px);
-    max-width: 92vw;
-    top: calc(100% + 8px);
-  }
-
-  .wrapper {
-    overflow-x: hidden;
-  }
-} */
-
 
 @media (max-width: 600px) {
   .filters {
@@ -429,6 +399,7 @@
     overflow-x: hidden;
   }
 }
+
 
 
 

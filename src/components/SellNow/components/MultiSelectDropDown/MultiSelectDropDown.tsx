@@ -1,102 +1,101 @@
-import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
-import styles from "./SellItem.module.css";
+import { useState, useRef, useEffect, type FC } from "react";
 
-type Props = {
-  label: string;
-  options: string[];
-  selected: string[];
-  setSelected: (v: string[]) => void;
-  error?: string;
-  singleSelect?: boolean;
-  maxSelect?: number;
-};
+import styles from "../../SellItem.module.css";
 
-const MultiSelectDropdown = ({
+/** Types */
+import type { MultiSelectDropDownProps } from "./MultiSelectDropDown.types";
+import DropDownMenu from "./components/DropDownMenu/DropDownMenu";
+import DropDownDisplay from "./components/DropDownDisplay/DropDownDisplay";
+
+/**
+ * Generic MultiSelectDropdown with type T
+ */
+const MultiSelectDropdown: FC<MultiSelectDropDownProps> = ({
   label,
   options,
   selected,
-  setSelected,
+  onChange,
   error,
   singleSelect,
   maxSelect,
-}: Props) => {
+}) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const [open,setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(()=>{
-
-    const close = (e:MouseEvent)=>{
-      if(ref.current && !ref.current.contains(e.target as Node)){
-        setOpen(false)
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
       }
-    }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    document.addEventListener("mousedown",close)
+  // Get unique identifier (for objects or strings)
+  const getId = (option: any) => typeof option[0] === "string" ? option : option._id;
 
-    return ()=> document.removeEventListener("mousedown",close)
-
-  },[])
-
-  const toggle = (opt:string)=>{
-
+  const handletoggleOption = (option:any) => {
+    
     if(singleSelect){
-      setSelected([opt])
-      setOpen(false)
-      return
+      onChange(option);
+      setOpen(false);
+      return;
     }
 
-    if(selected.includes(opt)){
-      setSelected(selected.filter(v=>v!==opt))
-    }
-    else if(!maxSelect || selected.length < maxSelect){
-      setSelected([...selected,opt])
+    if(Array.isArray(selected) && selected?.length >= (maxSelect as number)){
+      return;
     }
 
-  }
+    if (label === "Material") {
+      // selected ko ensure karo array hai
+      const selectedArray:any = Array.isArray(selected) ? selected : [];
+      // Duplicate check
+      const isDuplicate = selectedArray.some((s:any) => s?._id === option._id);
+      if (isDuplicate) {
+        return;
+      }
 
+      // Not duplicate → add
+      onChange(option);
+    }
+
+    if(label === "Color"){
+      const selectedArray:any = Array.isArray(selected) ? selected : [];
+
+      const isDuplicate = selectedArray.some((s:string) => s === option);
+      if (isDuplicate) {
+        return;
+      }
+
+      onChange(option);
+    }
+
+    if(label === "Size"){
+      const selectedArray:any = Array.isArray(selected) ? selected : [];
+
+      const isDuplicate = selectedArray.some((s:any) => s?._id === option._id);
+      if (isDuplicate) {
+        return;
+      }
+      onChange(option);
+    }
+  };
+
+  const handleDropDownDisplay = () => setOpen(!open);
   return (
-
     <div className={styles.formGroup} ref={ref}>
-
       <label>{label}</label>
 
-      <div
-        className={styles.dropdownDisplay}
-        onClick={()=>setOpen(!open)}
-      >
-        <span>
-          {selected.length ? selected.join(",") : `Select ${label}`}
-        </span>
-
-        <ChevronDown size={16}/>
-      </div>
+      <DropDownDisplay label={label} selected={selected} handleDropDownDisplay={handleDropDownDisplay} />
 
       {error && <span className={styles.error}>{error}</span>}
 
       {open && (
-
-        <div className={styles.dropdownMenu}>
-
-          {options.map(opt=>(
-            <div
-              key={opt}
-              className={styles.dropdownOption}
-              onClick={()=>toggle(opt)}
-            >
-              {opt}
-            </div>
-          ))}
-
-        </div>
-
+        <DropDownMenu handletoggleOption={handletoggleOption} label={label} selected={selected} visible={options} />
       )}
-
     </div>
+  );
+};
 
-  )
-
-}
-
-export default MultiSelectDropdown
+export default MultiSelectDropdown;
