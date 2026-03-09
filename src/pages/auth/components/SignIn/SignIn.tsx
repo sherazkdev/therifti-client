@@ -8,9 +8,9 @@ import useLogin from "../../../../hooks/server/auth/useLogin";
 
 /** Types */
 import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "./SignIn.types";
-import type { ApiError } from "../../../../types/api/api.interfaces";
+import type { ApiError } from "../../../../types/api/apiError"; 
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
-import { saveRefreshToken,saveAccessToken } from "../../../../api/auth/auth"; 
+import { saveRefreshToken,saveAccessToken } from "../../../../services/api/auth/auth";
 
 export default function SignIn({ onForgot, onSuccess}: EmailLoginPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,11 +33,11 @@ export default function SignIn({ onForgot, onSuccess}: EmailLoginPropsInterface)
           if(err.response && err.response.data){
             const Error = err.response.data as ApiError || undefined;
             if(Error){
-              if(Error.errorCode === "VALIDATION_FAILED"){
+              if(Error.message === "VALIDATION_FAILED"){
                 setServerError(Error.message);
                 return;
               }
-              setServerError(AUTH_ERROR_MESSAGES[Error.errorCode]);
+              setServerError(AUTH_ERROR_MESSAGES[Error.message]);
               return;
             }
           }

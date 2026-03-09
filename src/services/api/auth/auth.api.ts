@@ -1,10 +1,10 @@
-import { type ForgotAccountApiResponse, type ForgotAccountInterface, type LoggedInUserApiResponse, type LoginAccountInterface, type LoginApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountOtpApiResponse, type VerifyForgotAccountResetTokenAndChangePasswordInterface, type VerifyForgotAccountResetTokenApiResponse,  type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpApiResponse, type VerifyRegisterationAccountOtpInterface } from "./auth.types";
-import type ApiServices from "../../services/api.services";
+import { type ForgotAccountApiResponse, type ForgotAccountInterface, type LoggedInUserApiResponse, type LoginAccountInterface, type LoginApiResponse, type RefreshAccessTokenApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountOtpApiResponse, type VerifyForgotAccountResetTokenAndChangePasswordInterface, type VerifyForgotAccountResetTokenApiResponse,  type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpApiResponse, type VerifyRegisterationAccountOtpInterface } from "./auth.types";
+import type BackendRequestMethods from "../../BackendRequestMethods/BackendRequestMethods";
 
 class AuthServices {
-    private apiServices:ApiServices;
+    private apiServices:BackendRequestMethods;
 
-    constructor(apiServices:ApiServices){
+    constructor(apiServices:BackendRequestMethods){
         this.apiServices = apiServices;
     }
     
@@ -92,6 +92,17 @@ class AuthServices {
     */
     public async CurrentUser():Promise<LoggedInUserApiResponse> {
         const response = await this.apiServices.Get<LoggedInUserApiResponse>("/auth/current-user");
+        return response;
+    };
+
+    /** 
+     * Note: Refresh Access Token Api Service.
+     * 
+     * this service using for jwt accesToken is expired to generate a new accessToken.
+     * @return {Promise<RefreshAccessTokenApiResponse>} - Created Token response
+    */
+    public async RefreshAccessToken(refreshToken:string):Promise<RefreshAccessTokenApiResponse>{
+        const response = await this.apiServices.Post<RefreshAccessTokenApiResponse>("/auth/refresh-token",{refreshToken});
         return response;
     }
 }

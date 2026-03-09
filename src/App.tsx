@@ -39,9 +39,8 @@ function App() {
           <Route path="*" element={<h1>Not Found</h1>} />
 
         </Route>
-
-        <Route path="/11" element={<SessionRefresh />} />
-
+          <Route path="/11" element={<SessionRefresh />} />
+      
       </Routes>
 
     </Suspense>

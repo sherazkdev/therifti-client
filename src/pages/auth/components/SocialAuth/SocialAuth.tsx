@@ -6,7 +6,7 @@ import styles from "./SocialAuth.module.css";
 import { AppleIcon, FacebookIcon, GoogleIcon } from "../../../../assets/icons/svgs/svg";
 
 import useUser from "../../../../hooks/server/auth/useUser";
-import { saveAccessToken, saveRefreshToken } from "../../../../api/auth/auth";
+import { saveRefreshToken,saveAccessToken } from "../../../../services/api/auth/auth";
 import type { SocialAuthInterface } from "../../Auth.types";
 
 /** Note: Context */

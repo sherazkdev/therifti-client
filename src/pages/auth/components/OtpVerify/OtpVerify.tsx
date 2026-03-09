@@ -4,8 +4,8 @@ import styles from "./OtpVerify.module.css";
 /** Hooks */
 import useVerifyRegisterationOtp from "../../../../hooks/server/auth/useVerifyRegisterationOtp";
 import useVerifyForgotAccountOtp from "../../../../hooks/server/auth/useVerifyForgotAccountOtp";
-import type { ApiError } from "../../../../types/api/api.interfaces";
-import { saveRefreshToken,saveAccessToken } from "../../../../api/auth/auth"; 
+import type { ApiError } from "../../../../types/api/apiError";
+import { saveRefreshToken,saveAccessToken } from "../../../../services/api/auth/auth";
 
 /** @note: AuthProviders */
 import { AuthContext } from "../../../../contexts/auth/AuthContext";
@@ -110,11 +110,11 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
             const err = resErr.response?.data as ApiError || undefined;
             console.log(err)
             if(err){
-              if(err.errorCode === "VALIDATION_FAILED"){
-                setError(err.errorCode);
+              if(err.message === "VALIDATION_FAILED"){
+                setError(err.message);
                 return;
               }
-              setError(AUTH_ERROR_MESSAGES[err.errorCode]);
+              setError(AUTH_ERROR_MESSAGES[err.message]);
               return;
             }
           },
@@ -132,11 +132,11 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
           onError:(resErr) => {
             const err = resErr.response?.data as ApiError || undefined;
             if(err){
-              if(err.errorCode === "VALIDATION_FAILED"){
-                setError(err.errorCode);
+              if(err.message === "VALIDATION_FAILED"){
+                setError(err.message);
                 return;
               }
-              setError(AUTH_ERROR_MESSAGES[err.errorCode]);
+              setError(AUTH_ERROR_MESSAGES[err.message]);
               return;
             }
           },

@@ -3,8 +3,7 @@ import type { AuthErrorCodes } from "../../constants/errors/auth.errors";
 
 export interface ApiError {
     success?: boolean;
-    message: string;
+    message: AuthErrorCodes;
     statusCode: number;
-    errorCode:AuthErrorCodes,
-    data?: unknown;
+    errors:any[]
 }

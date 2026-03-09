@@ -1,75 +1,32 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  ChevronDown,
-  ChevronRight,
-  ChevronLeft,
-  TextSelect,
-} from "lucide-react";
+import { useState, useEffect, useRef, type FC } from "react";
+
+/** Types */
+import type {CategoryDropDownProps} from "./CategoryDropDown.types";
+import type { CategoryDocument } from "../../../../types/category/category.types";
+
+/** Categories dummy data */
+import { categories } from "../../../../data/categories";
+
+/** Styles */
 import styles from "./CategoryDropdown.module.css";
+import { ChevronDown, ChevronLeft, ChevronRight, TextSelect } from "lucide-react";
 
-
-import type { CategoryNode, SelectedCategory } from "./CategoryDropdown.types";
-
-/* ---------------- PROPS ---------------- */
-
-type Props = {
-  onSelectCategory: (cat: SelectedCategory) => void;
-};
-
-/* ---------------- MOCK DATA ---------------- */
-
-const MOCK_CATEGORIES: CategoryNode[] = [
-  {
-    id: "women",
-    label: "Women",
-    children: [
-      {
-        id: "women-clothing",
-        label: "Clothing",
-        children: [
-          { id: "dresses", label: "Dresses" },
-          { id: "tops", label: "Tops" },
-        ],
-      },
-      { id: "women-shoes", label: "Shoes" },
-      { id: "women-bags", label: "Bags" },
-    ],
-  },
-  {
-    id: "men",
-    label: "Men",
-    children: [
-      {
-        id: "men-clothing",
-        label: "Clothing",
-        children: [
-          { id: "shirts", label: "Shirts" },
-          { id: "pants", label: "Pants" },
-        ],
-      },
-      { id: "men-shoes", label: "Shoes" },
-    ],
-  },
-];
-
-/* ---------------- COMPONENT ---------------- */
-
-const CategoryDropdown = ({ onSelectCategory }: Props) => {
+const CategoryDropdown: FC<CategoryDropDownProps> = ({handleCategoryOnChange}) => {
+  
   const ref = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
 
   // FULL selected path
-  const [path, setPath] = useState<CategoryNode[]>([]);
+  const [path, setPath] = useState<CategoryDocument[]>([]);
 
   // items currently visible in menu
-  const [currentItems, setCurrentItems] = useState<CategoryNode[]>(MOCK_CATEGORIES);
+  const [currentItems, setCurrentItems] = useState<CategoryDocument[]>(categories);
 
   // depth of currentItems
   const [currentDepth, setCurrentDepth] = useState(0);
 
   /* -------- CLOSE ON OUTSIDE CLICK -------- */
-
   useEffect(() => {
     const close = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -82,25 +39,24 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
   }, []);
 
   /* -------- RESET MENU ON OPEN -------- */
-
   useEffect(() => {
     if (!open) return;
 
     if (path.length === 0) {
-      setCurrentItems(MOCK_CATEGORIES);
+      setCurrentItems(categories);
       setCurrentDepth(0);
       return;
     }
 
     const parent = path.length > 1 ? path[path.length - 2] : null;
 
-    setCurrentItems(parent?.children || MOCK_CATEGORIES);
+    setCurrentItems(parent?.children || categories);
     setCurrentDepth(path.length - 1);
   }, [open]);
 
   /* -------- SELECT -------- */
 
-  const handleSelect = (item: CategoryNode) => {
+  const handleSelect = (item: CategoryDocument) => {
     const newPath = [...path.slice(0, currentDepth), item];
 
     if (item.children && item.children.length) {
@@ -109,13 +65,7 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
       setCurrentDepth(currentDepth + 1);
     } else {
       setPath(newPath);
-      
-     
-      console.log("Selected Category ID:", item.id);
-    
-      onSelectCategory({
-        path: newPath.map((p) => p.label),
-      });
+      handleCategoryOnChange(item)
       setOpen(false);
     }
   };
@@ -130,14 +80,14 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
     setCurrentDepth(newDepth);
 
     if (newDepth === 0) {
-      setCurrentItems(MOCK_CATEGORIES);
+      setCurrentItems(categories);
     } else {
       setCurrentItems(newPath[newDepth - 1].children || []);
     }
   };
 
   const displayValue =
-    path.length > 0 ? path.map((p) => p.label).join(" → ") : "Select Category";
+    path.length > 0 ? path.map((p) => p.title).join(" → ") : "Select Category";
 
   return (
     <div className={styles.wrapper} ref={ref}>
@@ -169,7 +119,7 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
                 <span className={styles.iconBox}>
                   <ChevronLeft size={18} />
                 </span>
-                <span>{path[currentDepth - 1].label}</span>
+                <span>{path[currentDepth - 1].title}</span>
               </div>
             </div>
           )}
@@ -177,13 +127,13 @@ const CategoryDropdown = ({ onSelectCategory }: Props) => {
           {/* OPTIONS */}
           {currentItems.map((item) => (
             <div
-              key={item.id}
+              key={item._id}
               className={styles.option}
               onClick={() => handleSelect(item)}
             >
               <div className={styles.left}>
                 <span className={styles.iconBox}>⬚</span>
-                {item.label}
+                {item.title}
               </div>
 
               {item.children && <ChevronRight size={16} />}

@@ -1,7 +1,9 @@
-import axios,{type AxiosInstance, type AxiosResponse} from "axios";
-import { getAccessToken } from "../api/auth/auth";
+import axios,{AxiosError, type AxiosInstance, type AxiosResponse} from "axios";
+import { getAccessToken, getRefreshToken, removeAccessAndRefreshToken, saveAccessToken, saveRefreshToken } from "../api/auth/auth";
+import type { RefreshAccessTokenApiResponse } from "../api/auth/auth.types";
+import type { ApiError } from "../../types/api/apiError";
 
-class ApiServices {
+class BackendRequestMethods {
     private api:AxiosInstance;
 
     constructor(baseURL: string){
@@ -19,7 +21,50 @@ class ApiServices {
                 config.headers["Authorization"] = `Bearer ${accessToken}`;
             }
             return config;
-        },err => Promise.reject(err));
+        },err => Promise.resolve(err));
+
+        this.api.interceptors.response.use( async (response) => response,
+            async (err:any) => {
+                console.log(err)
+                let orignalRequest = err.config;
+                if(err && err.response && err.response.data?.stack?.includes("jwt expired") && !orignalRequest._retry){
+                    const memoryRefreshToken = await getRefreshToken();
+                    if(!memoryRefreshToken){
+                        await removeAccessAndRefreshToken();
+                        return;
+                    }
+                    try {
+                        /** To Session Refresh */
+                        const response = await this.api.post("/auth/refresh-token",{refreshToken:memoryRefreshToken});
+                        const {accessToken,refreshToken} = response.data.data;
+                        /** Note: Store Access and Refresh Token */
+                        saveAccessToken(accessToken);
+                        saveRefreshToken(refreshToken);
+                        /** Note: Set Authorization Bearer ${accessToken} */
+                        orignalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
+                        orignalRequest._retry = true;
+                        
+                        return this.api(orignalRequest);
+                    } catch (e:unknown) {
+                        if(e instanceof AxiosError){
+                            const err = (e.response?.data as ApiError) || undefined;
+                            
+                            console.log(err);
+                            if(err){
+                                if(err.message === "TOKEN_INVALID" || err.message === "TOKEN_EXPIRED" || err.message === "TOKEN_IS_USED"){
+                                    return await removeAccessAndRefreshToken();
+                                }else if(err.message === "VALIDATION_FAILED"){
+                                    return;
+                                }
+                            }
+                            return Promise.reject(e);
+                        }
+                    }
+                    return Promise.reject(err);
+                }
+                return Promise.reject(err)
+            }
+        )
     }
     
     /**
@@ -78,4 +123,4 @@ class ApiServices {
     }
 }
 
-export default ApiServices;
+export default BackendRequestMethods;

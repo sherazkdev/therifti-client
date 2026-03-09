@@ -22,3 +22,11 @@ export function saveRefreshToken(refreshToken:string) {
 export async function getRefreshToken() {
   return localStorage.getItem("refreshToken");
 }
+
+
+/** @note: Remove access and refresh token */
+export async function removeAccessAndRefreshToken(){
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  return;
+}

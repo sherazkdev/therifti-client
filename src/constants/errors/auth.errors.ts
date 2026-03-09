@@ -13,6 +13,7 @@ export const AUTH_ERROR_MESSAGES = {
   OTP_EXPIRED: "Verification code has expired.",
   ACCESS_TOKEN_NOT_FOUND: "Access token missing.",
   TOKEN_INVALID: "Invalid authentication token.",
+  UNAUTHORIZED: "Unauthorized access",
   VALIDATION_FAILED: "VALIDATION_FAILED"
 } as const;
 

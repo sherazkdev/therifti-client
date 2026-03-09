@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import styles from "./SellItem.module.css";
+import styles from "../../SellItem.module.css";
 
 type Props = {
   onClose: () => void;
