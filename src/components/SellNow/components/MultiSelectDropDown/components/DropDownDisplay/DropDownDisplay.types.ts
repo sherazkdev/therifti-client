@@ -1,5 +1,7 @@
 export interface DropDownDisplayPropsInterface {
-    selected:any,
-    label:"Material" | "Size" | "Brand" | "Condition" | "Color",
-    handleDropDownDisplay: () => void;
+  label: "Material" | "Size" | "Brand" | "Condition" | "Color";
+  placeholder: string;
+  displayValue: string;
+  isEmpty: boolean;
+  handleDropDownDisplay: () => void;
 }

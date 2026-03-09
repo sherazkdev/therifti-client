@@ -1,5 +1,5 @@
 
-import type {UserDocumentInterface} from "../../types/auth/auth.types";
+import type { UserDocumentInterface } from "../../../types/auth/auth.types";
 
 /** @note: Login account interface */
 export interface LoginAccountInterface { 
@@ -81,13 +81,15 @@ export interface RegisterApiResponse {
   data:RegisterResponseInterface
 };
 
+export interface ACCESS_REFRESH_TOKEN_INTERFACE {
+  refreshToken:string,
+  accessToken:string
+}
+
 /** Note: Verify Registeration AccountOtp Response.*/
 export interface VerifyRegisterationAccountOtpResponse {
   user:UserDocumentInterface,
-  tokens:{
-    refreshToken:string,
-    accessToken:string
-  }
+  tokens:ACCESS_REFRESH_TOKEN_INTERFACE
 }
 
 /** Note: Verify Registeration AccountOtp Response. */
@@ -130,3 +132,10 @@ export interface LoggedInUserApiResponse {
   data:LoggedInUserResponse
 }
 
+/** Note: Refresh Access Token Api Response */
+export interface RefreshAccessTokenApiResponse {
+  success: boolean;
+  message: string;
+  statusCode: number;
+  data:ACCESS_REFRESH_TOKEN_INTERFACE
+}

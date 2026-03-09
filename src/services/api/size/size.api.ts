@@ -1,11 +1,11 @@
-import ApiServices from "../../services/api.services";
+import BackendRequestMethods from "../../BackendRequestMethods/BackendRequestMethods";
 import type { GetSizesByCategoryApiResponse } from "./size.types";
 
 
 class SizeServices {
-    private apiServices:ApiServices;
+    private apiServices:BackendRequestMethods;
 
-    constructor(apiServices:ApiServices){
+    constructor(apiServices:BackendRequestMethods){
         this.apiServices = apiServices;
     }
 

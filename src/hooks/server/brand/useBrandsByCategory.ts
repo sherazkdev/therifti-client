@@ -1,16 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 
+/** Types */
+import type { GetBrandsByCategoryApiResponse } from "../../../services/api/brand/brand.types";
+
 /** Services */
-import BrandServices from "../../../api/brand/brand.api";
-import ApiServices from "../../../services/api.services";
-import { AxiosError } from "axios";
-import type { GetBrandsByCategoryApiResponse } from "../../../api/brand/brand.types";
+import BrandServices from "../../../services/api/brand/brand.api";
+import BackendRequestMethods from "../../../services/BackendRequestMethods/BackendRequestMethods";
+import type { AxiosError } from "axios";
 
 /** @note: Server url. */
 const BaseURL = import.meta.env.VITE_SERVER_URL;
 
-const apiServices = new ApiServices(BaseURL);
-const brandServices = new BrandServices(apiServices);
+const requestMethods = new BackendRequestMethods(BaseURL);
+const brandServices = new BrandServices(requestMethods);
 
 const useBrandsByCategoryId = (categoryId?:string) => {
     return useQuery<GetBrandsByCategoryApiResponse,AxiosError>({

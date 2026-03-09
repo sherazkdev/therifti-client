@@ -1,8 +1,7 @@
 import axios,{type AxiosInstance, type AxiosResponse} from "axios";
 import { getAccessToken } from "../api/auth/auth";
-import { useNavigate } from "react-router-dom";
 
-class ApiServices {
+class BackendRequestMethods {
     private api:AxiosInstance;
 
     constructor(baseURL: string){
@@ -24,10 +23,9 @@ class ApiServices {
 
         this.api.interceptors.response.use( async (response) => response,
             (err) => {
-                const Redirect = useNavigate();
-                if(err.response?.data?.messages?.includes("jwt expired")){
+                if(err.response?.data?.stack?.includes("jwt expired") && window.location.pathname !== "/session-refresh"){
                     /** To Session Refresh */
-                    Redirect("/session-refresh");
+                    window.location.href = '/session-refresh';
                 }
                 return Promise.reject(err);
             }
@@ -90,4 +88,4 @@ class ApiServices {
     }
 }
 
-export default ApiServices;
+export default BackendRequestMethods;

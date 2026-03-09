@@ -1,16 +1,16 @@
-import { type LoginApiResponse, type LoginAccountInterface } from "../../../api/auth/auth.types";
+import { type LoginApiResponse, type LoginAccountInterface } from "../../../services/api/auth/auth.types";
 import { useMutation } from "@tanstack/react-query";
 
 /** Services */
-import AuthServices from "../../../api/auth/auth.api";
-import ApiServices from "../../../services/api.services";
+import AuthServices from "../../../services/api/auth/auth.api";
+import BackendRequestMethods from "../../../services/BackendRequestMethods/BackendRequestMethods";
 import type { AxiosError } from "axios";
 
 /** @note: Server url. */
 const BaseURL = import.meta.env.VITE_SERVER_URL;
 
-const apiServices = new ApiServices(BaseURL);
-const authServices = new AuthServices(apiServices);
+const requestMethods = new BackendRequestMethods(BaseURL);
+const authServices = new AuthServices(requestMethods);
 
 const useLogin = () => {
     return useMutation<LoginApiResponse,AxiosError,LoginAccountInterface>({

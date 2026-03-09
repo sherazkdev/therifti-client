@@ -1,16 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 
-/** Services */
-import SizeServices from "../../../api/size/size.api";
-import ApiServices from "../../../services/api.services";
+/** Types */
 import { AxiosError } from "axios";
-import type { GetSizesByCategoryApiResponse} from "../../../api/size/size.types";
+import type { GetSizesByCategoryApiResponse } from "../../../services/api/size/size.types";
+
+/** Services */
+import SizeServices from "../../../services/api/size/size.api";
+import BackendRequestMethods from "../../../services/BackendRequestMethods/BackendRequestMethods";
 
 /** @note: Server url. */
 const BaseURL = import.meta.env.VITE_SERVER_URL;
 
-const apiServices = new ApiServices(BaseURL);
-const sizeServices = new SizeServices(apiServices);
+const requestMethods = new BackendRequestMethods(BaseURL);
+const sizeServices = new SizeServices(requestMethods);
 
 const useSizesByCategory = (categoryId?:string) => {
     return useQuery<GetSizesByCategoryApiResponse,AxiosError>({

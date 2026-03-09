@@ -5,14 +5,14 @@ import { EyeIcon } from "../../../../components/icons";
 
 /** Note: Api Hooks */
 import useRegister from "../../../../hooks/server/auth/useRegister";
-import type { ApiError } from "../../../../types/api/api.interfaces";
+import type { ApiError } from "../../../../types/api/apiError"; 
 import type { SignUpEmailPropsInterface, SignUpFormInterface } from "./SignUp.types";
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
 
 export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError,setServerError] = useState<string | null>(null);
-  const { register,handleSubmit,setError,formState: { errors, isValid },} = useForm<SignUpFormInterface>({mode: "onChange"});
+  const { register,handleSubmit,setError,formState: { errors}} = useForm<SignUpFormInterface>({mode: "onChange"});
   
   const registerMutation = useRegister();
   const isLoading = registerMutation.isPending;
@@ -33,11 +33,11 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
       onError:(resErr) => {
         const err = resErr.response?.data as ApiError || undefined;
         if(err){
-          if(err.errorCode === "VALIDATION_FAILED"){
+          if(err.message === "VALIDATION_FAILED"){
             setServerError(err.message);
             return;
           }
-          if(err.errorCode === "EMAIL_EXISTS") setError("email",{message:AUTH_ERROR_MESSAGES[err.errorCode]})
+          if(err.message === "EMAIL_EXISTS") setError("email",{message:AUTH_ERROR_MESSAGES[err.message]})
           return;
         }
       },

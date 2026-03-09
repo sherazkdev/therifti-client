@@ -11,148 +11,128 @@ import ItemAttributes from "./components/ItemAttributes/ItemAttributes";
 import PriceInput from "./components/PriceInput/PriceInput";
 
 /* Types */
-import type { FormValues, ListingStatus } from "./SellItem.types";
+import type { FormValues, ProductStatus, ParcelSizeInterface } from "./SellItem.types";
 import type { CategoryDocument } from "../../types/category/category.types";
 import type { MaterialDocument } from "../../types/material/material.types";
 import type { SizeDocument } from "../../types/size/size.types";
 import type { BrandDocument } from "../../types/brand/brand.types";
 
+/* Services */
+import ImageUploadService from "../../services/imageUpload.services";
+
+/* Hooks */
+import useCreateProduct from "../../hooks/server/product/useCreateProduct";
+
+/**
+ * SellItem Component
+ * @description Form to create a new product listing with images, attributes and price
+ */
 const SellItem = () => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<FormValues>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>();
+  const imageUploadService = new ImageUploadService();
+  const productMutation = useCreateProduct();
 
-  /* ---------- IMAGE STATE ---------- */
+  // ==========================
+  // ======= STATE ============
+  // ==========================
 
+  // Images
   const [images, setImages] = useState<File[]>([]);
   const [showPhotoTips, setShowPhotoTips] = useState(false);
 
-  /* ---------- CATEGORY ---------- */
-
+  // Category / Brand / Attributes
   const [categoryId, setCategoryId] = useState<string | null>(null);
-
-  /* ---------- ATTRIBUTES ---------- */
-
   const [selectedBrand, setSelectedBrand] = useState<BrandDocument | null>(null);
   const [selectedCondition, setSelectedCondition] = useState<string | null>(null);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [selectedMaterials, setSelectedMaterials] = useState<MaterialDocument[] | []>([]);
+  const [selectedMaterials, setSelectedMaterials] = useState<MaterialDocument[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<SizeDocument[]>([]);
+  const [parcelSize, setParcelSize] = useState<ParcelSizeInterface[]>([
+    { info: "For items that’d fit in a large envelope.", parcelSize: "SMALL" },
+    { info: "For items that’d fit in a shoebox.", parcelSize: "MEDIUM" },
+    { info: "For items that’d fit in a moving box.", parcelSize: "LARGE" },
+  ]);
 
-  /* ---------- ERRORS ---------- */
+  // Errors
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const [imageError, setImageError] = useState("");
-  const [categoryError, setCategoryError] = useState("");
-  const [brandError, setBrandError] = useState("");
-  const [conditionError, setConditionError] = useState("");
-  const [colorError, setColorError] = useState("");
-  const [sizeError, setSizeError] = useState("");
-  const [materialError, setMaterialError] = useState("");
+  // ==========================
+  // ======= HANDLERS =========
+  // ==========================
 
-  /* ---------- HANDLERS ---------- */
+  const handleCategoryChange = (category: CategoryDocument) => setCategoryId(category._id);
+  const handleBrandChange = (brand: BrandDocument) => setSelectedBrand(brand);
+  const handleConditionChange = (condition: string) => setSelectedCondition(condition);
+  const handleMaterialChange = (materials: MaterialDocument[]) => setSelectedMaterials(materials);
+  const handleSizeChange = (sizes: SizeDocument[]) => setSelectedSizes(sizes);
+  const handleColorChange = (colors: string[]) => setSelectedColors(colors);
 
-  const handleCategoryChange = (category: CategoryDocument) => {
-    setCategoryId(category._id);
-  };
+  /**
+   * Form submit handler
+   * @param data - Form data from react-hook-form
+   * @param status - Product status (DRAFT / PUBLISHED)
+   */
+  const onSubmit = async (data: FormValues, status: ProductStatus) => {
+    const errors: Record<string, string> = {};
 
-  const handleMaterialChange = (material: any) => {
-    setSelectedMaterials((prev) => [...prev, material]);
-  };
+    if (!images.length) errors.images = "At least 1 image is required (max 4).";
+    if (!categoryId) errors.category = "Category is required";
+    if (!selectedBrand) errors.brand = "Brand is required";
+    if (!selectedSizes.length) errors.sizes = "Size is required";
+    if (!selectedMaterials.length) errors.materials = "Material is required";
+    if (!selectedCondition) errors.condition = "Condition is required";
+    if (!selectedColors.length) errors.colors = "Color is required";
 
-  const handleSizeChange = (size: SizeDocument) => {
-    setSelectedSizes((prev) => [...prev, size]);
-  };
-
-  const handleConditionChange = (condition: string) => {
-    setSelectedCondition(condition);
-  };
-
-  const handleColorChange = (color: string) => {
-    setSelectedColors((prev) => [...prev, color]);
-  };
-
-  const handleBrandChange = (brand: BrandDocument) => {
-    setSelectedBrand(brand);
-  };
-
-  /* ---------- FORM SUBMIT ---------- */
-
-  const onSubmit = (data: FormValues, status: ListingStatus) => {
-    let hasError = false;
-
-    if (!images.length) {
-      setImageError("At least 1 image is required (max 4).");
-      hasError = true;
+    if (Object.keys(errors).length) {
+      setFieldErrors(errors);
+      return;
     }
 
-    if (!categoryId) {
-      setCategoryError("Category is required");
-      hasError = true;
-    }
+    /** Upload Images */
+    const uploadedImages = await imageUploadService.uploadMultipleImages(images);
 
-    if (categoryId) {
-      if (!selectedBrand) {
-        setBrandError("Brand is required");
-        hasError = true;
-      }
+    const payload = {
+      ...data,
+      categoryId,
+      brand: selectedBrand?._id,
+      materials: selectedMaterials.map(m => m._id),
+      sizes: selectedSizes.map(s => s._id),
+      colors: selectedColors,
+      condition: selectedCondition,
+      status,
+      coverImage: uploadedImages.splice(0, 1)[0],
+      images: uploadedImages,
+    };
 
-      if (!selectedSizes.length) {
-        setSizeError("Size is required");
-        hasError = true;
-      }
-
-      if (!selectedMaterials.length) {
-        setMaterialError("Material is required");
-        hasError = true;
-      }
-
-      if (!selectedCondition) {
-        setConditionError("Condition is required");
-        hasError = true;
-      }
-
-      if (!selectedColors.length) {
-        setColorError("Color is required");
-        hasError = true;
-      }
-    }
-
-    if (hasError) return;
-
-    
+    productMutation.mutate(payload);
   };
 
-  const submitWithStatus = (status: ListingStatus) =>
+  const submitWithStatus = (status: ProductStatus) =>
     handleSubmit((data) => onSubmit(data, status))();
 
-  /* ---------- UI ---------- */
+  // ==========================
+  // ======= JSX ==============
+  // ==========================
 
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Sell an Item</h2>
 
-      {/* Image Upload */}
+      {/* IMAGE UPLOADER */}
       <ImageUploader
         images={images}
         setImages={setImages}
         showPhotoTips={showPhotoTips}
         setShowPhotoTips={setShowPhotoTips}
       />
-
-      {imageError && <div className={styles.imageErrorOutside}>{imageError}</div>}
+      {fieldErrors.images && <div className={styles.imageErrorOutside}>{fieldErrors.images}</div>}
 
       <form onSubmit={(e) => e.preventDefault()}>
         {/* TITLE */}
         <div className={styles.row}>
           <div className={styles.formGroup} style={{ flex: 1 }}>
             <label>Title</label>
-            <input
-              placeholder="Enter item title"
-              {...register("title", { required: "Title is required" })}
-            />
+            <input placeholder="Enter item title" {...register("title", { required: "Title is required" })} />
             {errors.title && <span className={styles.error}>{errors.title.message}</span>}
           </div>
         </div>
@@ -161,9 +141,8 @@ const SellItem = () => {
         <div className={styles.row}>
           <div className={styles.formGroup}>
             <CategoryDropdown handleCategoryOnChange={handleCategoryChange} />
-            {categoryError && <span className={styles.error}>{categoryError}</span>}
+            {fieldErrors.category && <span className={styles.error}>{fieldErrors.category}</span>}
           </div>
-
           <PriceInput register={register} errors={errors} setValue={setValue} />
         </div>
 
@@ -181,69 +160,47 @@ const SellItem = () => {
             handlMaterialOnChange={handleMaterialChange}
             handleBrandOnChange={handleBrandChange}
             handleColorOnChange={handleColorChange}
-            brandError={brandError}
-            colorError={colorError}
-            conditionError={conditionError}
-            materialError={materialError}
-            sizeError={sizeError}
+            brandError={fieldErrors.brand}
+            colorError={fieldErrors.colors}
+            conditionError={fieldErrors.condition}
+            materialError={fieldErrors.materials}
+            sizeError={fieldErrors.sizes}
           />
         )}
 
         {/* DESCRIPTION */}
         <div className={styles.formGroup}>
           <label>Description</label>
-
           <textarea
             rows={5}
             placeholder="Describe your item in detail..."
             {...register("description", { required: "Description is required" })}
             className={styles.textarea}
           />
-
-          {errors.description && (
-            <span className={styles.error}>{errors.description.message}</span>
-          )}
+          {errors.description && <span className={styles.error}>{errors.description.message}</span>}
         </div>
 
         {/* PARCEL SIZE */}
         <div className={styles.formGroup}>
           <label>Select your Parcel Size</label>
-
           <div className={styles.parcelList}>
-            {["5kg", "10kg", "15kg"].map((size) => (
-              <label key={size} className={styles.parcelRow}>
-                <span>{size}</span>
-                <input
-                  type="radio"
-                  value={size}
-                  {...register("parcelSize", { required: "Parcel size is required" })}
-                />
+            {parcelSize.map((size, index) => (
+              <label key={index} className={styles.parcelRow}>
+                <div className="row">
+                  <span>{size.parcelSize}</span>
+                  <p>{size.info}</p>
+                </div>
+                <input type="radio" value={size.parcelSize} {...register("parcelSize", { required: "Parcel size is required" })} />
               </label>
             ))}
           </div>
-
-          {errors.parcelSize && (
-            <span className={styles.error}>{errors.parcelSize.message}</span>
-          )}
+          {errors.parcelSize && <span className={styles.error}>{errors.parcelSize.message}</span>}
         </div>
 
         {/* ACTION BUTTONS */}
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.draftBtn}
-            onClick={() => submitWithStatus("DRAFT")}
-          >
-            Save Draft
-          </button>
-
-          <button
-            type="button"
-            className={styles.submitBtn}
-            onClick={() => submitWithStatus("PUBLISHED")}
-          >
-            Upload
-          </button>
+          <button type="button" className={styles.draftBtn} onClick={() => submitWithStatus("DRAFT")}>Save Draft</button>
+          <button type="button" className={styles.submitBtn} onClick={() => submitWithStatus("PUBLISHED")}>Upload</button>
         </div>
       </form>
 

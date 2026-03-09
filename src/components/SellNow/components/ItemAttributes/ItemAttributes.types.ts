@@ -6,17 +6,17 @@ export interface ItemAttributesPropsInterface {
 
   categoryId:string,
 
-  Selectedmaterials: MaterialDocument[] | null;
+  Selectedmaterials: MaterialDocument[];
   Selectedbrand: BrandDocument | null;
   Selectedcondition: string | null;
   Selectedcolors: string[];
-  Selectedsizes: SizeDocument[] | null;
+  Selectedsizes: SizeDocument[];
 
-  handleColorOnChange: (color:string) => void,
+  handleColorOnChange: (colors:string[]) => void,
   handleBrandOnChange: (brand:BrandDocument) => void,
   handlConditionOnChange: (condition:string) => void,
-  handlMaterialOnChange: (material:MaterialDocument) => void,
-  handlSizeOnChange: (size:SizeDocument) => void,
+  handlMaterialOnChange: (materials:MaterialDocument[]) => void,
+  handlSizeOnChange: (sizes:SizeDocument[]) => void,
 
   materialError: string;
   brandError: string;

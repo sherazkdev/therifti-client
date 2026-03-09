@@ -5,7 +5,7 @@ import { AuthContext } from "./AuthContext";
 import type { UserDocumentInterface } from "../../types/auth/auth.types";
 import useUser from "../../hooks/server/auth/useUser";
 import { AxiosError } from "axios";
-import type { ApiError } from "../../types/api/api.interfaces";
+import type { ApiError } from "../../types/api/apiError";
 
 export const AuthProvider = ({ children }:{children:ReactNode}) => {
   const [user, setUser] = useState<UserDocumentInterface | null>(null);
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
     /** Cleanup Timer */
     const timer = setTimeout(handleFetchAuthenticatedUser,100);
     return () => clearTimeout(timer);
-  },[isAuthenticated]);
+  },[]);
 
 
   useEffect( () => {

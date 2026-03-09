@@ -22,3 +22,4 @@ export function saveRefreshToken(refreshToken:string) {
 export async function getRefreshToken() {
   return localStorage.getItem("refreshToken");
 }
+
