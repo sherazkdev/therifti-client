@@ -6,6 +6,9 @@ import ProductCard from "../productcard/ProductCard";
 import { ChevronDown } from "../../components/icons";
 import { Shirt } from "lucide-react";
 import { ChevronLeft } from 'lucide-react';
+import { categories } from "../../data/categories";
+import type { CategoryDocument } from "../../types/category/category.types";
+import FilterBar from "./components/FilterBar/Filterbar";
 
 /* ---------------- TYPES ---------------- */
 export type CategoryNode = {
@@ -28,43 +31,9 @@ export type Product = {
 };
 
 /* ---------------- DEFAULT FALLBACK DATA (UI demo) ---------------- */
-const CATEGORY_TREE_FALLBACK: CategoryNode[] = [
-  {
-    key: "women",
-    label: "Women",
-    children: [
-      {
-        key: "women_clothing",
-        label: "Clothing",
-        options: ["Dresses", "Tops", "Jeans", "Jackets", "Abayas"],
-      },
-      {
-        key: "women_shoes",
-        label: "Shoes",
-        options: ["Heels", "Sneakers", "Boots", "Flats", "Sandals", "Wedges"],
-      },
-      {
-        key: "women_bags",
-        label: "Bags",
-        options: ["Handbags", "Crossbody", "Totes", "Clutches", "Backpacks", "Wallets"],
-      },
-      {
-        key: "women_accessories",
-        label: "Accessories",
-        options: ["Jewelry", "Belts", "Scarves", "Sunglasses", "Watches", "Hats"],
-      },
-    ],
-  },
-  { key: "men", label: "Men" },
-  { key: "kids", label: "Kids" },
-  { key: "electronics", label: "Electronics" },
-  { key: "sports", label: "Sports" },
-  { key: "entertainment", label: "Entertainment" },
-  { key: "faizan", label: "faizan Sports" },
-];
 
 const SIZE_OPTIONS = ["XXXS / 2", "XXX / 4", "XS / 6", "S / 8", "M / 10"];
-const SORT_OPTIONS = ["Recommended", "Newest", "Price: Low to High", "Price: High to Low"];
+const SORT_OPTIONS = ["PRICE_HIGH_TO_LOW","PRICE_LOW_TO_HIGH","NEWEST_FIRST","RELEVANCE"];
 
 const ALL_DEMO_PRODUCTS: Product[] = Array.from({ length: 24 }).map((_, i) => {
   const brands = ["River Island", "Mango", "Topman", "Fashion House", "Zara", "Nike", "Adidas"];
@@ -80,9 +49,9 @@ const ALL_DEMO_PRODUCTS: Product[] = Array.from({ length: 24 }).map((_, i) => {
 });
 
 /* ---------------- HELPERS ---------------- */
-function findNodeByKey(nodes: CategoryNode[], key: string): CategoryNode | null {
+function findNodeByKey(nodes: CategoryDocument[], key: string): CategoryDocument | null {
   for (const n of nodes) {
-    if (n.key === key) return n;
+    if (n._id === key) return n;
     if (n.children) {
       const hit = findNodeByKey(n.children, key);
       if (hit) return hit;
@@ -93,9 +62,9 @@ function findNodeByKey(nodes: CategoryNode[], key: string): CategoryNode | null 
 
 const PAGE_SIZE = 8;
 
-function buildCategoryLabel(tree: CategoryNode[], stack: string[]) {
+function buildCategoryLabel(tree: CategoryDocument[], stack: string[]) {
   const labels = stack
-    .map((k) => findNodeByKey(tree, k)?.label)
+    .map((k) => findNodeByKey(tree, k)?.title)
     .filter(Boolean) as string[];
   return labels.length ? labels.join(" / ") : "All";
 }
@@ -105,12 +74,9 @@ function toNumberOrUndefined(v: string) {
   return Number.isFinite(n) ? n : undefined;
 }
 
-/* ---------------- API (PLACEHOLDERS) ---------------- */
-async function apiFetchCategories(): Promise<CategoryNode[]> {
-  const res = await fetch("/api/categories");
-  if (!res.ok) throw new Error("Failed to load categories");
-  return res.json();
-}
+import useFeaturedProducts from "../../hooks/server/product/useFeaturedProducts";
+import type { FeaturedProductFilters } from "../../hooks/useFeaturedProducts";
+import type { FeaturedProductsSortingInterface } from "../../services/api/product/product.types";
 
 type FetchProductsResponse =
   | { items: Product[]; total: number }
@@ -146,7 +112,7 @@ async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchPr
 /* ---------------- COMPONENT ---------------- */
 const TopPicks = () => {
   const [open, setOpen] = useState<Drop>(null);
-  const [categoryTree, setCategoryTree] = useState<CategoryNode[]>(CATEGORY_TREE_FALLBACK);
+  const [categoryTree, setCategoryTree] = useState<CategoryDocument[]>(categories);
   const [catStack, setCatStack] = useState<string[]>([]);
 
 
@@ -158,6 +124,10 @@ const TopPicks = () => {
   const [sortValue, setSortValue] = useState<string>(SORT_OPTIONS[0]);
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
+
+  useEffect( () => {
+    console.log(selectedPath)
+  },[selectedPath])
 
   const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(null);
 
@@ -172,24 +142,23 @@ const TopPicks = () => {
 
   const panelRef = useRef<HTMLDivElement | null>(null);
 
+  const featuredProductMutation = useFeaturedProducts();
+
   const currentCatNode = useMemo(() => {
     if (catStack.length === 0) return null;
     return findNodeByKey(categoryTree, catStack[catStack.length - 1]);
   }, [catStack, categoryTree]);
-
-  const showRoot = open === "category" && catStack.length === 0;
-  const showCategoryScreen = open === "category" && catStack.length > 0;
 
   /* ---------- INITIAL LOAD ---------- */
   useEffect(() => {
     const loadCats = async () => {
       try {
         setLoadingCats(true);
-        const cats = await apiFetchCategories();
-        if (Array.isArray(cats) && cats.length) {
-          setCategoryTree(cats);
+        // const cats = await apiFetchCategories();
+        // if (Array.isArray(cats) && cats.length) {
+          setCategoryTree(categories);
           setUseDemoMode(false);
-        }
+        // }
       } catch {
         // fallback
       } finally {
@@ -206,19 +175,22 @@ const TopPicks = () => {
         // Instant clear for skeletons
         setProducts([]);
 
-        const payload: ProductFiltersPayload = {
-          page: 1,
-          pageSize: PAGE_SIZE,
-          sort: sortValue,
+        const payload: FeaturedProductsSortingInterface = {
+          limit:PAGE_SIZE,
+          page:page,
+          price:{
+            min:Number(priceFrom),
+            max:Number(priceTo),
+          },
+          sizes:null,
+          sort:"PRICE_LOW_TO_HIGH",
+          categoryId:null
         };
-        const resp = await apiFetchProducts(payload);
+        const response = featuredProductMutation.mutate(payload,{
+          onError:(e) => console.log(e),
+          onSuccess:(productsD) => setProducts(productsD.data)
+        });
 
-        setProducts(resp.items);
-        if ("hasMore" in resp) {
-          setHasMore(resp.hasMore);
-        } else {
-          setHasMore(resp.total > resp.items.length);
-        }
         setUseDemoMode(false);
         setLoadingProducts(false); // Stop loading on success
       } catch {
@@ -416,256 +388,33 @@ const TopPicks = () => {
       </div>
 
       {/* Filters */}
-      <div className={styles.filters} ref={panelRef}>
-        <button
-          className={`${styles.pill} ${styles.allPill} ${selectedPath === "All" ? styles.pillActive : ""}`}
-          type="button"
-          onClick={async () => {
-            setSelectedPath("All");
-            setAppliedCategoryKey(null);
-            await fetchProductsWithCurrentFilters(1, "replace", { categoryKey: null });
-          }}
-        >
-          All
-        </button>
-
-        {/* Category */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "category" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("category")}
-            title={selectedPath}
-          >
-            {selectedPath === "All" ? "Category" : selectedPath} <ChevronDown size={16}/>
-          </button>
-
-          {open === "category" && (
-            <div className={styles.dropdown}>
-              {showRoot && (
-                <div className={styles.menuList}>
-                  <div className={styles.ddHeader}>
-                    Category{loadingCats ? " (Loading…)" : ""}
-                  </div>
-
-                  {categoryTree.map((c) => (
-                    <button
-                      key={c.key}
-                      className={styles.menuItem}
-                      type="button"
-                      onClick={() => {
-                        if (c.children && c.children.length) {
-                          goIntoCategory(c.key);
-                        } else {
-                          void applyCategorySelection([c.key]);
-                        }
-                      }}
-                    >
-                      <span className={styles.menuLeft}>
-                        <span className={styles.iconBox} aria-hidden="true">
-                          <Shirt size={16} />
-                        </span>
-                        <span className={styles.menuLabel}>{c.label}</span>
-                      </span>
-
-                      <span className={styles.menuRight} aria-hidden="true">
-                        {c.children && c.children.length ? "›" : ""}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {showCategoryScreen && (
-                <div className={styles.menuScreen}>
-                  <div className={styles.menuTop}>
-                    <button
-                      className={styles.backBtn}
-                      type="button"
-                      onClick={goBackCategory}
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-
-                    <div className={styles.menuTitle}>{currentCatNode?.label ?? "Category"}</div>
-
-                    <button className={styles.applyBtn} type="button" onClick={() => void applyCategorySelection()}>
-                      Apply
-                    </button>
-                  </div>
-
-                  {currentCatNode?.children?.length ? (
-                    <div className={styles.menuList}>
-                      {currentCatNode.children.map((child) => (
-                        <button
-                          key={child.key}
-                          className={styles.menuItem}
-                          type="button"
-                          onClick={() => goIntoCategory(child.key)}
-                        >
-                          <span className={styles.menuLeft}>
-                            <span className={styles.iconBox} aria-hidden="true">
-                              <Shirt size={16} />
-                            </span>
-                            <span className={styles.menuLabel}>{child.label}</span>
-                          </span>
-                          <span className={styles.menuRight} aria-hidden="true">
-                            ›
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className={styles.checkList}>
-                      <div className={styles.ddSubHeader}>Choose options</div>
-
-                      {(currentCatNode?.options ?? []).map((opt) => {
-                        const groupKey = currentCatNode?.key ?? "unknown";
-                        const checked = (selectedCatOptions[groupKey] ?? []).includes(opt);
-
-                        return (
-                          <button
-                            key={opt}
-                            type="button"
-                            className={styles.checkRow}
-                            onClick={() => toggleOption(groupKey, opt)}
-                          >
-                            <span className={styles.checkText}>{opt}</span>
-
-                            <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
-                              {checked ? "✓" : ""}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Price */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "price" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("price")}
-          >
-            Price <ChevronDown size={16} />
-          </button>
-
-          {open === "price" && (
-            <div className={styles.dropdown}>
-              <div className={styles.ddHeader}>Price Range</div>
-
-              <div className={styles.priceBox}>
-                <div className={styles.priceField}>
-                  <label className={styles.priceLabel}>From</label>
-                  <input
-                    className={styles.priceInput}
-                    placeholder="0$"
-                    value={priceFrom}
-                    onChange={(e) => setPriceFrom(e.target.value)}
-                  />
-                </div>
-                <div className={styles.priceField}>
-                  <label className={styles.priceLabel}>To</label>
-                  <input
-                    className={styles.priceInput}
-                    placeholder="999$"
-                    value={priceTo}
-                    onChange={(e) => setPriceTo(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
-                  Done
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Size */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "size" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("size")}
-          >
-            Size <ChevronDown size={16} />
-          </button>
-
-          {open === "size" && (
-            <div className={styles.dropdown}>
-              <div className={styles.ddHeader}>Sizes</div>
-
-              <div className={styles.sizeList}>
-                {SIZE_OPTIONS.map((s) => {
-                  const checked = selectedSizes.includes(s);
-                  return (
-                    <button key={s} type="button" className={styles.sizeRow} onClick={() => toggleSize(s)}>
-                      <span className={styles.sizeText}>{s}</span>
-                      <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
-                        {checked ? "✓" : ""}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
-                  Done
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sort */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "sort" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("sort")}
-          >
-            Sort By <ChevronDown size={16} />
-          </button>
-
-          {open === "sort" && (
-            <div className={styles.dropdown}>
-              <div className={styles.ddHeader}>Sort</div>
-
-              <div className={styles.menuList}>
-                {SORT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    className={styles.menuItem}
-                    onClick={async () => {
-                      setSortValue(opt);
-                      setOpen(null);
-                      await fetchProductsWithCurrentFilters(1, "replace", { sort: opt });
-                    }}
-                  >
-                    <span className={styles.menuLeft}>
-                      <span className={styles.menuLabel}>{opt}</span>
-                    </span>
-                    <span className={`${styles.rightBox} ${sortValue === opt ? styles.rightBoxOn : ""}`} aria-hidden="true">
-                      {sortValue === opt ? "✓" : ""}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      <FilterBar
+        open={open}
+        toggleOpen={toggleOpen}
+        selectedPath={selectedPath}
+        setSelectedPath={setSelectedPath}
+        categoryTree={categoryTree}
+        catStack={catStack}
+        setCatStack={setCatStack}
+        currentCatNode={currentCatNode}
+        goIntoCategory={goIntoCategory}
+        goBackCategory={goBackCategory}
+        applyCategorySelection={applyCategorySelection}
+        selectedSizes={selectedSizes}
+        toggleSize={toggleSize}
+        SIZE_OPTIONS={SIZE_OPTIONS}
+        sortValue={sortValue}
+        setSortValue={setSortValue}
+        SORT_OPTIONS={SORT_OPTIONS}
+        priceFrom={priceFrom}
+        setPriceFrom={setPriceFrom}
+        priceTo={priceTo}
+        setPriceTo={setPriceTo}
+        applyNonCategoryFilters={applyNonCategoryFilters}
+        selectedCatOptions={selectedCatOptions}
+        toggleOption={toggleOption}
+        loadingCats={loadingCats}
+      />
 
       {/* ---> NEW: SMART SKELETON PRODUCTS GRID <--- */}
       <div className={styles.grid}>
@@ -680,12 +429,12 @@ const TopPicks = () => {
         {/* 2. REAL CARDS: Map through actual products */}
         {products.map((p, index) => (
           <ProductCard 
-            key={`${p.id}-${index}`} 
-            image={p.image} 
+            key={`${p._id}-${index}`} 
+            image={p.coverImage} 
             brand={p.brand} 
-            meta={p.meta} 
+            meta={p.title} 
             price={p.price} 
-            likes={p.likes} 
+            likes={p.totalLikes} 
           />
         ))}
 
