@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import AuthServices from "../../../services/api/auth/auth.api";
 import BackendRequestMethods from "../../../services/BackendRequestMethods/BackendRequestMethods";
 import type { AxiosError } from "axios";
+import type { ApiError } from "../../../types/api/apiError";
 
 /** @note: Server url. */
 const BaseURL = import.meta.env.VITE_SERVER_URL;
@@ -16,7 +17,7 @@ const useUser = () => {
     return useQuery<LoggedInUserApiResponse,AxiosError,LoggedInUserResponse>({
         queryKey:["authenticatedUser"],
         queryFn: () => authServices.CurrentUser(),
-        enabled:false
+        enabled:false,
     })
 };
 export default useUser;

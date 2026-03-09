@@ -46,14 +46,15 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
     }
   },[data]);
 
-  useEffect( () => {
-    if(error?.response?.data){
-      const err = error.response.data as ApiError || undefined;
-      if(err){
-        console.log(err)
-      }
-    }
-  },[error])
+  // useEffect( () => {
+  //   console.log(error)
+  //   if(error && error.response){
+  //     const err = (error.response?.data as ApiError ) || undefined;
+  //     if(err){
+  //       console.log(err)
+  //     }
+  //   }
+  // },[error])
 
   return (
     <AuthContext.Provider value={{handleSetUser,isAuthenticated,user}}>

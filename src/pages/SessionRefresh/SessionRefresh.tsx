@@ -13,7 +13,6 @@ const SessionRefresh: React.FC = () => {
   useEffect(() => {
     const refreshSession = async () => {
       try {
-        alert();
         const token = await getRefreshToken(); // async get token
         if (!token) return;
 

@@ -149,6 +149,8 @@ const TopPicks = () => {
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>(CATEGORY_TREE_FALLBACK);
   const [catStack, setCatStack] = useState<string[]>([]);
 
+
+  
   // Selected values
   const [selectedPath, setSelectedPath] = useState<string>("All"); 
   const [selectedCatOptions, setSelectedCatOptions] = useState<Record<string, string[]>>({});

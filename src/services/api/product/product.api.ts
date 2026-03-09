@@ -1,6 +1,6 @@
 import BackendRequestMethods from "../../BackendRequestMethods/BackendRequestMethods";
 
-import type { ProductApiImplmentsInterface, CreateProductApiResponse } from "./product.types";
+import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, FeaturedProductApiResponse } from "./product.types";
 
 /** 
  * Note: This Product Api Service Using for get all product, update product, creare product more than.
@@ -27,6 +27,14 @@ class ProductServices implements ProductApiImplmentsInterface {
         const response = await this.apiService.Post<CreateProductApiResponse>("/products/create-product",product);
         return response;
     };
+
+    /**
+     * Note: Get Featured Products.
+    */
+    public async GetFeaturedProducts(sortObj:FeaturedProductsSortingInterface):Promise<FeaturedProductApiResponse> {
+        const response = await this.apiService.Post<FeaturedProductApiResponse>("/products/featured-products",sortObj);
+        return response;
+    }
 }
 
 export default ProductServices;
