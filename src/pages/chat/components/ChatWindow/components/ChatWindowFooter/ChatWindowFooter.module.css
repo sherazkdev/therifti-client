@@ -1,0 +1,31 @@
+.footer {
+    width: 100%;
+    position: absolute;
+    padding: 10px 20px;
+    bottom: 0;
+    gap: 10px;
+    display: flex;
+    border-top: 2px solid #15191a1f;
+    align-items: center;
+}
+
+.sendMessageInputDev {
+    position: relative;
+    width: 100%;
+    display: flex;
+}
+
+.sendMessageInputDev input {
+    width: 100%;
+    border:1px solid #15191a1f;
+    padding: 12px;
+    border-radius: 6px;
+    outline: none;
+}
+
+.sendMessageInputDev button {
+    background-color: transparent;
+    border: none;
+    right: 0;
+    position: absolute;
+}

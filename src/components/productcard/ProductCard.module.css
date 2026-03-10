@@ -20,7 +20,7 @@
   position: relative;
   width: 100%;
   aspect-ratio: 4/5; /*  3/4 thora zyada lamba tha, 4/5 thora balanced aur pyara lagega */
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   background: #f8f8f8;
   border: 1px solid #efefef; 
@@ -77,9 +77,9 @@
 }
 
 .brand {
-  font-size: 14px;
-  font-weight: 500;
-  color: #111;
+  font-size: 12px;
+  font-weight: 300;
+  color: #5a6566;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

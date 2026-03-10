@@ -40,7 +40,7 @@
   gap: 22px;
 
   /* Keeps all cards same height like Figma rows */
-  grid-auto-rows: 210px;
+  grid-auto-rows: 240px;
 }
 
 /* CARD */

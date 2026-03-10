@@ -11,6 +11,7 @@ const Home = lazy(() => import("./pages/Home/Home"));
 const LoginPage = lazy(() => import("./pages/auth/Auth"));
 const Sell = lazy(() => import("./pages/Sellnow/Sell"));
 const SingleCategory = lazy(() => import("./pages/SingleCategory/SingleCategory"));
+const Chat = lazy(() => import("./pages/chat/Chat"));
 const ProductPage = lazy(() => import("./pages/SingleProduct/ProductPage"));
 const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
 
@@ -36,10 +37,12 @@ function App() {
 
           <Route path="/profile/:userId" element={<ProfilePage />}/>
 
+          <Route path="/chat" element={<Chat />} />
+
           <Route path="*" element={<h1>Not Found</h1>} />
 
+
         </Route>
-          <Route path="/11" element={<SessionRefresh />} />
       
       </Routes>
 

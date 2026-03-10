@@ -1,0 +1,40 @@
+.header{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    border-bottom: 1px solid #15191a1f;
+}
+.topHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.searchSection {
+    padding: 10px 20px;
+    position: relative;
+}
+
+.searchInput {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 10px 30px;
+    width: 100%;
+    outline: none;
+}
+
+.searchIcon {
+    position: absolute;
+    background: transparent;
+    border: none;
+    top: 6px;
+    left: 6px;
+}
+.heading {
+    font-size: 16px;
+    font-weight: 500;
+    color: #5a6566;
+    line-height: 22px;
+}
