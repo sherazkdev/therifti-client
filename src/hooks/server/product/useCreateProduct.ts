@@ -1,23 +1,21 @@
 import { useMutation } from "@tanstack/react-query";
 
 /** Types */
-
-import type { CreateProductApiResponse } from "../../../services/api/product/product.types";
+import type { CreateProductApiResponse } from "../../../types/api/index";
 import { AxiosError } from "axios";
 
 /** Note: Envorment variables */
 import env from "../../../constants/loadEnv/loadEnv";
 
-import ProductServices from "../../../services/api/product/product.api"; 
-import ImageUploadService from "../../../services/imageUpload.services";
-import BackendRequestMethods from "../../../services/BackendRequestMethods/BackendRequestMethods";
-import type { ApiError } from "../../../types/api/apiError";
+import ProductApi from "../../../api/product.api";
+import ImageUploadService from "../../../services/upload.services";
+import BackendRequestServices from "../../../services/backendRequest.services";
 
 /** @note: Server url. */
 const BaseURL = env.SERVER_URL;
 
-const requestMethods = new BackendRequestMethods(BaseURL);
-const productServices = new ProductServices(requestMethods);
+const backendRequestServices = new BackendRequestServices(BaseURL);
+const productApi = new ProductApi(backendRequestServices);
 const imageUploadServices = new ImageUploadService();
 
 /** Note: Product Document Type */
@@ -40,7 +38,7 @@ const useCreateProduct = () => {
                 coverImage,
                 images:uploadedProductImages
             };
-            const response = await productServices.CreateProduct(productPayload);
+            const response = await productApi.CreateProduct(productPayload);
             return response;
         }
     })

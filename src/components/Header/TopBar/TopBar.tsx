@@ -1,4 +1,4 @@
-import React, { useRef, useState,useContext } from "react";
+import { useRef, useState,useContext } from "react";
 import styles from "./Topbar.module.css";
 import LogoIcon from "../../../assets/icons/logo.png"; // replace path if needed
 import SearchIcon from "../../../assets/icons/search.png"; // replace
@@ -7,7 +7,7 @@ import { MoveRight } from "lucide-react";
 import { ArrowUpRight, Bell, Heart, MessageCircle } from "lucide-react";
 
 /** Note: Auth Contexts */
-import { AuthContext } from "../../../contexts/auth/AuthContext";
+import { AuthContext } from "../../../contexts/auth/auth.context";
 
 const MOCK_SUGGESTIONS = [
   "mens clothes",

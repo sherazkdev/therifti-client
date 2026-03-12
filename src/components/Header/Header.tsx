@@ -3,7 +3,7 @@ import TopBar from "./TopBar/TopBar";
 import CategoryBar from "./Category/CategoryBar";
 import styles from "./TopBar/Topbar.module.css";
 import { categories } from "../../data/categories";
-import type { Category } from "../../types/category";
+import type { CategoryDocument } from "../../types/api";
 import { useNavigate } from "react-router-dom";
 import type { HeaderPropsInterface } from "./Header.types";
 
@@ -40,7 +40,7 @@ const Header = ({
 
       <div className={styles.overlayArea}>
         <CategoryBar
-          categories={categories as Category[]}
+          categories={categories as CategoryDocument[]}
           onCategoryClick={handleCategoryClick}
           variant={variant}
         />

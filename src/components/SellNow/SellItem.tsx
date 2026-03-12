@@ -11,12 +11,8 @@ import ItemAttributes from "./components/ItemAttributes/ItemAttributes";
 import PriceInput from "./components/PriceInput/PriceInput";
 
 /* Types */
-import type { FormValues, ProductStatus, ParcelSizeInterface } from "./SellItem.types";
-import type { CategoryDocument } from "../../types/category/category.types";
-import type { MaterialDocument } from "../../types/material/material.types";
-import type { SizeDocument } from "../../types/size/size.types";
-import type { BrandDocument } from "../../types/brand/brand.types";
-
+import type { SellFormValues, ProductStatus, ParcelSizeInterface } from "../../types/components/index";
+import type { CategoryDocument, SizeDocument, MaterialDocument, BrandDocument  } from "../../types/api/index";
 /* Hooks */
 import useCreateProduct from "../../hooks/server/product/useCreateProduct";
 import Loader from "../Loader/Loader";
@@ -26,7 +22,7 @@ import Loader from "../Loader/Loader";
  * @description Form to create a new product listing with images, attributes and price
  */
 const SellItem = () => {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<SellFormValues>();
 
   const productMutation = useCreateProduct();
 
@@ -70,7 +66,7 @@ const SellItem = () => {
    * @param data - Form data from react-hook-form
    * @param status - Product status (DRAFT / PUBLISHED)
    */
-  const onSubmit = async (data: FormValues, status: ProductStatus) => {
+  const onSubmit = async (data: SellFormValues, status: ProductStatus) => {
     const errors: Record<string, string> = {};
 
     if (!images.length) errors.images = "At least 1 image is required (max 4).";
@@ -80,6 +76,7 @@ const SellItem = () => {
     if (!selectedMaterials.length) errors.materials = "Material is required";
     if (!selectedCondition) errors.condition = "Condition is required";
     if (!selectedColors.length) errors.colors = "Color is required";
+
 
     if (Object.keys(errors).length) {
       setFieldErrors(errors);

@@ -1,6 +1,6 @@
 import { useState, useRef, type FC, useEffect } from "react";
 import { UploadCloud, Plus, X, RotateCw, Camera } from "lucide-react";
-import type { ImageUploaderPropsInterface } from "./ImageUploader.types";
+import type { ImageUploaderPropsInterface } from "../../../../types/components/index";
 
 /** Component Styles */
 import styles from "./ImageUploader.module.css";

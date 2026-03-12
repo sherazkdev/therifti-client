@@ -2,15 +2,15 @@ import { useForm } from "react-hook-form";
 import styles from "./ChangePassword.module.css";
 
 /** Types */
-import type { ChangePasswordFormInterface, ChangePasswordPropsInterface } from "./ChatPassword.types";
+import type { ChangePasswordFormInterface, ChangePasswordPropsInterface } from "../../../../types/components/index";
 
 /** Hooks */
 import useVerifyForgotAccountResetTokenAndChangePassword from "../../../../hooks/server/auth/useVerifyForgotAccountResetTokenAndChangePassword";
-import type { ApiError } from "../../../../types/api/apiError";
+import type { ApiError } from "../../../../types/api/api.types";
 import { useState } from "react";
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
 
-export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordPropsInterface) {
+export default function ChangePassword({ otpRequest }: ChangePasswordPropsInterface) {
   const {
     register,
     handleSubmit,

@@ -9,12 +9,12 @@ import EmailSignIn from "./components/SignIn/SignIn";
 import ChangePassword from "./components/ChangePassword/ChangePassword";
 
 /** Interfaces */
-import type { OtpRequestInterface,AuthFlow,AuthSteps, SocialAuthInterface } from "./Auth.types";
+import type { OtpRequestInterface,AuthFlow,AuthSteps, SocialAuthInterface } from "../../types/components/index";
 import SocialAuth from "./components/SocialAuth/SocialAuth";
 
 /** Contexts*/
-import { AuthContext } from "../../contexts/auth/AuthContext";
-import type { UserDocumentInterface } from "../../types/auth/auth.types";
+import { AuthContext } from "../../contexts/auth/auth.context";
+import type { UserDocumentInterface } from "../../types/api";
 
 const AuthPage = () => {
   const [step, setStep] = useState<AuthSteps>("SOCIAL-AUTH");

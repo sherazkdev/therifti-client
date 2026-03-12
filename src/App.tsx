@@ -34,7 +34,6 @@ function App() {
 
           <Route  path="/product/:productId"  element={<ProductPage />} />
 
-
           <Route path="/profile/:userId" element={<ProfilePage />}/>
 
           <Route path="/chat" element={<Chat />} />
@@ -43,7 +42,7 @@ function App() {
 
 
         </Route>
-      
+
       </Routes>
 
     </Suspense>

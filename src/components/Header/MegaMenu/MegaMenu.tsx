@@ -1,8 +1,8 @@
 import { useState } from "react";
 import styles from "./MegaMenu.module.css";
 import { ChevronRight, LayoutGrid } from "lucide-react";
-import { type CategoryDocument } from "../../../types/category/category.types";
-import type { MegaMenuPropsInterface } from "./MegaMenu.types";
+import { type CategoryDocument } from "../../../types/api";
+import type { MegaMenuPropsInterface } from "../../../types/components";
 
 const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
   const [activeChild, setActiveChild] = useState<CategoryDocument | null>(

@@ -5,8 +5,8 @@ import { EyeIcon } from "../../../../components/icons";
 
 /** Note: Api Hooks */
 import useRegister from "../../../../hooks/server/auth/useRegister";
-import type { ApiError } from "../../../../types/api/apiError"; 
-import type { SignUpEmailPropsInterface, SignUpFormInterface } from "./SignUp.types";
+import type { ApiError } from "../../../../types/api/index"; 
+import type { SignUpEmailPropsInterface, SignUpFormInterface } from "../../../../types/components/index";
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
 
 export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {

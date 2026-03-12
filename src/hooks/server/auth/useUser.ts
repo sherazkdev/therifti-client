@@ -1,23 +1,25 @@
-import type { LoggedInUserResponse,LoggedInUserApiResponse } from "../../../services/api/auth/auth.types";
+import type { LoggedInUserResponse,LoggedInUserApiResponse } from "../../../types/api/index";
 import { useQuery } from "@tanstack/react-query";
 
 /** Services */
-import AuthServices from "../../../services/api/auth/auth.api";
-import BackendRequestMethods from "../../../services/BackendRequestMethods/BackendRequestMethods";
+import AuthApi from "../../../api/auth.api";
+import BackendRequestServices from "../../../services/backendRequest.services";
 import type { AxiosError } from "axios";
-import type { ApiError } from "../../../types/api/apiError";
+import { getAccessToken } from "../../../services/auth.services";
 
 /** @note: Server url. */
 const BaseURL = import.meta.env.VITE_SERVER_URL;
 
-const requestMethods = new BackendRequestMethods(BaseURL);
-const authServices = new AuthServices(requestMethods);
+const backendRequestServices = new BackendRequestServices(BaseURL);
+const authApi = new AuthApi(backendRequestServices);
 
 const useUser = () => {
+    const accessToken = getAccessToken();
     return useQuery<LoggedInUserApiResponse,AxiosError,LoggedInUserResponse>({
         queryKey:["authenticatedUser"],
-        queryFn: () => authServices.CurrentUser(),
-        enabled:false,
+        queryFn: () => authApi.CurrentUser(),
+        enabled:!!accessToken,
+        retry:false
     })
 };
 export default useUser;

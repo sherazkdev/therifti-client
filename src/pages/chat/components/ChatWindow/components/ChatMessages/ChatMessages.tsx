@@ -16,7 +16,7 @@ const ChatMessages:React.FC<ChatMessagePropsInterface>  = () => {
                 <div id="date-header" className={styles.dateHeader}>
                     <span>2 month ago</span>
                 </div>
-                <div id="messages">
+                <div id="messages" className={styles.messages}>
                     <MessageBubble />
                 </div>
             </div>

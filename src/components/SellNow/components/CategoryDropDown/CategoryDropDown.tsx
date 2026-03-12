@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, type FC } from "react";
 
 /** Types */
-import type {CategoryDropDownProps} from "./CategoryDropDown.types";
-import type { CategoryDocument } from "../../../../types/category/category.types";
+import type {CategoryDropDownPropsInterface} from "../../../../types/components/index";
+import type { CategoryDocument } from "../../../../types/api/index";
 
 /** Categories dummy data */
 import { categories } from "../../../../data/categories";
@@ -11,7 +11,7 @@ import { categories } from "../../../../data/categories";
 import styles from "./CategoryDropdown.module.css";
 import { ChevronDown, ChevronLeft, ChevronRight, TextSelect } from "lucide-react";
 
-const CategoryDropdown: FC<CategoryDropDownProps> = ({handleCategoryOnChange}) => {
+const CategoryDropdown: FC<CategoryDropDownPropsInterface> = ({handleCategoryOnChange}) => {
   
   const ref = useRef<HTMLDivElement>(null);
 

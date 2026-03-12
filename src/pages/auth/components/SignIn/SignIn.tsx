@@ -7,10 +7,10 @@ import { EyeIcon } from "../../../../components/icons";
 import useLogin from "../../../../hooks/server/auth/useLogin";
 
 /** Types */
-import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "./SignIn.types";
-import type { ApiError } from "../../../../types/api/apiError"; 
+import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "../../../../types/components/index";
+import type { ApiError } from "../../../../types/api/api.types"; 
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
-import { saveRefreshToken,saveAccessToken } from "../../../../services/api/auth/auth";
+import { saveRefreshToken,saveAccessToken } from "../../../../services/auth.services";
 
 export default function SignIn({ onForgot, onSuccess}: EmailLoginPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);

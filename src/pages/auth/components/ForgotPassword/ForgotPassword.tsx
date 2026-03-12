@@ -5,9 +5,9 @@ import styles from "./ForgotPassword.module.css";
 import useForgot from "../../../../hooks/server/auth/useForgot";
 
 /** Types */
-import type { ForgotPasswordFormInterface,ForgotPasswordPropsInterface } from "./ForgotPassword.types";
+import type { ForgotPasswordFormInterface,ForgotPasswordPropsInterface } from "../../../../types/components/index";
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
-import type { ApiError } from "../../../../types/api/apiError";
+import type { ApiError } from "../../../../types/api/api.types";
 import { useState } from "react";
 export default function ForgotPassword({ onSubmit, }: ForgotPasswordPropsInterface) {
   const {

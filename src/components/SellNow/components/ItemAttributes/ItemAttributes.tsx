@@ -1,13 +1,11 @@
 import { useEffect, useState, type FC } from "react";
 import MultiSelectDropdown from "../MultiSelectDropDown/MultiSelectDropDown";
 import styles from "../../SellItem.module.css";
-import type { ItemAttributesPropsInterface } from "./ItemAttributes.types";
+import type { ItemAttributesPropsInterface } from "../../../../types/components/index";
 
 /** Hook */
 import useCategoryAttributes from "../../../../hooks/server/category/useCategoryAttributes";
-import type { BrandDocument } from "../../../../types/brand/brand.types";
-import type { MaterialDocument } from "../../../../types/material/material.types";
-import type { SizeDocument } from "../../../../types/size/size.types";
+import type { BrandDocument, MaterialDocument, SizeDocument } from "../../../../types/api/index";
 
 const ItemAttributes:  FC<ItemAttributesPropsInterface> = ({
   categoryId,

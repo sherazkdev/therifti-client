@@ -1,20 +1,20 @@
-import type { VerifyForgotAccountResetTokenAndChangePasswordInterface,VerifyForgotAccountResetTokenApiResponse} from "../../../services/api/auth/auth.types";
+import type { VerifyForgotAccountResetTokenAndChangePasswordInterface,VerifyForgotAccountResetTokenApiResponse} from "../../../types/api/index";
 import { useMutation } from "@tanstack/react-query";
 
 /** Services */
-import AuthServices from "../../../services/api/auth/auth.api";
-import BackendRequestMethods from "../../../services/BackendRequestMethods/BackendRequestMethods";
+import AuthApi from "../../../api/auth.api";
+import BackendRequestServices from "../../../services/backendRequest.services";
 import type { AxiosError } from "axios";
 
 /** @note: Server url. */
 const BaseURL = import.meta.env.VITE_SERVER_URL;
 
-const requestMethods = new BackendRequestMethods(BaseURL);
-const authServices = new AuthServices(requestMethods);
+const backendRequestServices = new BackendRequestServices(BaseURL);
+const authApi = new AuthApi(backendRequestServices);
 
 const useVerifyForgotAccountResetTokenAndChangePassword = () => {
     return useMutation<VerifyForgotAccountResetTokenApiResponse,AxiosError,VerifyForgotAccountResetTokenAndChangePasswordInterface>({
-        mutationFn: (verifyObj:VerifyForgotAccountResetTokenAndChangePasswordInterface) => authServices.VerifyForgotAccountResetTokenAndChangePassword(verifyObj),
+        mutationFn: (verifyObj:VerifyForgotAccountResetTokenAndChangePasswordInterface) => authApi.VerifyForgotAccountResetTokenAndChangePassword(verifyObj),
     })
 };
 export default useVerifyForgotAccountResetTokenAndChangePassword;

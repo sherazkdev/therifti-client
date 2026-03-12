@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styles from "./CategoryBar.module.css";
 import MegaMenu from "../MegaMenu/MegaMenu";
-import type { Category } from "../../../types/category";
 import { MapPin, Globe } from "lucide-react";
-import type { CategoryPropsInterface } from "./Category.types";
+import type { CategoryDocument } from "../../../types/api";
+import type { CategoryPropsInterface } from "../../../types/components";
 
 
 const CategoryBar: React.FC<CategoryPropsInterface> = ({
@@ -11,7 +11,7 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
   onCategoryClick,
   variant = "overlay",
 }) => {
-  const [active, setActive] = useState<Category | null>(null);
+  const [active, setActive] = useState<CategoryDocument | null>(null);
 
   return (
     <nav
@@ -53,8 +53,8 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
       {active && (
         <MegaMenu
           category={active}
-          onCategoryClick={(id) => {
-            onCategoryClick(id, active.title);
+          onCategoryClick={(_id:string) => {
+            onCategoryClick(_id, active.title);
             setActive(null); 
           }}
         />

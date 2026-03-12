@@ -1,16 +1,16 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
-import type { SocialAuthPropsInterface } from "./SocialAuth.typs";
+import type { SocialAuthPropsInterface } from "../../../../types/components/index";
 import styles from "./SocialAuth.module.css";
 
 import { AppleIcon, FacebookIcon, GoogleIcon } from "../../../../assets/icons/svgs/svg";
 
 import useUser from "../../../../hooks/server/auth/useUser";
-import { saveRefreshToken,saveAccessToken } from "../../../../services/api/auth/auth";
-import type { SocialAuthInterface } from "../../Auth.types";
+import { saveRefreshToken,saveAccessToken } from "../../../../services/auth.services";
+import type { SocialAuthInterface } from "../../../../types/components/index";
 
 /** Note: Context */
-import { AuthContext } from "../../../../contexts/auth/AuthContext";
+import { AuthContext } from "../../../../contexts/auth/auth.context";
 
 export default function SocialAuth({type,onEmailClick,onSwitchMode,onSocialAuth}: SocialAuthPropsInterface) {
 

@@ -4,11 +4,12 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./styles/globals.css";
-import { AuthProvider } from "./contexts/auth/AuthProvider";
+import { AuthProvider } from "./contexts/auth/auth.provider";
 
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import SocketProvider from "./contexts/sockets/socket.provider";
 
 /** Note: Created Client. */
 const queryClient = new QueryClient();
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <App />
+          <SocketProvider>
+            <App />
+          </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
