@@ -15,7 +15,6 @@ import type { SellFormValues, ProductStatus, ParcelSizeInterface } from "../../t
 import type { CategoryDocument, SizeDocument, MaterialDocument, BrandDocument  } from "../../types/api/index";
 /* Hooks */
 import useCreateProduct from "../../hooks/server/product/useCreateProduct";
-import Loader from "../Loader/Loader";
 
 /**
  * SellItem Component
@@ -105,7 +104,6 @@ const SellItem = () => {
 
   return (
     <>
-      {!productMutation.isPending && <Loader />}
       <div className={styles.container}>
         <h2 className={styles.title}>Sell an Item</h2>
 

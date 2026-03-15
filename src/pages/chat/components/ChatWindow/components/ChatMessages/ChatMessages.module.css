@@ -1,17 +1,8 @@
-.chatMessages {
-    padding: 10px 20px;
-    display: flex;
-    flex-direction: column;
-    overflow: scroll;
-    height: 100%;
-    gap: 10px;
-}
+
 .chatMessages::-webkit-scrollbar {
     width: 10px;
 }
 .chatMessages {
-    overflow: scroll;
-    overflow-x: hidden;
     scrollbar-width: thin;
     scrollbar-color: #909393 transparent;
 }
@@ -20,6 +11,8 @@
 }
 .dateHeader {
     display: flex;
+    position: sticky;
+    top: 5px;
     justify-content: center;
     align-items: center;
 }
@@ -28,6 +21,16 @@
     font-size: 12px;
     font-weight: 375;
     line-height: 16px;
+}
+.chatMessages {
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    gap: 10px;
+    overscroll-behavior: contain;
+    overflow-y: auto;
 }
 
 .messages {

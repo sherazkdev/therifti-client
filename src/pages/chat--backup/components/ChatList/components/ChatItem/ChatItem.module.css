@@ -1,0 +1,56 @@
+.chatItem {
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 16px;
+}
+
+.active {
+    background-color: #ededed;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 200px;
+}
+
+.rightSection{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.topSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.memberName {
+    color: #15191a;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 18px;
+}
+
+.lastMessageTime {
+    color:#5a6566;
+    font-size: 14px;
+    font-weight: 375;
+    line-height: 18px;
+}
+
+.messageContent {
+    color:#5a6566;
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.bottomSection {
+    width: 100%;
+    overflow: hidden;
+}

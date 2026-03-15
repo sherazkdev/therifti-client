@@ -1,6 +1,7 @@
 
 /** @note: User Document Interface. */
 export interface UserDocumentInterface {
+  _id:string,
   googleId: string | null;
   facebookId: string | null;
   appleId: string | null;

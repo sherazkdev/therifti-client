@@ -7,7 +7,8 @@ import styles from "./ChatListTopHeader.module.css";
 import type { ChatListTopHeaderPropsInterface } from './ChatListTopHeader.types';
 import { Search } from 'lucide-react';
 
-const ChatlistTopHeader:React.FC<ChatListTopHeaderPropsInterface> = () => {
+const ChatlistTopHeader:React.FC<ChatListTopHeaderPropsInterface> = ({handleSearchChat}) => {
+
     return (
         <header className={styles.header}>
             <div id="top-header" className={styles.topHeader}>
@@ -24,8 +25,10 @@ const ChatlistTopHeader:React.FC<ChatListTopHeaderPropsInterface> = () => {
             </div>
             {/* Search Section */}
             <div id="search-section" className={styles.searchSection}>
-                <input className={styles.searchInput} type="text" placeholder='Search or start a new chat' />
-                <button className={styles.searchIcon}><Search color='#aeaeae' width="20px"/></button>
+                <div className={styles.searchInput}>
+                    <input onChange={ (e) => handleSearchChat(e.target.value)} type="text" placeholder='Search or start a new chat' />
+                    <button className={styles.searchIcon}><Search color='#aeaeae' width="20px"/></button>
+                </div>
             </div>
         </header>
     );

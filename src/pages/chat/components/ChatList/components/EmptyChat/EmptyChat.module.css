@@ -1,0 +1,17 @@
+.emptyChatMain {
+  display: flex;
+  flex-direction: column;    /* items stacked vertically */
+  justify-content: center;   /* vertical centering */
+  width: 100%;
+  min-height: 100%;              /* parent height fill kare */
+  text-align: center;        /* optional, text center */
+  position: absolute;
+  gap: 10px;
+}
+
+.messageEmtyChat {
+    color:#5a6566;
+    font-size: 14px;
+    font-weight: 375;
+    line-height: 22px;
+}

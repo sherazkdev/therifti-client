@@ -72,10 +72,10 @@ const AuthPage = () => {
   const handleOnSocialAuth = (type:SocialAuthInterface) => {
     if(type === "GOOGLE"){
       // window.open(import.meta.env.VITE_SERVER_URL + "/auth/google","_blank","width=/500px;height=200px");
-      window.location.href = import.meta.env.VITE_SERVER_URL + "/auth/google";
+      window.location.href = import.meta.env.VITE_SERVER_URL + "/api/v1/auth/google";
       window.close();
     }else if(type === "FACEBOOK"){
-      window.location.href = import.meta.env.VITE_SERVER_URL + "/auth/facebook";
+      window.location.href = import.meta.env.VITE_SERVER_URL + "/api/v1/auth/facebook";
     }
   };
 

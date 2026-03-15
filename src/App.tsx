@@ -4,8 +4,9 @@ import { lazy, Suspense } from "react";
 /** Layout */
 import MainLayout from "./layouts/Main/mainLayout";
 
-/** Pages */
-import SessionRefresh from "./pages/SessionRefresh/SessionRefresh";
+/** Note: Route Protecter */
+import ProtectRoute from "./utils/ProtectRoute";
+import Loader from "./components/UI/Loader/Loader";
 
 const Home = lazy(() => import("./pages/Home/Home"));
 const LoginPage = lazy(() => import("./pages/auth/Auth"));
@@ -17,7 +18,7 @@ const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
 
 function App() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
 
       <Routes>
 
@@ -28,18 +29,41 @@ function App() {
 
           <Route path="/login" element={<LoginPage />} />
 
-          <Route path="/sell" element={<Sell />} />
-
           <Route path="/category/:categoryId" element={<SingleCategory />} />
 
           <Route  path="/product/:productId"  element={<ProductPage />} />
 
           <Route path="/profile/:userId" element={<ProfilePage />}/>
 
-          <Route path="/chat" element={<Chat />} />
-
           <Route path="*" element={<h1>Not Found</h1>} />
 
+          {/* Secure Routes */}
+          <Route 
+            path="/sell" 
+              element={
+                <ProtectRoute>
+                  <Sell />
+                </ProtectRoute>
+              }
+           />
+
+          <Route 
+            path="/inbox" 
+              element={
+                <ProtectRoute>
+                  <Chat />
+                </ProtectRoute>
+              } 
+          />
+
+          <Route 
+            path="/inbox/:chatId"
+              element={
+                <ProtectRoute>
+                  <Chat />
+                </ProtectRoute>
+              }
+          />
 
         </Route>
 

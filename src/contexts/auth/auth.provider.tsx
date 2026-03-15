@@ -2,10 +2,9 @@ import { type ReactNode, useState,useEffect } from "react";
 import { AuthContext } from "./auth.context";
 
 /** Types */
-import type { UserDocumentInterface } from "../../types/auth/auth.types";
+import type { UserDocumentInterface } from "../../types/api";
 import useUser from "../../hooks/server/auth/useUser";
 import { AxiosError } from "axios";
-import type { ApiError } from "../../types/api/api.types";
 
 export const AuthProvider = ({ children }:{children:ReactNode}) => {
   const [user, setUser] = useState<UserDocumentInterface | null>(null);
@@ -13,13 +12,12 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
 
   /** Note: Handle Set User Document. */
   const handleSetUser = (user:UserDocumentInterface) => {
-      console.log(user);
       setUser(user);
       setIsAuthenticated(true);
   };
 
   /** Note: Check User is Authenticated */
-  const { data, refetch, isLoading,error} = useUser();
+  const { data, refetch} = useUser();
 
   useEffect( () => {
     const handleFetchAuthenticatedUser = async ():Promise<void> => {
@@ -39,10 +37,8 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
 
 
   useEffect( () => {
-    console.log(data);
-    if(data){
-      console.log(data);
-      handleSetUser(data);
+    if(data && data.data){
+      handleSetUser(data.data);
     }
   },[data]);
 

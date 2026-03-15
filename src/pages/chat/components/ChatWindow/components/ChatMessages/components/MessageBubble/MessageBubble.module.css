@@ -7,7 +7,7 @@
     border:1px solid #15191a1f;
     padding: 5px 10px;
     background-color: #edf2f2;
-
+    max-width: 370px;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
@@ -31,6 +31,7 @@
     display: flex;
     justify-content: start;
     align-items: start;
+    max-width: 370px;
     margin-bottom: 15px;
     gap: 8px;
 }

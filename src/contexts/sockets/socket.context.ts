@@ -1,8 +1,10 @@
-import { createContext, type Context } from "react";
+import { createContext, useContext, type Context } from "react";
 
 /** Socket Context Types */
 import type { SocketContextInterface } from "../../types/contexts/index";
 
-const SocketContext:Context<SocketContextInterface> = createContext<SocketContextInterface>({socket:null});
+/** Note: Socket Context */
+export const SocketContext:Context<SocketContextInterface> = createContext<SocketContextInterface>({socket:null,onlineUsers:null});
 
-export default SocketContext;
+/** Note: Socket Provider */
+export const useSockets = () =>  useContext(SocketContext);

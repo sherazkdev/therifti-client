@@ -82,6 +82,7 @@
 
 .topHeader div .backBtn {
     background: transparent;
+    display: none;
     border: none;
     padding: 5px;
     border-radius: 6px;
@@ -118,5 +119,11 @@
     .header {
 
         border-bottom: 2px solid #15191a1f;
+    }
+}
+
+@media screen and (max-width:1080px){
+    .topHeader div .backBtn{
+        display: block;
     }
 }

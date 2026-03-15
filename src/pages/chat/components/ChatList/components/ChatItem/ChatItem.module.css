@@ -1,5 +1,6 @@
 .chatItem {
     width: 100%;
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -43,13 +44,51 @@
 }
 
 .messageContent {
-    color:#5a6566;
-    font-size: 14px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .bottomSection {
     width: 100%;
     overflow: hidden;
+}
+
+.messageContent {
+    color:#5a6566;
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.unreadMessageLenght {
+    background-color: #1daa61;
+    width: 20px;
+    color: #fff;
+    text-align: center;
+    align-content: center;
+    height: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 300px;
+}
+
+.leftSection{
+    position: relative;
+}
+
+.isOnline {
+    position: absolute;
+    top: 5px;
+    right: -5px;
+    background-color: #fff;
+    border-radius: 200px;
+    display: flex;
+    justify-content: center;
+    padding: 1px;
+    align-items: center;
+}
+
+.isOnline img {
+    width: 14px;
+    object-fit: cover;
 }

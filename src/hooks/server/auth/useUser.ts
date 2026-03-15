@@ -1,4 +1,4 @@
-import type { LoggedInUserResponse,LoggedInUserApiResponse } from "../../../types/api/index";
+import type { LoggedInUserApiResponse } from "../../../types/api/index";
 import { useQuery } from "@tanstack/react-query";
 
 /** Services */
@@ -15,7 +15,7 @@ const authApi = new AuthApi(backendRequestServices);
 
 const useUser = () => {
     const accessToken = getAccessToken();
-    return useQuery<LoggedInUserApiResponse,AxiosError,LoggedInUserResponse>({
+    return useQuery<LoggedInUserApiResponse,AxiosError>({
         queryKey:["authenticatedUser"],
         queryFn: () => authApi.CurrentUser(),
         enabled:!!accessToken,
