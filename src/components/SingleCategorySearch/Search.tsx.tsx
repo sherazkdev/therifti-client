@@ -9,11 +9,11 @@ import type {
   ProductSort,
 } from "../../services/api/product/product.types";
 
-import useSearchProducts from "../../hooks/server/product/useSearchProducts"; // Apne hook ka path theek kar lein
+import useSearchProducts from "../../hooks/server/product/useSearchProducts"; 
 
 export type Drop = "category" | "price" | "size" | "brand" | "material" | "condition" | "color" | "sort" | null;
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 1; 
 
 const SORT_OPTIONS: ProductSort[] = [
   "RELEVANCE",
@@ -34,31 +34,33 @@ function findNodeByKey(nodes: CategoryDocument[], key: string): CategoryDocument
   return null;
 }
 
+// ✅ Breadcrumb ab strictly category ka path banayega bina 'Home /' ke
 function buildCategoryLabel(tree: CategoryDocument[], stack: string[]) {
   const labels = stack
     .map((k) => findNodeByKey(tree, k)?.title)
     .filter(Boolean) as string[];
-  return labels.length ? labels.join(" / ") : "Category";
+  return labels.length ? labels.join(" / ") : ""; 
 }
 
 interface SearchProps {
   initialCategoryId?: string | null;
   initialQuery?: string | null;
-  initialBreadcrumb?: string; // e.g. "Home / Electronics / Mobiles"
+  initialBreadcrumb?: string; 
 }
 
-const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcrumb = "All Products" }: SearchProps) => {
+const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcrumb = "" }: SearchProps) => {
   const [open, setOpen] = useState<Drop>(null);
   const [categoryTree] = useState<CategoryDocument[]>(categories);
   const panelRef = useRef<HTMLDivElement | null>(null);
 
   // Search Specific States
   const [query, setQuery] = useState<string | null>(initialQuery);
-  const [breadcrumb, setBreadcrumb] = useState<string>(initialBreadcrumb);
+  
+  // ✅ Breadcrumb ab initialBreadcrumb lega, warna initialQuery, warna All Products
+  const [breadcrumb, setBreadcrumb] = useState<string>(initialBreadcrumb || initialQuery || "All Products");
 
   // Category States
   const [catStack, setCatStack] = useState<string[]>([]);
-  const [selectedPath, setSelectedPath] = useState(initialBreadcrumb.split("/").pop()?.trim() || "Category");
   const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(initialCategoryId);
 
   // Filter States
@@ -84,28 +86,30 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     return findNodeByKey(categoryTree, catStack[catStack.length - 1]);
   }, [catStack, categoryTree]);
 
-  /* ---------------- URL UPDATE (Optional, if you want sharable links) ---------------- */
+  /* ---------------- URL UPDATE ---------------- */
   const updateURL = useCallback((payload: SearchProductsPayloadInterface) => {
     const params = new URLSearchParams(window.location.search);
     if (payload.q) params.set("q", payload.q);
+    else params.delete("q");
+
     if (payload.categoryId) params.set("category", payload.categoryId);
+    else params.delete("category");
+
     window.history.replaceState(null, "", `?${params.toString()}`);
   }, []);
 
   /* ---------------- FETCH PRODUCTS ---------------- */
-   /* ---------------- FETCH PRODUCTS ---------------- */
   const fetchProducts = useCallback(
     (
       nextPage: number, 
       mode: "replace" | "append", 
       overrideCategory?: string | null, 
       newSort?: ProductSort,
-      overrideQuery?: string | null // ✅ Naya parameter for clearing query
+      overrideQuery?: string | null 
     ) => {
       setLoadingProducts(true);
       if (mode === "replace") setProducts([]);
 
-      //  Agar parameter mein null aaya hai toh strictly usko use karo, warna state wala use karo
       const finalCategory = overrideCategory !== undefined ? overrideCategory : appliedCategoryKey;
       const finalQuery = overrideQuery !== undefined ? overrideQuery : query;
 
@@ -113,7 +117,7 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
         q: finalQuery || undefined,
         categoryId: finalCategory || undefined,
         page: nextPage,
-        limit: PAGE_SIZE, // Make sure yeh 10 ho
+        limit: PAGE_SIZE, 
         sort: newSort ?? sortValue,
         price: priceFrom || priceTo ? { min: priceFrom ? Number(priceFrom) : undefined, max: priceTo ? Number(priceTo) : undefined } : undefined,
         sizes: selectedSizes.length ? selectedSizes : undefined,
@@ -141,8 +145,7 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
 
   /* ---------------- INITIAL LOAD ---------------- */
   useEffect(() => {
-    // Component mount hoty hi data fetch karega based on props
-    fetchProducts(1, "replace", initialCategoryId, sortValue);
+    fetchProducts(1, "replace", initialCategoryId, sortValue, initialQuery);
   }, [initialCategoryId, initialQuery]);
 
   /* ---------------- CLICK OUTSIDE ---------------- */
@@ -167,7 +170,6 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
   const goIntoCategory = (key: string) => setCatStack((s) => [...s, key]);
   const goBackCategory = () => setCatStack((s) => s.slice(0, -1));
 
-  // Generic Toggle Function array filters ke liye
   const toggleArrayFilter = (setter: React.Dispatch<React.SetStateAction<string[]>>, item: string) => {
     setter((prev) => prev.includes(item) ? prev.filter((x) => x !== item) : [...prev, item]);
   };
@@ -180,14 +182,22 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
   };
 
   const applyCategorySelection = (explicitId?: string) => {
-    const label = buildCategoryLabel(categoryTree, catStack);
+    let finalLabel = buildCategoryLabel(categoryTree, catStack);
+    
+    if (explicitId) {
+       const node = findNodeByKey(categoryTree, explicitId);
+       if (node) {
+         finalLabel = finalLabel ? `${finalLabel} / ${node.title}` : node.title;
+       }
+    }
+
     const lastKey = explicitId ?? (catStack.length ? catStack[catStack.length - 1] : null);
 
-    setSelectedPath(label);
     setAppliedCategoryKey(lastKey);
-    setBreadcrumb(`Home / Search / ${label}`); // Update breadcrumb dynamically
+    
+    // ✅ Sets pure path like: Fashion / Women / Handbags
+    setBreadcrumb(finalLabel || "All Products");
 
-    // Reset inner filters when category changes
     setSelectedSizes([]);
     setSelectedBrands([]);
     setSelectedMaterials([]);
@@ -195,7 +205,7 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     setPage(1);
     setOpen(null);
     setCatStack([]);
-    fetchProducts(1, "replace", lastKey);
+    fetchProducts(1, "replace", lastKey, undefined, query); 
   };
 
   const applyNonCategoryFilters = () => {
@@ -207,7 +217,6 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
 
   /* ---------------- RESET ALL ---------------- */
   const resetAll = () => {
-    // 1. Saare Filters Reset
     setSelectedSizes([]);
     setSelectedBrands([]);
     setSelectedMaterials([]);
@@ -217,10 +226,8 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     setPriceTo("");
     setSortValue("RELEVANCE");
 
-    // Category aur Query completely Reset
     setAppliedCategoryKey(null);
-    setSelectedPath("Category"); 
-    setBreadcrumb("Home / All Products");
+    setBreadcrumb("All Products"); 
     setQuery(null);
 
     setPage(1);
@@ -229,7 +236,6 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
 
     window.history.replaceState(null, "", window.location.pathname);
 
-    //  API ko strictly NULL category aur NULL query bhejo
     fetchProducts(1, "replace", null, "RELEVANCE", null); 
   };
 
@@ -240,16 +246,10 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
 
   return (
     <section className={styles.wrapper}>
-      {/* Search Header & Breadcrumb */}
+      {/* Search Header */}
       <div className={styles.header}>
-        <div>
-          <span style={{ fontSize: "12px", color: "#666", marginBottom: "4px", display: "block" }}>
-            {breadcrumb}
-          </span>
-          <h2 className={styles.title}>
-            {query ? `Results for "${query}"` : "Search Products"}
-          </h2>
-        </div>
+        {/* ✅ Title is static and fully spaced */}
+        <h2 className={styles.title}>Items</h2>
 
         <button className={styles.resetBtn} onClick={resetAll}>
           Clear Filters
@@ -259,7 +259,7 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
       <SearchFilterBar
         open={open}
         toggleOpen={toggleOpen}
-        selectedPath={selectedPath}
+        selectedPath="Category" // ✅ HARDCODED: Yeh ab change nahi hoga
         categoryTree={categoryTree}
         catStack={catStack}
         currentCatNode={currentCatNode}
@@ -293,6 +293,11 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
         applyNonCategoryFilters={applyNonCategoryFilters}
         panelRef={panelRef}
       />
+
+      {/* ✅ Breadcrumb is moved here, perfectly aligned under filters */}
+      <div className={styles.breadcrumb}>
+        {breadcrumb}
+      </div>
 
       {/* Grid */}
       <div className={styles.grid}>
