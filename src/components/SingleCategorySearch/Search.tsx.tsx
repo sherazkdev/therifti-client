@@ -93,16 +93,27 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
   }, []);
 
   /* ---------------- FETCH PRODUCTS ---------------- */
+   /* ---------------- FETCH PRODUCTS ---------------- */
   const fetchProducts = useCallback(
-    (nextPage: number, mode: "replace" | "append", overrideCategory?: string | null, newSort?: ProductSort) => {
+    (
+      nextPage: number, 
+      mode: "replace" | "append", 
+      overrideCategory?: string | null, 
+      newSort?: ProductSort,
+      overrideQuery?: string | null // ✅ Naya parameter for clearing query
+    ) => {
       setLoadingProducts(true);
       if (mode === "replace") setProducts([]);
 
+      //  Agar parameter mein null aaya hai toh strictly usko use karo, warna state wala use karo
+      const finalCategory = overrideCategory !== undefined ? overrideCategory : appliedCategoryKey;
+      const finalQuery = overrideQuery !== undefined ? overrideQuery : query;
+
       const payload: SearchProductsPayloadInterface = {
-        q: query || undefined,
-        categoryId: overrideCategory !== undefined ? overrideCategory : appliedCategoryKey,
+        q: finalQuery || undefined,
+        categoryId: finalCategory || undefined,
         page: nextPage,
-        limit: PAGE_SIZE,
+        limit: PAGE_SIZE, // Make sure yeh 10 ho
         sort: newSort ?? sortValue,
         price: priceFrom || priceTo ? { min: priceFrom ? Number(priceFrom) : undefined, max: priceTo ? Number(priceTo) : undefined } : undefined,
         sizes: selectedSizes.length ? selectedSizes : undefined,
@@ -194,7 +205,9 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     fetchProducts(1, "replace");
   };
 
+  /* ---------------- RESET ALL ---------------- */
   const resetAll = () => {
+    // 1. Saare Filters Reset
     setSelectedSizes([]);
     setSelectedBrands([]);
     setSelectedMaterials([]);
@@ -203,9 +216,21 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     setPriceFrom("");
     setPriceTo("");
     setSortValue("RELEVANCE");
+
+    // Category aur Query completely Reset
+    setAppliedCategoryKey(null);
+    setSelectedPath("Category"); 
+    setBreadcrumb("Home / All Products");
+    setQuery(null);
+
     setPage(1);
     setOpen(null);
-    fetchProducts(1, "replace", appliedCategoryKey, "RELEVANCE");
+    setCatStack([]);
+
+    window.history.replaceState(null, "", window.location.pathname);
+
+    //  API ko strictly NULL category aur NULL query bhejo
+    fetchProducts(1, "replace", null, "RELEVANCE", null); 
   };
 
   const onSeeMore = () => {
