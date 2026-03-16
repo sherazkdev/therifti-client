@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import styles from "./Search.module.css"; 
 import ProductCard from "../productcard/ProductCard";
 import { categories } from "../../data/categories";
-import SearchFilterBar from "./component/SearchFilterBar";
+import SearchFilterBar from "./component/SearchFilterBar"; 
 import type { CategoryDocument } from "../../types/category/category.types";
 import type {
   SearchProductsPayloadInterface,
@@ -34,7 +34,6 @@ function findNodeByKey(nodes: CategoryDocument[], key: string): CategoryDocument
   return null;
 }
 
-// ✅ Breadcrumb ab strictly category ka path banayega bina 'Home /' ke
 function buildCategoryLabel(tree: CategoryDocument[], stack: string[]) {
   const labels = stack
     .map((k) => findNodeByKey(tree, k)?.title)
@@ -55,13 +54,15 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
 
   // Search Specific States
   const [query, setQuery] = useState<string | null>(initialQuery);
-  
-  // ✅ Breadcrumb ab initialBreadcrumb lega, warna initialQuery, warna All Products
   const [breadcrumb, setBreadcrumb] = useState<string>(initialBreadcrumb || initialQuery || "All Products");
 
   // Category States
   const [catStack, setCatStack] = useState<string[]>([]);
+  const [selectedPath] = useState("Category"); 
   const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(initialCategoryId);
+  
+  //  Temporary state for holding category selection before clicking "Apply"
+  const [pendingCategory, setPendingCategory] = useState<string | null>(null);
 
   // Filter States
   const [priceFrom, setPriceFrom] = useState("");
@@ -155,6 +156,7 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
       if (!panelRef.current.contains(e.target as Node)) {
         setOpen(null);
         setCatStack([]);
+        setPendingCategory(null); // Clear pending if user clicks outside
       }
     };
     document.addEventListener("mousedown", onDown);
@@ -164,7 +166,10 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
   /* ---------------- ACTIONS ---------------- */
   const toggleOpen = (d: Drop) => {
     setOpen((prev) => (prev === d ? null : d));
-    if (d !== "category") setCatStack([]);
+    if (d !== "category") {
+      setCatStack([]);
+      setPendingCategory(null);
+    }
   };
 
   const goIntoCategory = (key: string) => setCatStack((s) => [...s, key]);
@@ -181,21 +186,22 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     fetchProducts(1, "replace", undefined, value);
   };
 
+  //  Apply Category abb pending state check karega
   const applyCategorySelection = (explicitId?: string) => {
     let finalLabel = buildCategoryLabel(categoryTree, catStack);
     
-    if (explicitId) {
-       const node = findNodeByKey(categoryTree, explicitId);
+    const targetId = explicitId || pendingCategory;
+
+    if (targetId) {
+       const node = findNodeByKey(categoryTree, targetId);
        if (node) {
          finalLabel = finalLabel ? `${finalLabel} / ${node.title}` : node.title;
        }
     }
 
-    const lastKey = explicitId ?? (catStack.length ? catStack[catStack.length - 1] : null);
+    const lastKey = targetId ?? (catStack.length ? catStack[catStack.length - 1] : null);
 
     setAppliedCategoryKey(lastKey);
-    
-    // ✅ Sets pure path like: Fashion / Women / Handbags
     setBreadcrumb(finalLabel || "All Products");
 
     setSelectedSizes([]);
@@ -205,6 +211,7 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     setPage(1);
     setOpen(null);
     setCatStack([]);
+    setPendingCategory(null); // Applied ho gaya toh pending saaf kar do
     fetchProducts(1, "replace", lastKey, undefined, query); 
   };
 
@@ -233,9 +240,9 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
     setPage(1);
     setOpen(null);
     setCatStack([]);
+    setPendingCategory(null);
 
     window.history.replaceState(null, "", window.location.pathname);
-
     fetchProducts(1, "replace", null, "RELEVANCE", null); 
   };
 
@@ -246,11 +253,8 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
 
   return (
     <section className={styles.wrapper}>
-      {/* Search Header */}
       <div className={styles.header}>
-        {/* ✅ Title is static and fully spaced */}
         <h2 className={styles.title}>Items</h2>
-
         <button className={styles.resetBtn} onClick={resetAll}>
           Clear Filters
         </button>
@@ -259,7 +263,7 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
       <SearchFilterBar
         open={open}
         toggleOpen={toggleOpen}
-        selectedPath="Category" // ✅ HARDCODED: Yeh ab change nahi hoga
+        selectedPath={selectedPath}
         categoryTree={categoryTree}
         catStack={catStack}
         currentCatNode={currentCatNode}
@@ -267,6 +271,10 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
         goBackCategory={goBackCategory}
         applyCategorySelection={applyCategorySelection}
         
+        // Nayi state props for holding option before clicking Apply
+        pendingCategory={pendingCategory}
+        setPendingCategory={setPendingCategory}
+
         // Dynamic States
         categoryId={appliedCategoryKey}
         selectedSizes={selectedSizes}
@@ -294,12 +302,10 @@ const Search = ({ initialCategoryId = null, initialQuery = null, initialBreadcru
         panelRef={panelRef}
       />
 
-      {/* ✅ Breadcrumb is moved here, perfectly aligned under filters */}
       <div className={styles.breadcrumb}>
         {breadcrumb}
       </div>
 
-      {/* Grid */}
       <div className={styles.grid}>
         {loadingProducts && products.length === 0 &&
           Array.from({ length: PAGE_SIZE }).map((_, idx) => (
