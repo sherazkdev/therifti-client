@@ -1,88 +1,35 @@
-// TopPicks.tsx (backend-ready + payload simplified + state lag fixed + Skeletons)
-
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import styles from "./TopPicks.module.css";
 import ProductCard from "../productcard/ProductCard";
-import { ChevronDown } from "../../components/icons";
-import { Shirt } from "lucide-react";
-import { ChevronLeft } from 'lucide-react';
+import { categories } from "../../data/categories";
+import FilterBar from "./components/FilterBar/Filterbar";
+import type { CategoryDocument } from "../../types/category/category.types";
+import type {
+  FeaturedProductsSortingInterface,
+  ProductSort,
+} from "../../services/api/product/product.types";
 
-/* ---------------- TYPES ---------------- */
-export type CategoryNode = {
-  key: string;
-  label: string;
-  iconUrl?: string; 
-  children?: CategoryNode[];
-  options?: string[]; 
-};
+import useFeaturedProducts from "../../hooks/server/product/useFeaturedProducts";
 
 type Drop = "category" | "price" | "size" | "sort" | null;
 
-export type Product = {
-  id: string;
-  image?: string;
-  brand: string;
-  meta: string;
-  price: string;
-  likes: string;
-};
+const PAGE_SIZE = 1;
 
-/* ---------------- DEFAULT FALLBACK DATA (UI demo) ---------------- */
-const CATEGORY_TREE_FALLBACK: CategoryNode[] = [
-  {
-    key: "women",
-    label: "Women",
-    children: [
-      {
-        key: "women_clothing",
-        label: "Clothing",
-        options: ["Dresses", "Tops", "Jeans", "Jackets", "Abayas"],
-      },
-      {
-        key: "women_shoes",
-        label: "Shoes",
-        options: ["Heels", "Sneakers", "Boots", "Flats", "Sandals", "Wedges"],
-      },
-      {
-        key: "women_bags",
-        label: "Bags",
-        options: ["Handbags", "Crossbody", "Totes", "Clutches", "Backpacks", "Wallets"],
-      },
-      {
-        key: "women_accessories",
-        label: "Accessories",
-        options: ["Jewelry", "Belts", "Scarves", "Sunglasses", "Watches", "Hats"],
-      },
-    ],
-  },
-  { key: "men", label: "Men" },
-  { key: "kids", label: "Kids" },
-  { key: "electronics", label: "Electronics" },
-  { key: "sports", label: "Sports" },
-  { key: "entertainment", label: "Entertainment" },
-  { key: "faizan", label: "faizan Sports" },
+const SORT_OPTIONS: ProductSort[] = [
+  "PRICE_HIGH_TO_LOW",
+  "PRICE_LOW_TO_HIGH",
+  "NEWEST_FIRST",
+  "RELEVANCE",
 ];
 
-const SIZE_OPTIONS = ["XXXS / 2", "XXX / 4", "XS / 6", "S / 8", "M / 10"];
-const SORT_OPTIONS = ["Recommended", "Newest", "Price: Low to High", "Price: High to Low"];
-
-const ALL_DEMO_PRODUCTS: Product[] = Array.from({ length: 24 }).map((_, i) => {
-  const brands = ["River Island", "Mango", "Topman", "Fashion House", "Zara", "Nike", "Adidas"];
-  const b = brands[i % brands.length];
-  return {
-    id: String(i + 1),
-    brand: b,
-    meta: "M30 · Good",
-    price: "$59.99",
-    likes: "1.2k",
-    image: undefined,
-  };
-});
-
 /* ---------------- HELPERS ---------------- */
-function findNodeByKey(nodes: CategoryNode[], key: string): CategoryNode | null {
+
+function findNodeByKey(
+  nodes: CategoryDocument[],
+  key: string
+): CategoryDocument | null {
   for (const n of nodes) {
-    if (n.key === key) return n;
+    if (n._id === key) return n;
     if (n.children) {
       const hit = findNodeByKey(n.children, key);
       if (hit) return hit;
@@ -91,318 +38,268 @@ function findNodeByKey(nodes: CategoryNode[], key: string): CategoryNode | null 
   return null;
 }
 
-const PAGE_SIZE = 8;
-
-function buildCategoryLabel(tree: CategoryNode[], stack: string[]) {
+function buildCategoryLabel(tree: CategoryDocument[], stack: string[]) {
   const labels = stack
-    .map((k) => findNodeByKey(tree, k)?.label)
+    .map((k) => findNodeByKey(tree, k)?.title)
     .filter(Boolean) as string[];
+
   return labels.length ? labels.join(" / ") : "All";
 }
 
-function toNumberOrUndefined(v: string) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : undefined;
-}
-
-/* ---------------- API (PLACEHOLDERS) ---------------- */
-async function apiFetchCategories(): Promise<CategoryNode[]> {
-  const res = await fetch("/api/categories");
-  if (!res.ok) throw new Error("Failed to load categories");
-  return res.json();
-}
-
-type FetchProductsResponse =
-  | { items: Product[]; total: number }
-  | { items: Product[]; hasMore: boolean };
-
-type ProductFiltersPayload = {
-  page: number;
-  pageSize: number;
-  sort: string;
-  categoryKey?: string; 
-  minPrice?: number;
-  maxPrice?: number;
-  sizes?: string[];
-};
-
-async function apiFetchProducts(payload: ProductFiltersPayload): Promise<FetchProductsResponse> {
-  const params = new URLSearchParams();
-
-  params.set("page", String(payload.page));
-  params.set("pageSize", String(payload.pageSize));
-  params.set("sort", payload.sort);
-
-  if (payload.categoryKey) params.set("categoryKey", payload.categoryKey);
-  if (typeof payload.minPrice === "number") params.set("minPrice", String(payload.minPrice));
-  if (typeof payload.maxPrice === "number") params.set("maxPrice", String(payload.maxPrice));
-  if (payload.sizes?.length) params.set("sizes", payload.sizes.join(","));
-
-  const res = await fetch(`/api/products?${params.toString()}`);
-  if (!res.ok) throw new Error("Failed to load products");
-  return res.json();
-}
-
-/* ---------------- COMPONENT ---------------- */
 const TopPicks = () => {
   const [open, setOpen] = useState<Drop>(null);
-  const [categoryTree, setCategoryTree] = useState<CategoryNode[]>(CATEGORY_TREE_FALLBACK);
+  const [categoryTree] = useState<CategoryDocument[]>(categories);
+
   const [catStack, setCatStack] = useState<string[]>([]);
+  const [selectedPath, setSelectedPath] = useState("All");
 
+  const [appliedCategoryKey, setAppliedCategoryKey] =
+    useState<string | null>(null);
 
-  
-  // Selected values
-  const [selectedPath, setSelectedPath] = useState<string>("All"); 
-  const [selectedCatOptions, setSelectedCatOptions] = useState<Record<string, string[]>>({});
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [sortValue, setSortValue] = useState<string>(SORT_OPTIONS[0]);
+  const [sortValue, setSortValue] = useState<ProductSort>(SORT_OPTIONS[0]);
+
   const [priceFrom, setPriceFrom] = useState("");
   const [priceTo, setPriceTo] = useState("");
 
-  const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(null);
-
-  // Pagination + products
+  const [products, setProducts] = useState<any[]>([]);
   const [page, setPage] = useState(1);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [hasMore, setHasMore] = useState(true);
 
+  const [hasMore, setHasMore] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(false);
-  const [loadingCats, setLoadingCats] = useState(false);
-  const [useDemoMode, setUseDemoMode] = useState(false);
+
+  const [selectedCatOptions, setSelectedCatOptions] = useState<
+    Record<string, string[]>
+  >({});
 
   const panelRef = useRef<HTMLDivElement | null>(null);
+
+  const featuredProductMutation = useFeaturedProducts();
+
+  const SIZE_OPTIONS: string[] = [];
+  const loadingCats = false;
 
   const currentCatNode = useMemo(() => {
     if (catStack.length === 0) return null;
     return findNodeByKey(categoryTree, catStack[catStack.length - 1]);
   }, [catStack, categoryTree]);
 
-  const showRoot = open === "category" && catStack.length === 0;
-  const showCategoryScreen = open === "category" && catStack.length > 0;
+  /* ---------------- URL UPDATE ---------------- */
 
-  /* ---------- INITIAL LOAD ---------- */
+  const updateURL = useCallback(
+    (payload: FeaturedProductsSortingInterface) => {
+      const params = new URLSearchParams();
+
+      if (payload.categoryId) params.set("category", payload.categoryId);
+      if (payload.sort) params.set("sort", payload.sort);
+      if (payload.page) params.set("page", String(payload.page));
+
+      if (payload.price?.min)
+        params.set("min", String(payload.price.min));
+      if (payload.price?.max)
+        params.set("max", String(payload.price.max));
+
+      if (payload.sizes?.length)
+        params.set("sizes", payload.sizes.join(","));
+
+      window.history.replaceState(null, "", `?${params.toString()}`);
+    },
+    []
+  );
+
+  /* ---------------- FETCH PRODUCTS ---------------- */
+
+  const fetchProducts = useCallback(
+    (
+      nextPage: number,
+      mode: "replace" | "append",
+      categoryId?: string | null,
+      newSort?: ProductSort
+    ) => {
+      setLoadingProducts(true);
+
+      if (mode === "replace") setProducts([]);
+
+      const payload: FeaturedProductsSortingInterface = {
+        page: nextPage,
+        limit: PAGE_SIZE,
+        categoryId:
+          categoryId !== undefined
+            ? categoryId
+            : appliedCategoryKey || undefined,
+        sort: newSort ?? sortValue,
+        sizes: selectedSizes.length ? selectedSizes : undefined,
+        price:
+          priceFrom || priceTo
+            ? {
+                min: priceFrom ? Number(priceFrom) : undefined,
+                max: priceTo ? Number(priceTo) : undefined,
+              }
+            : undefined,
+      };
+
+      updateURL(payload);
+
+      featuredProductMutation.mutate(payload, {
+        onSuccess: (res) => {
+          const newProducts = res.data || [];
+
+          setProducts((prev) =>
+            mode === "replace" ? newProducts : [...prev, ...newProducts]
+          );
+
+          setHasMore(newProducts.length === PAGE_SIZE);
+          setPage(nextPage);
+          setLoadingProducts(false);
+        },
+
+        onError: () => setLoadingProducts(false),
+      });
+    },
+    [
+      appliedCategoryKey,
+      priceFrom,
+      priceTo,
+      selectedSizes,
+      sortValue,
+      updateURL,
+      featuredProductMutation,
+    ]
+  );
+
+  /* ---------------- LOAD FROM URL ---------------- */
+
   useEffect(() => {
-    const loadCats = async () => {
-      try {
-        setLoadingCats(true);
-        const cats = await apiFetchCategories();
-        if (Array.isArray(cats) && cats.length) {
-          setCategoryTree(cats);
-          setUseDemoMode(false);
-        }
-      } catch {
-        // fallback
-      } finally {
-        setLoadingCats(false);
-      }
-    };
-    loadCats();
+    const params = new URLSearchParams(window.location.search);
+
+    const category = params.get("category");
+    const sort = params.get("sort") as ProductSort | null;
+    const pageParam = params.get("page");
+    const min = params.get("min");
+    const max = params.get("max");
+    const sizes = params.get("sizes");
+
+    if (category) setAppliedCategoryKey(category);
+    if (sort) setSortValue(sort);
+    if (pageParam) setPage(Number(pageParam));
+    if (min) setPriceFrom(min);
+    if (max) setPriceTo(max);
+    if (sizes) setSelectedSizes(sizes.split(","));
+
+    fetchProducts(
+      Number(pageParam) || 1,
+      "replace",
+      category ?? undefined,
+      sort ?? undefined
+    );
   }, []);
 
-  useEffect(() => {
-    const loadInitialProducts = async () => {
-      try {
-        setLoadingProducts(true);
-        // Instant clear for skeletons
-        setProducts([]);
-
-        const payload: ProductFiltersPayload = {
-          page: 1,
-          pageSize: PAGE_SIZE,
-          sort: sortValue,
-        };
-        const resp = await apiFetchProducts(payload);
-
-        setProducts(resp.items);
-        if ("hasMore" in resp) {
-          setHasMore(resp.hasMore);
-        } else {
-          setHasMore(resp.total > resp.items.length);
-        }
-        setUseDemoMode(false);
-        setLoadingProducts(false); // Stop loading on success
-      } catch {
-        // Force a delay so the skeletons are visible during demo mode
-        setTimeout(() => {
-          setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
-          setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
-          setLoadingProducts(false); // Stop loading after fake data sets
-        }, 1000);
-      }
-    };
-    loadInitialProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  /* ---------------- CLICK OUTSIDE ---------------- */
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!panelRef.current) return;
+
       if (!panelRef.current.contains(e.target as Node)) {
         setOpen(null);
         setCatStack([]);
       }
     };
+
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  /* ---------- UI ACTIONS ---------- */
+  /* ---------------- ACTIONS ---------------- */
+
   const toggleOpen = (d: Drop) => {
     setOpen((prev) => (prev === d ? null : d));
     if (d !== "category") setCatStack([]);
   };
 
-  const goIntoCategory = (key: string) => setCatStack((s) => [...s, key]);
-  const goBackCategory = () => setCatStack((s) => s.slice(0, -1));
+  const goIntoCategory = (key: string) =>
+    setCatStack((s) => [...s, key]);
+
+  const goBackCategory = () =>
+    setCatStack((s) => s.slice(0, -1));
+
+  const toggleSize = (size: string) => {
+    setSelectedSizes((prev) =>
+      prev.includes(size)
+        ? prev.filter((x) => x !== size)
+        : [...prev, size]
+    );
+  };
 
   const toggleOption = (groupKey: string, option: string) => {
     setSelectedCatOptions((prev) => {
-      const existing = prev[groupKey] ?? [];
-      const has = existing.includes(option);
-      const next = has ? [] : [option];
-      return { ...prev, [groupKey]: next };
+      const group = prev[groupKey] ?? [];
+      const exists = group.includes(option);
+
+      const updated = exists
+        ? group.filter((x) => x !== option)
+        : [...group, option];
+
+      return { ...prev, [groupKey]: updated };
     });
   };
 
-  const toggleSize = (size: string) => {
-    setSelectedSizes((prev) => (prev.includes(size) ? prev.filter((x) => x !== size) : [...prev, size]));
+  const handleSortChange = (value: ProductSort) => {
+    setSortValue(value);
+    setPage(1);
+    setOpen(null);
+
+    fetchProducts(1, "replace", undefined, value);
   };
 
-  /* ---------- BACKEND-READY PRODUCT FETCH ---------- */
-  type FilterOverrides = {
-    categoryKey?: string | null;
-    sort?: string;
-  };
+  const applyCategorySelection = (explicitId?: string) => {
+    const label = buildCategoryLabel(categoryTree, catStack);
 
-  const fetchProductsWithCurrentFilters = async (
-    nextPage: number,
-    mode: "replace" | "append",
-    overrides?: FilterOverrides
-  ) => {
-    if (useDemoMode) {
-      const nextCount = nextPage * PAGE_SIZE;
-      const nextProducts = ALL_DEMO_PRODUCTS.slice(0, nextCount);
-      setProducts(nextProducts);
-      setHasMore(nextProducts.length < ALL_DEMO_PRODUCTS.length);
-      setPage(nextPage);
-      return;
-    }
+    const lastKey =
+      explicitId ??
+      (catStack.length ? catStack[catStack.length - 1] : null);
 
-    try {
-      setLoadingProducts(true);
-
-      // ---> NEW LOGIC: Clear products immediately if applying a new filter to show Skeletons <---
-      if (mode === "replace") {
-        setProducts([]);
-      }
-
-      const activeCatKey = overrides && "categoryKey" in overrides ? overrides.categoryKey : appliedCategoryKey;
-      let finalCategoryKey = activeCatKey ?? undefined;
-      
-      if (activeCatKey && selectedCatOptions[activeCatKey]?.length > 0) {
-        finalCategoryKey = selectedCatOptions[activeCatKey][0];
-      }
-
-      const activeSort = overrides?.sort ?? sortValue;
-
-      const payload: ProductFiltersPayload = {
-        page: nextPage,
-        pageSize: PAGE_SIZE,
-        sort: activeSort,
-        categoryKey: finalCategoryKey,
-        minPrice: toNumberOrUndefined(priceFrom),
-        maxPrice: toNumberOrUndefined(priceTo),
-        sizes: selectedSizes.length ? selectedSizes : undefined,
-      };
-
-      console.group("FETCH PRODUCTS PAYLOAD");
-      console.log("Final Payload sent to backend:", payload);
-      console.groupEnd();
-
-      const resp = await apiFetchProducts(payload);
-
-      const fetchedItems = resp.items || (resp as any).data || (resp as any).products || [];
-
-      if (mode === "replace") {
-        setProducts(fetchedItems);
-      } else {
-        setProducts((prev) => [...prev, ...fetchedItems]);
-      }
-
-      if ("hasMore" in resp) {
-        setHasMore(resp.hasMore);
-      } else {
-        const alreadyCount = mode === "replace" ? fetchedItems.length : products.length + fetchedItems.length;
-        setHasMore(resp.total > alreadyCount);
-      }
-
-      setPage(nextPage);
-      setLoadingProducts(false); // Stop loading on success
-    } catch (error) {
-      console.log(" API Fetch Failed. Injecting fake data to test UI.");
-      
-      // Delay so you can actually see the skeleton shimmer!
-      setTimeout(() => {
-        if (mode === "append") {
-          const fakeData = [
-            { id: `fake-${Date.now()}-1`, brand: "Test Brand 1", meta: "Test", price: "$99", likes: "1k" },
-            { id: `fake-${Date.now()}-2`, brand: "Test Brand 2", meta: "Test", price: "$99", likes: "1k" },
-            { id: `fake-${Date.now()}-3`, brand: "Test Brand 3", meta: "Test", price: "$99", likes: "1k" },
-            { id: `fake-${Date.now()}-4`, brand: "Test Brand 4", meta: "Test", price: "$99", likes: "1k" },
-          ];
-          setProducts((prev) => [...prev, ...fakeData]);
-          setHasMore(true); 
-          setPage(nextPage); 
-        } else if (mode === "replace") {
-           setProducts(ALL_DEMO_PRODUCTS.slice(0, PAGE_SIZE));
-           setHasMore(ALL_DEMO_PRODUCTS.length > PAGE_SIZE);
-           setPage(1);
-        }
-        setLoadingProducts(false); // Stop loading after fake data sets
-      }, 1000);
-    }
-  };
-
-  const applyCategorySelection = async (stackToApply?: string[]) => {
-    const stack = stackToApply ?? catStack;
-    const label = buildCategoryLabel(categoryTree, stack);
     setSelectedPath(label);
-
-    const lastKey = stack.length ? stack[stack.length - 1] : null;
     setAppliedCategoryKey(lastKey);
 
+    setPage(1);
     setOpen(null);
     setCatStack([]);
 
-    await fetchProductsWithCurrentFilters(1, "replace", { categoryKey: lastKey });
+    fetchProducts(1, "replace", lastKey);
   };
 
-  const applyNonCategoryFilters = async () => {
+  const applyNonCategoryFilters = () => {
+    setPage(1);
     setOpen(null);
     setCatStack([]);
-    await fetchProductsWithCurrentFilters(1, "replace");
+
+    fetchProducts(1, "replace");
   };
 
-  const resetAll = async () => {
+  const resetAll = () => {
+    const resetSort: ProductSort = SORT_OPTIONS[0];
+
     setSelectedPath("All");
     setAppliedCategoryKey(null);
-    setSelectedCatOptions({});
     setSelectedSizes([]);
-    setSortValue(SORT_OPTIONS[0]);
+    setSortValue(resetSort);
+
     setPriceFrom("");
     setPriceTo("");
+
+    setPage(1);
     setOpen(null);
     setCatStack([]);
-    
-    await fetchProductsWithCurrentFilters(1, "replace", { 
-      categoryKey: null, 
-      sort: SORT_OPTIONS[0] 
-    });
+
+    window.history.replaceState(null, "", "?page=1");
+
+    fetchProducts(1, "replace", null, resetSort);
   };
 
-  const onSeeMore = async () => {
+  const onSeeMore = () => {
     if (!hasMore || loadingProducts) return;
-    await fetchProductsWithCurrentFilters(page + 1, "append");
+    fetchProducts(page + 1, "append");
   };
 
   return (
@@ -410,302 +307,94 @@ const TopPicks = () => {
       <div className={styles.header}>
         <h2 className={styles.title}>Top Picks</h2>
 
-        <button className={styles.resetBtn} type="button" onClick={resetAll}>
+        <button
+          className={styles.resetBtn}
+          onClick={resetAll}
+        >
           Reset
         </button>
       </div>
 
-      {/* Filters */}
-      <div className={styles.filters} ref={panelRef}>
-        <button
-          className={`${styles.pill} ${styles.allPill} ${selectedPath === "All" ? styles.pillActive : ""}`}
-          type="button"
-          onClick={async () => {
-            setSelectedPath("All");
-            setAppliedCategoryKey(null);
-            await fetchProductsWithCurrentFilters(1, "replace", { categoryKey: null });
-          }}
-        >
-          All
-        </button>
+      <FilterBar
+        open={open}
+        toggleOpen={toggleOpen}
+        selectedPath={selectedPath}
+        setSelectedPath={setSelectedPath}
+        categoryTree={categoryTree}
+        catStack={catStack}
+        setCatStack={setCatStack}
+        currentCatNode={currentCatNode}
+        goIntoCategory={goIntoCategory}
+        goBackCategory={goBackCategory}
+        applyCategorySelection={applyCategorySelection}
+        selectedSizes={selectedSizes}
+        toggleSize={toggleSize}
+        SIZE_OPTIONS={SIZE_OPTIONS}
+        sortValue={sortValue}
+        setSortValue={handleSortChange}
+        SORT_OPTIONS={SORT_OPTIONS}
+        priceFrom={priceFrom}
+        setPriceFrom={setPriceFrom}
+        priceTo={priceTo}
+        setPriceTo={setPriceTo}
+        applyNonCategoryFilters={applyNonCategoryFilters}
+        selectedCatOptions={selectedCatOptions}
+        toggleOption={toggleOption}
+        loadingCats={loadingCats}
+        categoryId={appliedCategoryKey}
+      />
 
-        {/* Category */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "category" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("category")}
-            title={selectedPath}
-          >
-            {selectedPath === "All" ? "Category" : selectedPath} <ChevronDown size={16}/>
-          </button>
-
-          {open === "category" && (
-            <div className={styles.dropdown}>
-              {showRoot && (
-                <div className={styles.menuList}>
-                  <div className={styles.ddHeader}>
-                    Category{loadingCats ? " (Loading…)" : ""}
-                  </div>
-
-                  {categoryTree.map((c) => (
-                    <button
-                      key={c.key}
-                      className={styles.menuItem}
-                      type="button"
-                      onClick={() => {
-                        if (c.children && c.children.length) {
-                          goIntoCategory(c.key);
-                        } else {
-                          void applyCategorySelection([c.key]);
-                        }
-                      }}
-                    >
-                      <span className={styles.menuLeft}>
-                        <span className={styles.iconBox} aria-hidden="true">
-                          <Shirt size={16} />
-                        </span>
-                        <span className={styles.menuLabel}>{c.label}</span>
-                      </span>
-
-                      <span className={styles.menuRight} aria-hidden="true">
-                        {c.children && c.children.length ? "›" : ""}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {showCategoryScreen && (
-                <div className={styles.menuScreen}>
-                  <div className={styles.menuTop}>
-                    <button
-                      className={styles.backBtn}
-                      type="button"
-                      onClick={goBackCategory}
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-
-                    <div className={styles.menuTitle}>{currentCatNode?.label ?? "Category"}</div>
-
-                    <button className={styles.applyBtn} type="button" onClick={() => void applyCategorySelection()}>
-                      Apply
-                    </button>
-                  </div>
-
-                  {currentCatNode?.children?.length ? (
-                    <div className={styles.menuList}>
-                      {currentCatNode.children.map((child) => (
-                        <button
-                          key={child.key}
-                          className={styles.menuItem}
-                          type="button"
-                          onClick={() => goIntoCategory(child.key)}
-                        >
-                          <span className={styles.menuLeft}>
-                            <span className={styles.iconBox} aria-hidden="true">
-                              <Shirt size={16} />
-                            </span>
-                            <span className={styles.menuLabel}>{child.label}</span>
-                          </span>
-                          <span className={styles.menuRight} aria-hidden="true">
-                            ›
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className={styles.checkList}>
-                      <div className={styles.ddSubHeader}>Choose options</div>
-
-                      {(currentCatNode?.options ?? []).map((opt) => {
-                        const groupKey = currentCatNode?.key ?? "unknown";
-                        const checked = (selectedCatOptions[groupKey] ?? []).includes(opt);
-
-                        return (
-                          <button
-                            key={opt}
-                            type="button"
-                            className={styles.checkRow}
-                            onClick={() => toggleOption(groupKey, opt)}
-                          >
-                            <span className={styles.checkText}>{opt}</span>
-
-                            <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
-                              {checked ? "✓" : ""}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Price */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "price" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("price")}
-          >
-            Price <ChevronDown size={16} />
-          </button>
-
-          {open === "price" && (
-            <div className={styles.dropdown}>
-              <div className={styles.ddHeader}>Price Range</div>
-
-              <div className={styles.priceBox}>
-                <div className={styles.priceField}>
-                  <label className={styles.priceLabel}>From</label>
-                  <input
-                    className={styles.priceInput}
-                    placeholder="0$"
-                    value={priceFrom}
-                    onChange={(e) => setPriceFrom(e.target.value)}
-                  />
-                </div>
-                <div className={styles.priceField}>
-                  <label className={styles.priceLabel}>To</label>
-                  <input
-                    className={styles.priceInput}
-                    placeholder="999$"
-                    value={priceTo}
-                    onChange={(e) => setPriceTo(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
-                  Done
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Size */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "size" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("size")}
-          >
-            Size <ChevronDown size={16} />
-          </button>
-
-          {open === "size" && (
-            <div className={styles.dropdown}>
-              <div className={styles.ddHeader}>Sizes</div>
-
-              <div className={styles.sizeList}>
-                {SIZE_OPTIONS.map((s) => {
-                  const checked = selectedSizes.includes(s);
-                  return (
-                    <button key={s} type="button" className={styles.sizeRow} onClick={() => toggleSize(s)}>
-                      <span className={styles.sizeText}>{s}</span>
-                      <span className={`${styles.rightBox} ${checked ? styles.rightBoxOn : ""}`}>
-                        {checked ? "✓" : ""}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className={styles.ddFooter}>
-                <button className={styles.smallBtn} type="button" onClick={() => void applyNonCategoryFilters()}>
-                  Done
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Sort */}
-        <div className={styles.dropWrap}>
-          <button
-            className={`${styles.pill} ${open === "sort" ? styles.pillOpen : ""}`}
-            type="button"
-            onClick={() => toggleOpen("sort")}
-          >
-            Sort By <ChevronDown size={16} />
-          </button>
-
-          {open === "sort" && (
-            <div className={styles.dropdown}>
-              <div className={styles.ddHeader}>Sort</div>
-
-              <div className={styles.menuList}>
-                {SORT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    className={styles.menuItem}
-                    onClick={async () => {
-                      setSortValue(opt);
-                      setOpen(null);
-                      await fetchProductsWithCurrentFilters(1, "replace", { sort: opt });
-                    }}
-                  >
-                    <span className={styles.menuLeft}>
-                      <span className={styles.menuLabel}>{opt}</span>
-                    </span>
-                    <span className={`${styles.rightBox} ${sortValue === opt ? styles.rightBoxOn : ""}`} aria-hidden="true">
-                      {sortValue === opt ? "✓" : ""}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ---> NEW: SMART SKELETON PRODUCTS GRID <--- */}
       <div className={styles.grid}>
-        
-        {/* 1. FRESH SEARCH: If loading and array is empty, show 8 skeletons */}
-        {loadingProducts && products.length === 0 && (
-          Array.from({ length: 8 }).map((_, idx) => (
-            <ProductCard key={`skel-main-${idx}`} isLoading={true} brand="" meta="" price="" />
-          ))
-        )}
+        {loadingProducts && products.length === 0 &&
+          Array.from({ length: PAGE_SIZE }).map((_, idx) => (
+            <ProductCard
+              key={`skel-${idx}`}
+              isLoading
+              brand=""
+              meta=""
+              price=""
+            />
+          ))}
 
-        {/* 2. REAL CARDS: Map through actual products */}
         {products.map((p, index) => (
-          <ProductCard 
-            key={`${p.id}-${index}`} 
-            image={p.image} 
-            brand={p.brand} 
-            meta={p.meta} 
-            price={p.price} 
-            likes={p.likes} 
+          <ProductCard
+            key={`${p._id}-${index}`}
+            image={p.coverImage}
+            brand={p.brand}
+            meta={p.title}
+            price={p.price}
+            likes={p.totalLikes}
+            condition={p.condition}
+            parcelSize={p.parcelSize}
           />
         ))}
 
-        {/* 3. PAGINATION: If loading but we already have products, show 4 skeletons at the bottom */}
-        {loadingProducts && products.length > 0 && (
-          Array.from({ length: 4 }).map((_, idx) => (
-            <ProductCard key={`skel-append-${idx}`} isLoading={true} brand="" meta="" price="" />
-          ))
-        )}
-
+        {loadingProducts && page > 1 &&
+          Array.from({ length: 1 }).map((_, idx) => (
+            <ProductCard
+              key={`skel-more-${idx}`}
+              isLoading
+              brand=""
+              meta=""
+              price=""
+            />
+          ))}
       </div>
 
-      {/* Footer / pagination */}
       <div className={styles.footer}>
-        {/* Hide 'See More' if there are no products loaded at all */}
         {!loadingProducts && products.length === 0 ? (
-          <p>No products found for these filters.</p>
+          <p>No products found.</p>
         ) : (
-          <button className={styles.seeMore} type="button" onClick={onSeeMore} disabled={!hasMore || loadingProducts}>
-            {loadingProducts ? "Loading…" : hasMore ? "See More" : "No More Products"}
+          <button
+            className={styles.seeMore}
+            onClick={onSeeMore}
+            disabled={!hasMore || loadingProducts}
+          >
+            {loadingProducts
+              ? "Loading…"
+              : hasMore
+              ? "See More"
+              : "No More Products"}
           </button>
         )}
       </div>

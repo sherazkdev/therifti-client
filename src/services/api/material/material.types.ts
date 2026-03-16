@@ -1,5 +1,5 @@
 
-import type { MaterialDocument } from "../../types/material/material.types";
+import type { MaterialDocument } from "../../../types/material/material.types";
 
 export interface GetMaterialsByCategoryApiResponse {
     statusCode:number,

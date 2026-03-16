@@ -2,10 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 100%; 
-  /* 👇 Yahan se max-width aur margin hata diya hai taa keh gaps na aayein */
+  width: 100%;
   cursor: pointer;
   transition: transform 0.2s ease, opacity 0.2s ease;
+  position: relative;
 }
 
 .card:hover {
@@ -19,20 +19,26 @@
 .media {
   position: relative;
   width: 100%;
-  aspect-ratio: 4/5; /*  3/4 thora zyada lamba tha, 4/5 thora balanced aur pyara lagega */
+  aspect-ratio: 4/5;
   border-radius: 8px;
   overflow: hidden;
   background: #f8f8f8;
-  border: 1px solid #efefef; 
+  border: 1px solid #efefef;
 }
 
-.img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* 👈 YEH SAB SE ZAROORI HAI: Is se white space khatam ho jayega aur image poore box mein fit hogi */
-  object-position: top; /* 👈 Kapron ki images hamesha top se achi lagti hain */
-  display: block;
+.img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:top;
+  display:block;
+  transition: transform .4s ease;
 }
+
+.media:hover .img{
+  transform: scale(1.02);
+}
+
 .placeholder {
   width: 100%;
   height: 100%;
@@ -42,23 +48,48 @@
   justify-content: center;
 }
 
+/* CONDITION BADGE */
+
+.condition {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #111;
+  color: #fff;
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  text-transform: capitalize;
+  
+  opacity: 0;
+  transition: .2s;
+}
+ 
+  
+.media:hover .condition {
+  opacity: 1;
+}
+
+/* LIKE BADGE */
+
 .likeBadge {
   position: absolute;
   right: 10px;
   bottom: 10px;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 6px;
-  padding: 4px 6px;
+  border-radius: 20px;
+  padding: 4px 8px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  line-height: 1;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .likesText {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -86,10 +117,10 @@
 }
 
 .price {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: #111;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .meta {
@@ -97,18 +128,33 @@
   color: #6b6b6b;
 }
 
-/* ==================================================== */
-/* --- MASTER SKELETON LOADER --- */
-/* ==================================================== */
+.extra {
+  font-size: 11px;
+  color: #777;
+  display: flex;
+  gap: 6px;
+}
+
+/* ================= SKELETON ================= */
 
 @keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
 }
 
 .skeletonPulse {
   background: #f6f7f8;
-  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-image: linear-gradient(
+    to right,
+    #f6f7f8 0%,
+    #edeef1 20%,
+    #f6f7f8 40%,
+    #f6f7f8 100%
+  );
   background-repeat: no-repeat;
   background-size: 1000px 100%;
   animation: shimmer 1.5s infinite linear forwards;
@@ -120,8 +166,8 @@
 }
 
 /* ================= MOBILE ================= */
-@media (max-width: 600px) {
 
+@media (max-width: 600px) {
   .card {
     gap: 8px;
   }
@@ -139,19 +185,12 @@
     right: 8px;
     bottom: 8px;
     padding: 3px 5px;
-    font-size: 11px;
   }
-
 }
-
 
 /* ================= TABLET ================= */
+
 @media (min-width: 601px) and (max-width: 1024px) {
-
-  .card {
-    gap: 9px;
-  }
-
   .brand {
     font-size: 14px;
   }
@@ -163,22 +202,11 @@
   .meta {
     font-size: 12px;
   }
-
-  .likeBadge {
-    right: 9px;
-    bottom: 9px;
-  }
-
 }
-
 
 /* ================= LAPTOP ================= */
+
 @media (min-width: 1025px) and (max-width: 1440px) {
-
-  .card {
-    gap: 10px;
-  }
-
   .brand {
     font-size: 15px;
   }
@@ -186,21 +214,11 @@
   .price {
     font-size: 15px;
   }
-
-  .meta {
-    font-size: 12px;
-  }
-
 }
 
+/* ================= LARGE SCREEN ================= */
 
-/* ================= DESKTOP / LARGE SCREENS ================= */
 @media (min-width: 1441px) {
-
-  .card {
-    gap: 12px;
-  }
-
   .brand {
     font-size: 16px;
   }
@@ -208,9 +226,4 @@
   .price {
     font-size: 16px;
   }
-
-  .meta {
-    font-size: 13px;
-  }
-
 }

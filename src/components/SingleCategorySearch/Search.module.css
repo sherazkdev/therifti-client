@@ -1,42 +1,8 @@
-/* =========================================
-   NEW: Breadcrumbs and Items Row 
-========================================= */
-.metaRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 4px;
-  margin-bottom: 24px; /* Gives nice breathing room before the grid */
-  font-size: 14px;
-  color: #111;
-}
-
-.breadcrumbs {
-  color: #6b6b6b;
-}
-
-.breadcrumbs span {
-  color: #111; /* Highlights the currently selected category */
-  font-weight: 500;
-}
-
-.itemCount {
-  font-weight: 500;
-  color: #444;
-}
-
-@media (max-width: 600px) {
-  .metaRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    margin-top: 12px;
-  }
-}
-
 .wrapper {
   padding: 28px 3%;
   background: #fff;
+  
+ 
 }
 
 .header {
@@ -50,6 +16,11 @@
   font-size: 18px;
   font-weight: 600;
   color: #111;
+  /* Optional: Agar query lumbi ho jaye toh truncate karein */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
 }
 
 .resetBtn {
@@ -60,6 +31,7 @@
   cursor: pointer;
   opacity: 0.7;
 }
+
 .resetBtn:hover {
   opacity: 1;
 }
@@ -74,7 +46,7 @@
   position: relative;
 }
 
-/* ✅ Make all pills same height (All button issue fix) */
+/* Pills */
 .pill {
   background: #f3f3f3;
   border: 1px solid #ededed;
@@ -91,7 +63,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 36px; /* ✅ same visual height */
+  min-height: 36px;
 }
 
 .pillActive {
@@ -154,7 +126,7 @@
   font-size: 12px;
   padding: 7px 12px;
   cursor: pointer;
-  min-height: 32px; /* ✅ consistent */
+  min-height: 32px;
 }
 
 /* Menu list */
@@ -235,7 +207,6 @@
   font-size: 14px;
 }
 
-/* ✅ Apply button size same as others */
 .applyBtn {
   border: 1px solid #111;
   background: #111;
@@ -244,7 +215,7 @@
   font-size: 12px;
   padding: 7px 12px;
   cursor: pointer;
-  min-height: 32px; /* ✅ consistent with Done */
+  min-height: 32px;
 }
 
 /* Checkbox list */
@@ -253,7 +224,6 @@
   overflow: auto;
 }
 
-/* ✅ NOW checkRow behaves like sizeRow (button, right box) */
 .checkRow {
   width: 100%;
   border: none;
@@ -270,7 +240,6 @@
   background: #f7f7f7;
 }
 
-/* keep this class (even if not used now) */
 .checkInput {
   width: 18px;
   height: 18px;
@@ -280,10 +249,6 @@
   font-size: 14px;
   color: #111;
 }
-
-/* .checkRow, .menuItem, .sizeRow { -webkit-tap-highlight-color: transparent; } */
-
-
 
 /* Price */
 .priceBox {
@@ -314,7 +279,7 @@
   font-size: 14px;
 }
 
-/* Size */
+/* Size & Lists */
 .sizeList {
   max-height: 320px;
   overflow: auto;
@@ -363,6 +328,7 @@
   gap: 24px;
   margin-top: 4px;
 }
+
 /* Footer */
 .footer {
   display: flex;
@@ -386,16 +352,9 @@
   cursor: not-allowed;
 }
 
-.allPill {
-  padding: 9px 16px;   /* bigger padding */
-  font-size: 13px;      /* slightly bigger text */
-  min-height: 19px;     /* taller */
-}
-
 /* Responsive */
 @media (max-width: 1024px) {
- .grid {
-    /* Mobile par zaroori 2 columns aur gap kam karna */
+  .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
@@ -404,15 +363,12 @@
   }
 }
 
-
-
-
 @media (max-width: 600px) {
   .filters {
     flex-wrap: wrap;
     overflow: visible;
     gap: 8px;
-    position: relative; /* keep this */
+    position: relative;
   }
 
   .pill {
@@ -421,7 +377,7 @@
 
   .dropWrap {
     width: auto;
-    position: static; /* ✅ key fix */
+    position: static;
   }
 
   .dropdown {
@@ -431,10 +387,7 @@
     width: min(92vw, 360px);
     max-width: calc(100vw - 16px);
     top: calc(100% + 8px);
-  }
-   .dropdown { max-height: 70vh; overflow: auto; }
-
-  .wrapper {
-    overflow-x: hidden;
+    max-height: 70vh; 
+    overflow: auto;
   }
 }

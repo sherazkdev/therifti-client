@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { categories } from "../../data/categories";
 import Hero from "../../components/Hero/Hero";
-import SearchResults from "../../components/SingleCategorySearch/SearchResults";
+import Search from "../../components/SingleCategorySearch/Search.tsx";
 
 const SingleCategory = () => {
   const { categoryId } = useParams();
@@ -32,7 +32,11 @@ const SingleCategory = () => {
   return (
     <>
       <Hero category={parentName} />
-      <SearchResults />
+      <Search 
+        // initialCategoryId="69a7f877bac8df0e8d5fb59a" 
+        // initialBreadcrumb="Home/ Fashion / Women" // Aap yahan dynamically naam bhi bhej sakte hain
+        initialQuery={"sneaker shoes"}
+      />
     </>
   );
 };

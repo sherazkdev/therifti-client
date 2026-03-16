@@ -1,4 +1,4 @@
-import type { BrandDocument } from "../../types/brand/brand.types";
+import type { BrandDocument } from "../../../types/brand/brand.types";
 
 export interface GetBrandsByCategoryApiResponse {
     statusCode:number,

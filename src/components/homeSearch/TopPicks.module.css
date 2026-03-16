@@ -382,7 +382,7 @@
 
   .dropWrap {
     width: auto;
-    position: static; /* ✅ key fix */
+    position: static; /* key fix */
   }
 
   .dropdown {
