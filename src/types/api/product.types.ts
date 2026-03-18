@@ -7,38 +7,71 @@ export interface CreateProductApiResponse {
 }
 
 export interface ProductApiImplmentsInterface {
-    CreateProduct:(product:unknown) => Promise<CreateProductApiResponse>;
+  CreateProduct:(product:unknown) => Promise<CreateProductApiResponse>;
+  SearchProducts?:(searchPayload: SearchProductsInterface) => Promise<SearchProductApiResponse>;
 }
 
-/** Note: Get Feature Product Sorting */
+export type ProductSort =
+  | "PRICE_HIGH_TO_LOW"
+  | "PRICE_LOW_TO_HIGH"
+  | "NEWEST_FIRST"
+  | "RELEVANCE";
+
 export interface FeaturedProductsSortingInterface {
-  page:number | null,
-  limit:number,
-  categoryId?:string | null,
-  price:{
-    min:number,
-    max:number
-  },
-  sizes:string[] | null,
-  sort:string | null
+  page: number;
+  limit: number;
+  categoryId?: string | null;
+  price?: {
+    min?: number;
+    max?: number;
+  };
+  sizes?: string[] | null;
+  sort?: ProductSort | null;
+
 }
 
-/** Note: Featured Product Response */
-export interface FeaturedProductResponse {
-    _id:string,
-    title:string,
-    coverImage:string,
-    totalLikes:number,
-    isLiked:boolean,
-    price:number,
-    parcelSize:string,
-    condition:string
-};
+export interface FeaturedProducTResponse {
+  _id: string;
+  title: string;
+  coverImage: string;
+  totalLikes: number;
+  isLiked: boolean;
+  price: number;
+  parcelSize: string;
+  condition: string;
+  brand: string;
 
-/** Note: Featured Product ApiResponse */
+}
+
 export interface FeaturedProductApiResponse {
-    succes:boolean,
-    statusCode:number,
-    message:string,
-    data:FeaturedProductResponse[]
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: FeaturedProducTResponse[];
+}
+
+/** ---------------- ADDED FOR SEARCH ENDPOINT ---------------- */
+
+export interface SearchProductsInterface {
+  q?: string | null;
+  categoryId?: string | null;
+  price?: {
+    min?: number | null;
+    max?: number | null;
+  };
+  materials?: string[];
+  conditions?: string[];
+  colors?: string[] | null;
+  brands?: string[] | null;
+  sizes?: string[] | null;
+  page?: number;
+  sort?: ProductSort | null;
+  limit?: number;
+}
+
+export interface SearchProductApiResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: SearchProductsInterface[];
 }

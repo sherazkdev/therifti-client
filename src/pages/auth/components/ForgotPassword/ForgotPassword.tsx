@@ -57,7 +57,7 @@ export default function ForgotPassword({ onSubmit, }: ForgotPasswordPropsInterfa
       className={styles.card}
       onSubmit={handleSubmit(handleForgotPassword)}
     >
-      <h2>Forgot your password?</h2>
+      <h2 className={styles.forgotHeading}>Forgot your password?</h2>
       {serverError && (<p className={styles.serverErrorAuth} >{serverError}</p>)}
 
       <input
@@ -76,7 +76,7 @@ export default function ForgotPassword({ onSubmit, }: ForgotPasswordPropsInterfa
       )}
 
       <button type="submit" className={isLoading ? "submitBtnIsFetching" : styles.submitBtn} disabled={isLoading}>
-        {isLoading ? (<div className="spinner"></div>) : "Continue"}
+        {isLoading ? (<div className="loader"></div>) : "Continue"}
       </button>
 
     </form>

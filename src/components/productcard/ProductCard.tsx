@@ -1,73 +1,83 @@
 import { useState } from "react";
 import styles from "./ProductCard.module.css";
-import { Heart } from "../../components/icons";
+import { Heart } from "../icons";
 import { ImageOff } from "lucide-react";
 
-type ProductCardProps = {
-  image?: string;
-  brand?: string;
-  meta?: string;
-  price?: string;
-  likes?: string;
-  isLoading?: boolean; // <-- Added loading prop
-};
+/** Types */
+import type { ProductCardPropsInterface } from "../../types/components";
 
 const ProductCard = ({
   image,
   brand = "",
-  meta = "M30 . Good",
+  meta = "",
   price = "",
-  likes = "1.2k",
+  likes = "0",
+  condition,
+  parcelSize,
   isLoading,
-}: ProductCardProps) => {
+}: ProductCardPropsInterface) => {
   const [imageError, setImageError] = useState(false);
 
-  // --- MASTER SKELETON LAYOUT ---
   if (isLoading) {
     return (
       <article className={styles.card}>
         <div className={`${styles.media} ${styles.skeletonPulse}`} />
         <div className={styles.info}>
-          <div className={styles.row}>
-            <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} style={{ width: '60%' }} />
-            <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} style={{ width: '25%' }} />
-          </div>
-          <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} style={{ width: '40%', marginTop: '4px' }} />
+          <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} />
+          <div className={`${styles.skeletonText} ${styles.skeletonPulse}`} />
         </div>
       </article>
     );
   }
 
-  // --- REAL CONTENT ---
   return (
     <article className={styles.card}>
       <div className={styles.media}>
         {image && !imageError ? (
-          <img 
-            className={styles.img} 
-            src={image} 
-            alt={brand} 
-            loading="lazy" 
-            onError={() => setImageError(true)} 
+          <img
+            src={image}
+            className={styles.img}
+            alt={brand}
+            loading="lazy"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className={styles.placeholder}>
-            <ImageOff size={32} color="#b0b0b0" strokeWidth={1.5} />
+            <ImageOff size={30} />
           </div>
         )}
 
+        {/* CONDITION BADGE */}
+        {condition && (
+          <div className={styles.condition}>
+            {condition.replaceAll("_", " ")}
+          </div>
+        )}
+
+        {/* LIKES */}
         <div className={styles.likeBadge}>
-          <Heart color="black" size={20} filled />
+          <Heart size={16} />
           <span className={styles.likesText}>{likes}</span>
         </div>
       </div>
 
       <div className={styles.info}>
         <div className={styles.row}>
-          <span className={styles.brand} title={brand}>{brand}</span>
-          <span className={styles.price}>{price}</span>
+          <span className={styles.brand}>{brand}</span>
+
+          <span className={styles.price}>
+            ${Number(price).toLocaleString()}
+          </span>
         </div>
-        <div className={styles.meta}>{meta}</div>
+
+        {meta && <div className={styles.meta}>{meta}</div>}
+
+        {(condition || parcelSize) && (
+          <div className={styles.extra}>
+            {condition && <span>{condition.replaceAll("_", " ")}</span>}
+            {parcelSize && <span>{parcelSize}</span>}
+          </div>
+        )}
       </div>
     </article>
   );

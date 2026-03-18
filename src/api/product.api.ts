@@ -1,6 +1,6 @@
 import type BackendRequestServices from "../services/backendRequest.services";
 
-import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, FeaturedProductApiResponse } from "../types/api/index";
+import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, FeaturedProductApiResponse, SearchProductApiResponse, SearchProductsInterface } from "../types/api/index";
 
 /** 
  * Note: This Product Api Service Using for get all product, update product, creare product more than.
@@ -29,7 +29,29 @@ class ProductApi implements ProductApiImplmentsInterface {
     };
 
     /**
+     * Note: Search Products by Query and Filters.
+     * 
+     * This service method using for searchProduct and get prduct by category.
+     * and added dynamic functionality to fetched sorting wise products.
+     * 
+     * @param {SearchProductsPayloadInterface} searchPayload - searchPayload detailed object.
+     * 
+     * @returns {Promise<SearchProductApiResponse>} Search product api response.
+    */
+    public async SearchProducts(searchPayload:SearchProductsInterface):Promise<SearchProductApiResponse> {
+        const response = await this.apiService.Post<SearchProductApiResponse>("/products/search",searchPayload);
+        return response;
+    }
+
+    /**
      * Note: Get Featured Products.
+     * 
+     * This service using for get latest products product for home page.
+     * and added sorting dynamicly for products.
+     * 
+     * @param {FeaturedProductsSortingInterface} sortObj - Sorting detailed object.
+     * 
+     * @returns {Promise<FeaturedProductApiResponse>} Fetched Latest Product response.
     */
     public async GetFeaturedProducts(sortObj:FeaturedProductsSortingInterface):Promise<FeaturedProductApiResponse> {
         const response = await this.apiService.Post<FeaturedProductApiResponse>("/products/featured-products",sortObj);

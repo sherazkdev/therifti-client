@@ -12,10 +12,8 @@ import useEmptyState from "../../../../../../assets/icons/user-empty-state.svg";
 
 /** Note: Socket Provider */
 import {useSockets} from '../../../../../../contexts/sockets/socket.context';
-import { useAuth } from '../../../../../../contexts/auth/auth.context';
-const ChatWindowTopHeader:React.FC<ChatWindowTopHeaderPropsInterface> = ({onBack, selectedChat, handleToggleWindowSection}) => {
+const ChatWindowTopHeader:React.FC<ChatWindowTopHeaderPropsInterface> = ({onBack, selectedChat, handleToggleWindowSection, handleDeleteChat}) => {
     const { onlineUsers } = useSockets();
-    const { user } = useAuth();
 
     return (
         <header id='header' className={styles.header}>
@@ -60,7 +58,7 @@ const ChatWindowTopHeader:React.FC<ChatWindowTopHeaderPropsInterface> = ({onBack
                         <Link to="/" className={styles.makeAPaymentBtn}>Make a payment</Link>
                     </span>
                     <span>
-                        <Link to="/" className={styles.cancelBtn}>
+                        <Link to={""} onClick={handleDeleteChat} className={styles.cancelBtn}>
                             <span><XCircleIcon /></span>
                             Cancel offer
                         </Link>

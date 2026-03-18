@@ -24,10 +24,11 @@ export interface GetChatsApiResponse {
     data:ChatDocumentInterface[]
 };
 
-/** Note: Delete Chat Api Response */
+
+/** Note: Chat Delete Api Response */
 export interface DeleteChatApiResponse {
     statusCode:number,
     success:boolean,
     message:string,
     data:[]
-};
+}

@@ -33,11 +33,24 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
       onError:(resErr) => {
         const err = resErr.response?.data as ApiError || undefined;
         if(err){
-          if(err.message === "VALIDATION_FAILED"){
-            setServerError(err.message);
-            return;
+          switch (err.message) {
+            case "VALIDATION_FAILED":
+              break;
+            
+            case "EMAIL_EXISTS":
+              setError("email",{
+                type: "manual",
+                message:AUTH_ERROR_MESSAGES.EMAIL_EXISTS
+              });
+              break;
+            
+            case "USERNAME_EXISTS":
+              setError("username",{
+                type: "manual",
+                message:AUTH_ERROR_MESSAGES.USERNAME_EXISTS
+              });
+              break;
           }
-          if(err.message === "EMAIL_EXISTS") setError("email",{message:AUTH_ERROR_MESSAGES[err.message]})
           return;
         }
       },
@@ -55,7 +68,7 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
           className={styles.card}
           onSubmit={handleSubmit(handleSignup)}
     >
-      <h2>Sign up with email</h2>
+      <h2 className={styles.signUpHeader}>Sign up with email</h2>
       
       {serverError && (<p className={styles.serverErrorAuth} >{serverError}</p>)}
 
@@ -91,7 +104,7 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
           }`}
         >
           {errors.username?.message ||
-            "Other users will see this name on your account"}
+            "Use letters, numbers, or both. Other Vinted users will see this name on your account."}
         </p>
       </div>
 
@@ -113,7 +126,7 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
           }`}
         >
           {errors.email?.message ||
-            "Enter the email you want to use on Thrifty"}
+            "Enter the email you want to use on Therfiti"}
         </p>
       </div>
 
@@ -124,7 +137,7 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             {...register("password", {
-              required: "Password required",
+              required: "Password can’t be blank",
               pattern: {
                 value: /^(?=.*[A-Za-z])(?=.*\d).{7,}$/,
                 message:
@@ -155,8 +168,10 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
       {/* ZIP CODE */}
       <div className={styles.field}>
         <input
-          placeholder="ZIP code (optional)"
-          {...register("zipCode")}
+          placeholder="ZIP code "
+          {...register("zipCode",{
+            required:{value:true, message:"ZIP code can’t be blank"},
+          })}
         />
         <p className={styles.help}>
           This will be used to calculate shipping and availability.
@@ -174,9 +189,7 @@ export default function SignUp({ onSubmit }: SignUpEmailPropsInterface) {
             })}
           />
           <span>
-            By clicking sign up, I agree to Thrifty’s Terms &
-            Conditions, confirm I’ve read the Privacy Policy,
-            and certify I’m 18 years or older.
+            Please accept the terms and conditions before registering.
           </span>
         </label>
 

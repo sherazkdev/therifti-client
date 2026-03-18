@@ -188,7 +188,7 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
       {error && <p className={styles.errorText}>{error}</p>}
 
       <button type="submit" onClick={handleVerify} className={isLoading ? "submitBtnIsFetching" : styles.submitBtn} disabled={isLoading}>
-        {isLoading ? (<div className="spinner"></div>) : "Continue"}
+        {isLoading ? (<div className="loader"></div>) : "Continue"}
       </button>
 
       {time > 0 ? (

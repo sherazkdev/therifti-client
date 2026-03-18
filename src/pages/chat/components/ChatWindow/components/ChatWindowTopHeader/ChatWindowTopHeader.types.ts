@@ -5,5 +5,6 @@ import type { WindowTabsInterface } from "../../ChatWindow.types";
 export interface ChatWindowTopHeaderPropsInterface {
     onBack: () => void,
     selectedChat:ChatDocumentInterface | null,
-    handleToggleWindowSection:(window:WindowTabsInterface) => void
+    handleToggleWindowSection:(window:WindowTabsInterface) => void,
+    handleDeleteChat: () => void
 }

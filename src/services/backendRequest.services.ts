@@ -51,7 +51,7 @@ class BackendRequestServices {
                             console.log(err);
                             if(err){
                                 if(err.message === "TOKEN_INVALID" || err.message === "TOKEN_EXPIRED" || err.message === "TOKEN_IS_USED"){
-                                    return await removeAccessAndRefreshToken();
+                                    return removeAccessAndRefreshToken();
                                 }else if(err.message === "VALIDATION_FAILED"){
                                     return;
                                 }

@@ -50,7 +50,6 @@ const AuthPage = () => {
       handleSetUser(userDocument as UserDocumentInterface);
       Redirect("/",{replace:true});
     }else if(authFlow === "FORGOT"){
-      alert("Note: Handle Submit otp Submited");
       setOtpRequest( (prev) => ({...prev,resetToken:resetToken as string}))
       setStep("CHANGE-PASSWORD");
     }
@@ -96,6 +95,7 @@ const AuthPage = () => {
       // setAuthFlow(null);
     }
   };
+  
   return (
     <div className={styles.page}>
         

@@ -12,3 +12,10 @@ export interface CategoryPropsInterface {
   onCategoryClick: (id: string, parentName?: string) => void;
   variant?: "overlay" | "solid";
 };
+
+/** Note: Header Component Props Interface */
+export interface HeaderPropsInterface {
+  variant:"overlay" | "solid"
+};
+
+

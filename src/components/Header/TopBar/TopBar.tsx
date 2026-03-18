@@ -120,7 +120,7 @@ const TopBar = () => {
               <Heart size={18} />
             </button>
 
-            <button className={styles.iconBtn}>
+            <button className={styles.iconBtn} onClick={ () => navigate("/inbox")}>
               <MessageCircle size={18} />
             </button>
 

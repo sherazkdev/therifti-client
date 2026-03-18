@@ -11,6 +11,7 @@ import ChatWindowTopHeader from "./components/ChatWindowTopHeader/ChatWindowTopH
 
 /** Note: Hooks */
 import useGetChatMessages from "../../../../hooks/server/message/useChatMessages";
+import useDeleteChat from "../../../../hooks/server/chat/useDeleteChat";
 
 import type { ApiError } from "../../../../types/api";
 import EmptyChat from "../ChatList/components/EmptyChat/EmptyChat";
@@ -22,7 +23,8 @@ const ChatWindow:FC<ChatWindowPropsInterface> = ({onBack,selectedChat, handleSet
     
     /** Note: Hooks */
     const { data, error, isLoading, refetch} = useGetChatMessages(selectedChat?._id);
-
+    const chatMutation = useDeleteChat();
+    
     /** Note: Fetched Chat Message assign to the constant */
     useEffect( () => {
         if(Array.isArray(data?.data) && data.data?.length > 0){
@@ -49,7 +51,27 @@ const ChatWindow:FC<ChatWindowPropsInterface> = ({onBack,selectedChat, handleSet
         }
     },[error]);
 
+    /** Note: Handle toggle window */
     const handleToggleWindowSection = (window:WindowTabsInterface) => setWindowTab(window);
+
+    /** Note: Handle Delete Chat */
+    const handleDeleteChat = async () => {
+        try {
+            
+            /** Note: Delete Chat */
+            chatMutation.mutate(selectedChat?._id.toString() as string,{
+                onSuccess:(response) => {
+                    if(response.statusCode === 202 && response.success === true){
+                        window.location.href = "/inbox";
+                    }
+                }
+            })
+
+        } catch (e:any) {
+            return console.log(e);
+        }
+    };
+
     return (
         <>
 
@@ -62,9 +84,9 @@ const ChatWindow:FC<ChatWindowPropsInterface> = ({onBack,selectedChat, handleSet
                             </div>
                         )}
 
-                        {!isLoading && chatMessages && chatMessages.length > 0 && (
+                        {!isLoading && chatMessages  && (
                             <>
-                                <ChatWindowTopHeader onBack={onBack} selectedChat={selectedChat} handleToggleWindowSection={handleToggleWindowSection} />
+                                <ChatWindowTopHeader handleDeleteChat={handleDeleteChat} onBack={onBack} selectedChat={selectedChat} handleToggleWindowSection={handleToggleWindowSection} />
                                 <ChatMessages chatMessages={chatMessages}/>
                                 <ChatWindowFooter handleSendMessage={handleSendMessage} />
                             </>

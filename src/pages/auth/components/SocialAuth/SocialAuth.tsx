@@ -40,7 +40,7 @@ export default function SocialAuth({type,onEmailClick,onSwitchMode,onSocialAuth}
 
   useEffect( () => {
     if(data){
-      handleSetUser(data);
+      handleSetUser(data.data);
       // Redirect("/",{replace:true});
     }
   },[data]);

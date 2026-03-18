@@ -1,14 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-
-/** Types */
 import { AxiosError } from "axios";
-import type { GetSizesByCategoryApiResponse } from "../../../types/api/index";
+import type { GetSizesByCategoryApiResponse } from "../../../types/api";
 
 /** Services */
 import SizeApi from "../../../api/size.api";
-import BackendRequestServices from "../../../services/backendRequest.services";
+import BackendRequestServices from "../../../services/backendRequest.services"; 
 
-/** @note: Server url. */
 const BaseURL = import.meta.env.VITE_SERVER_URL;
 
 const backendRequestServices = new BackendRequestServices(BaseURL);

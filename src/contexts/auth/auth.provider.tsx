@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
 
   /** Note: Handle Set User Document. */
   const handleSetUser = (user:UserDocumentInterface) => {
+    console.log(user)
       setUser(user);
       setIsAuthenticated(true);
   };
