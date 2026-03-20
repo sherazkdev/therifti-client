@@ -1,0 +1,445 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Added Border and Padding for the framed look */
+  padding: 24px;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 580;
+  line-height: 22px;
+  margin: 0 0 4px 0;
+  color: #15191a;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 20px 0;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.oldPrice {
+  font-size: 20px;
+  color: #888;
+  text-decoration: line-through;
+}
+
+.newPrice {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+}
+
+.protectionBanner {
+  background: #f2fbfa;
+  color: #007782;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.discountBadge {
+  background: #ff2d2d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  align-self: flex-start;
+  margin-bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.infoRow span { color: #5a6566; font-weight: 500; line-height: 18px; font-size: 14px; }
+.infoRow strong { color: #5a6566; font-weight: 500; line-height: 18px; font-size: 14px; }
+
+.brandBox {
+  background: #f7f7f7;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.postageRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.checkoutPromo {
+  background: #fafafa;
+  border: 1px solid #eaeaea;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.checkoutPromo p { margin: 0 0 4px 0; color: #111; }
+.mutedText { color: #777; font-size: 13px; }
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.buyBtn, .offerBtn, .askBtn {
+  padding: 14px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+/* 1. Buy Now - Black Theme */
+.buyBtn { 
+  background: #000; 
+  color: #fff; 
+  border: none; 
+}
+
+/* 2. Make an offer - Teal Theme from screenshot */
+.offerBtn { 
+  background: #fff; 
+ color: #111; 
+  border: 1px solid #ccc; 
+}
+
+/* 3. Ask Seller - Neutral Theme */
+.askBtn { 
+  background: #fff; 
+  color: #111; 
+  border: 1px solid #ccc; 
+}
+
+.buyBtn:hover, .offerBtn:hover, .askBtn:hover { 
+  opacity: 0.8; 
+}
+
+.askBtn:disabled { 
+  opacity: 0.6; 
+  cursor: not-allowed; 
+}
+/* ================== LAYOUT ================== */
+.pageWrapper {
+  width: 90%;
+  max-width: 100%;
+  margin: 40px auto;
+  color: #222;
+}
+
+.topContainer,
+.memberSection {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+.memberSection {
+  align-items: flex-start;
+}
+
+.leftCol,
+.memberLeft {
+  flex: 2;
+  min-width: 320px;
+}
+
+.rightCol {
+  flex: 1;
+  min-width: 320px;
+}
+
+.memberRight {
+  flex: 1.2;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ================== BREADCRUMB ================== */
+.breadcrumb {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 24px;
+}
+
+.breadcrumb a {
+  color: #777;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.breadcrumb a:hover {
+  color: #111;
+  text-decoration: underline;
+}
+
+.breadcrumb span {
+  color: #111;
+  font-weight: 500;
+}
+
+/* ================== BUYER PROTECTION ================== */
+.buyerProtectionBox {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.buyerProtectionBox h4 {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.buyerProtectionBox p {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.buyerProtectionBox a {
+  color: #111;
+  font-weight: 500;
+}
+
+/* ================== SELLER CARD ================== */
+.sellerCard {
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  padding: 24px;
+  background: #fff;
+}
+
+.sellerHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sellerAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sellerAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  font-size: 24px;
+  font-weight: 600;
+  color: #555;
+}
+
+.sellerName {
+  font-weight: 600;
+  font-size: 16px;
+  color: #111;
+  text-decoration: none;
+}
+
+/* Stars */
+.sellerRating {
+  display: flex;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1px solid #eaeaea;
+  margin: 16px 0;
+}
+
+/* Stats */
+.sellerStats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.statRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: #555;
+}
+
+.statRow strong {
+  color: #111;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.statRow p {
+  margin: 0;
+}
+
+.statIcon {
+  color: #777;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Button */
+.followBtn {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: 0.2s;
+}
+
+.followBtn:hover {
+  background: #111;
+  color: #fff;
+}
+
+/* ================== NOTICE ================== */
+.buyerNotice {
+  font-size: 12px;
+  color: #777;
+  line-height: 1.6;
+}
+
+.buyerNotice p {
+  margin-bottom: 12px;
+}
+
+.buyerNotice u {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  color: #111;
+  font-weight: 500;
+}
+
+/* ================== RECOMMENDED ================== */
+.recommendedSection {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid #eaeaea;
+}
+
+/* ================== SKELETON ================== */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.skeletonPulse {
+  background: #f6f7f8;
+  background-image: linear-gradient(
+    to right,
+    #f6f7f8 0%,
+    #edeef1 20%,
+    #f6f7f8 40%,
+    #f6f7f8 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 4px;
+}
+
+.skeletonSellerCard {
+  min-height: 310px;
+  margin-top: 24px;
+}
+
+.skelAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 1200px) {
+  .pageWrapper {
+    width: 95%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .topContainer,
+  .memberSection {
+    gap: 24px;
+  }
+
+  .leftCol {
+    flex: 1.1;
+  }
+}
+
+@media (max-width: 850px) {
+  .topContainer,
+  .memberSection {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .leftCol,
+  .rightCol,
+  .memberLeft,
+  .memberRight {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .memberRight {
+    order: 2;
+  }
+}

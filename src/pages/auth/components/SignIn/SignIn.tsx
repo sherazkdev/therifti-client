@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from "./SignIn.module.css";
-import { EyeIcon } from "../../../../components/icons";
+import { EyeIcon } from "../../../../assets/icons/svgs/svg";
 
 /** @note: Hook */
 import useLogin from "../../../../hooks/server/auth/useLogin";

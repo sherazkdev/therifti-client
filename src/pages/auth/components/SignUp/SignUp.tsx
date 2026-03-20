@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import styles from "./Signup.module.css";
-import { EyeIcon } from "../../../../components/icons";
+import { EyeIcon } from "../../../../assets/icons/svgs/svg";
 
 /** Note: Api Hooks */
 import useRegister from "../../../../hooks/server/auth/useRegister";

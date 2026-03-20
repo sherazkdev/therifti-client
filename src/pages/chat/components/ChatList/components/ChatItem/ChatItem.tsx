@@ -6,7 +6,7 @@ import type { ChatItemPropsInterface } from './Chat.types';
 /** Styles */
 import styles from "./ChatItem.module.css";
 import userEmtyState from "../../../../../../assets/icons/user-empty-state.svg"
-import isOnline from "../../../../../../assets/icons/online.png";
+import isOnline from "../../../../../../assets/icons/pngs/online.png";
 
 import { useSockets } from '../../../../../../contexts/sockets/socket.context';
 

@@ -1,0 +1,102 @@
+/* --- SKELETON LOADERS --- */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.skeletonPulse {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite linear forwards;
+  border-radius: 4px;
+}
+
+.skelTitle { width: 80%; height: 32px; margin-bottom: 8px; }
+.skelSubtitle { width: 40%; height: 20px; margin-bottom: 24px; }
+.skelPrice { width: 30%; height: 32px; margin-bottom: 16px; }
+.skelBanner { width: 50%; height: 36px; margin-bottom: 16px; border-radius: 6px; }
+.skelBadge { width: 40%; height: 36px; margin-bottom: 24px; border-radius: 20px; }
+.skelGrid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.skelRow { width: 100%; height: 20px; }
+.skelBox { width: 100%; height: 44px; margin-bottom: 16px; border-radius: 6px; }
+.skelPromo { width: 100%; height: 80px; margin-bottom: 24px; border-radius: 8px; }
+.skelButtons { display: flex; flex-direction: column; gap: 12px; }
+.skelBtn { width: 100%; height: 48px; border-radius: 6px; }
+
+.sectionWrapper {
+  width: 100%;
+}
+
+
+.topContainer {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+
+.skeletonPulse {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite linear forwards;
+  border-radius: 4px;
+}
+
+.skelGridTitle { width: 200px; height: 28px; margin-bottom: 24px; }
+.skelBanner { width: 100%; height: 74px; margin-bottom: 24px; border-radius: 8px; }
+
+.productDetailContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Added Border and Padding for the framed look */
+  padding: 24px;
+  border: 1px solid #eaeaea;
+  border-radius: 12px;
+  background-color: #fff;
+}
+
+.mainImageSkeleton {
+  flex: 1;
+  width: 100%;
+  aspect-ratio: 3/4; /* <--- THIS PREVENTS THE PAGE JUMP */
+  border-radius: 8px;
+}
+
+
+.container {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.skeletonPulse {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite linear forwards;
+}
+
+.thumbnailListSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeletonThumb {
+  width: 70px;
+  height: 90px;
+  border-radius: 6px;
+  flex-shrink: 0;
+};
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column-reverse;
+  }
+}

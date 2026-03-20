@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import styles from "./TopPicks.module.css";
-import ProductCard from "../Productcard/ProductCard";
+import ProductCard from "../ProductCard/ProductCard";
 import { categories } from "../../data/categories";
 import FilterBar from "./components/FilterBar/Filterbar";
 
@@ -351,7 +351,9 @@ const TopPicks = () => {
         {products.map((p, index) => (
           <ProductCard
             key={`${p._id}-${index}`}
-            image={p.coverImage}
+            _id={p._id}
+            coverImage={p.coverImage}
+            isLiked={p.isLiked}
             brand={p.brand}
             meta={p.title}
             price={p.price}

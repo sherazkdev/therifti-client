@@ -2,7 +2,8 @@
 
 /** Note: Product Card Props Interface */
 export interface ProductCardPropsInterface  {
-  image?: string;
+  _id?:string,
+  coverImage?: string;
   brand?: string;
   meta?: string;
   price?: number | string;
@@ -10,4 +11,5 @@ export interface ProductCardPropsInterface  {
   condition?: string;
   parcelSize?: string;
   isLoading?: boolean;
+  isLiked:boolean
 };

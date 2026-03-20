@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import styles from "./Search.module.css"; 
-import ProductCard from "../Productcard/ProductCard";
+import styles from "./Catalog.module.css"; 
+import ProductCard from "../ProductCard/ProductCard";
 import { categories } from "../../data/categories";
 import SearchFilterBar from "./component/SearchFilterBar"; 
 import type { CategoryDocument, ProductSort, SearchProductsInterface } from "../../types/api";
@@ -311,6 +311,7 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
         {products.map((p, index) => (
           <ProductCard
             key={`${p._id}-${index}`}
+            _id={p._id}
             image={p.coverImage}
             brand={p.brand}
             meta={p.title}

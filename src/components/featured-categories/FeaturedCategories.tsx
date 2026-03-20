@@ -9,7 +9,7 @@ import men from "../../assets/images/FeatureCategory/men.png";
 import sport from "../../assets/images/FeatureCategory/sport.svg";
 import entertainment from "../../assets/images/FeatureCategory/sport.svg";
 import platform from "../../assets/images/FeatureCategory/sport.svg";
-import { MoveRight } from "../../components/icons";
+import { MoveRight } from "../../assets/icons/svgs/svg"; 
 
 type FeaturedCard = {
   title: string;

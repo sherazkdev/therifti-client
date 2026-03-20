@@ -9,3 +9,6 @@ export * from "./chat.types";
 export * from "./message.types";
 export * from "./cloudinary.types";
 export * from "./category.types";
+export * from "./follow.types";
+export * from "./notification.types";
+export * from "./wishlist.types";

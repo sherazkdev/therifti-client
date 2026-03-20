@@ -1,7 +1,7 @@
 import { useRef, useState,useContext } from "react";
 import styles from "./Topbar.module.css";
-import LogoIcon from "../../../assets/icons/logo.png"; // replace path if needed
-import SearchIcon from "../../../assets/icons/search.png"; // replace
+import LogoIcon from "../../../assets/icons/pngs/logo.png"; // replace path if needed
+import SearchIcon from "../../../assets/icons/pngs/search.png"; // replace
 import { useNavigate } from "react-router-dom";
 import { MoveRight } from "lucide-react";
 import { ArrowUpRight, Bell, Heart, MessageCircle } from "lucide-react";

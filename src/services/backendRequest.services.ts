@@ -20,17 +20,16 @@ class BackendRequestServices {
                 config.headers["Authorization"] = `Bearer ${accessToken}`;
             }
             return config;
-        },err => Promise.resolve(err));
+        },err => Promise.reject(err));
 
         this.api.interceptors.response.use( async (response) => response,
             async (err:any) => {
-                console.log(err)
                 let orignalRequest = err.config;
                 if(err && err.response && err.response.data?.stack?.includes("jwt expired") && !orignalRequest._retry){
                     const memoryRefreshToken = await getRefreshToken();
                     if(!memoryRefreshToken){
-                        await removeAccessAndRefreshToken();
-                        return;
+                        removeAccessAndRefreshToken();
+                        return Promise.reject(err);
                     }
                     try {
                         /** To Session Refresh */
@@ -47,13 +46,12 @@ class BackendRequestServices {
                     } catch (e:unknown) {
                         if(e instanceof AxiosError){
                             const err = (e.response?.data as ApiError) || undefined;
-                            
-                            console.log(err);
                             if(err){
                                 if(err.message === "TOKEN_INVALID" || err.message === "TOKEN_EXPIRED" || err.message === "TOKEN_IS_USED"){
-                                    return removeAccessAndRefreshToken();
-                                }else if(err.message === "VALIDATION_FAILED"){
-                                    return;
+                                    removeAccessAndRefreshToken();
+                                    return Promise.reject(err)
+                                }else if(err.message === "VALIDATION_FAILED"){ 
+                                    return Promise.reject(err)
                                 }
                             }
                             return Promise.reject(e);
@@ -61,7 +59,7 @@ class BackendRequestServices {
                     }
                     return Promise.reject(err);
                 }
-                return Promise.reject(err)
+                return Promise.reject(err);
             }
         )
     }

@@ -1,0 +1,79 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Star, Truck, MapPin, Clock } from 'lucide-react'; // <-- Premium Icons imported here
+import ImageGallery from './components/ImageGallery/ImageGallery';
+import ProductDetails from "./components/ProductDetail/ProductDetails"
+import ProductGridSection from './components/ProductGrid/ProductGridSection';
+import styles from './SingleProduct.module.css';
+
+/** Note: Hooks */
+import useSingleProduct from '../../hooks/server/product/useSingleProduct';
+
+import type { GetSingleProductResponseInterface } from '../../types/api';
+import SingleProductSkeleton from './components/SingleProductSkeleton/SingleProductSkeleton';
+
+const ProductPage: React.FC = () => {
+
+  const [singleProduct, setSingleProduct] = useState<GetSingleProductResponseInterface | null>(null);
+  let isPending = false;
+  const { data, mutate} = useSingleProduct();
+  const params = useParams();
+
+  useEffect( () => {
+    /** Note: Check Param in productId is in exist. */
+    if(params?.productId){
+      mutate(params.productId);
+    }
+  },[params])
+
+  useEffect( () => {
+    if(data?.success === true && data){
+      console.log(data.data)
+      setSingleProduct(data.data);
+    }
+  },[data])
+
+  return (
+      <>
+      {isPending ? <SingleProductSkeleton /> : singleProduct && (
+        <div className={styles.pageWrapper}>
+          <nav className={styles.breadcrumb}>
+            <Link to='/'>Home</Link> / 
+            {singleProduct?.categoryTree.map( (tree) => (
+              <>
+                <Link key={tree._id} to={`/category/${tree._id}`}> {tree.title} </Link> / 
+              </>
+            ))}
+            <span> {singleProduct?.title}</span>
+          </nav>
+
+          <div className={styles.topContainer}>
+            <div className={styles.leftCol}>
+              <ImageGallery coverImage={singleProduct?.coverImage as string} images={singleProduct?.images as []} likesCount={singleProduct?.totalLikes} />
+            </div>
+            <div className={styles.rightCol}>
+              <ProductDetails product={singleProduct as GetSingleProductResponseInterface} />
+            </div>
+          </div>
+
+          <section className={styles.memberSection}>
+            <div className={styles.memberLeft}>
+              
+            {singleProduct && singleProduct.ownerProducts && (
+              <ProductGridSection title={`Member's items (${singleProduct?.ownerProducts?.length})`} products={singleProduct && singleProduct?.ownerProducts} showBundlesUI={true}  />
+            )}
+            </div>
+          </section>
+
+          <div className={styles.recommendedSection}>
+            {singleProduct && singleProduct.similarProducts && (
+              <ProductGridSection title="Recommended Products" products={singleProduct.similarProducts} isLoading={isPending} initialCount={10}/>
+            )}
+          </div>
+        </div>
+      )}
+      </>
+  );
+};
+
+export default ProductPage;

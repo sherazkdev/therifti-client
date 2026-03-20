@@ -1,5 +1,5 @@
 import styles from "./PromoFooter.module.css";
-import { MoveRight } from "../../components/icons";
+import { MoveRight } from "../../assets/icons/svgs/svg";
 import promoImg from "../../assets/images/Footer/PromoFooter.svg";
 
 const PromoFooter = () => {

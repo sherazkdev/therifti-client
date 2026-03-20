@@ -1,3 +1,7 @@
+import type { ParcelSizeInterface, ProductCondition, ProductParcelSize, ProductStatus } from "../components";
+import type { BrandDocument } from "./brand.types";
+import type { SizeDocument } from "./size.types";
+
 /** Create Product ApiResponse */
 export interface CreateProductApiResponse {
     success:boolean,
@@ -50,6 +54,25 @@ export interface FeaturedProductApiResponse {
   data: FeaturedProducTResponse[];
 }
 
+/** Note: Product Document */
+export interface ProductDocument {
+    _id:string,
+    categoryId:string,
+    owner:string,
+    title:string,
+    description:string,
+    condition:ProductCondition,
+    brand:string,
+    images:string[],
+    coverImage:string,
+    colors:string[],
+    materials:string[],
+    parcelSize:ProductParcelSize,
+    sizes:string[],
+    price:number,
+    status:ProductStatus,
+};
+
 /** ---------------- ADDED FOR SEARCH ENDPOINT ---------------- */
 
 export interface SearchProductsInterface {
@@ -67,11 +90,54 @@ export interface SearchProductsInterface {
   page?: number;
   sort?: ProductSort | null;
   limit?: number;
-}
+};
 
 export interface SearchProductApiResponse {
   success: boolean;
   statusCode: number;
   message: string;
   data: SearchProductsInterface[];
-}
+};
+
+/** Note: Get Single Product Api Response Interface */
+export interface GetSingleProductResponseInterface {
+  _id:string,
+  owner:{
+    _id:string,
+    fullname:string,
+    avatar:string | null,
+    username:string,
+    country?:string | null,
+    lastSeen:Date,
+    city?:string | null
+  },
+  title:string,
+  coverImage:string,
+  sizes:SizeDocument[],
+  description:string,
+  condition:ProductCondition,
+  brand:BrandDocument,
+  colors:string[],
+  price:string,
+  parcelSize:ParcelSizeInterface,
+  status:ProductStatus,
+  ownerProducts:ProductDocument[],
+  similarProducts:ProductDocument[],
+  isFollowed:boolean,
+  createdAt:Date,
+  isLiked:boolean,
+  totalLikes:number,
+  categoryTree:{
+    _id:string,
+    title:string
+  }[],
+  images:string[]
+};
+
+/** Note: Get Single Product Api Response */
+export interface GetSingleProductApiResponseInterface {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: GetSingleProductResponseInterface;
+};

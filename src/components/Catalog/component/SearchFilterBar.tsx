@@ -1,5 +1,5 @@
 import { type FC, type RefObject } from "react";
-import styles from "../Search.module.css"; 
+import styles from "../Catalog.module.css"; 
 import { ChevronDown, ChevronLeft, Shirt } from "lucide-react";
 import type { CategoryDocument } from "../../../types/api";
 import { CONDITION_OPTIONS } from "../../../data/condition"; 

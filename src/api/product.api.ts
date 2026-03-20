@@ -1,6 +1,6 @@
 import type BackendRequestServices from "../services/backendRequest.services";
 
-import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, FeaturedProductApiResponse, SearchProductApiResponse, SearchProductsInterface } from "../types/api/index";
+import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, GetSingleProductApiResponseInterface, FeaturedProductApiResponse, SearchProductApiResponse, SearchProductsInterface } from "../types/api/index";
 
 /** 
  * Note: This Product Api Service Using for get all product, update product, creare product more than.
@@ -55,6 +55,21 @@ class ProductApi implements ProductApiImplmentsInterface {
     */
     public async GetFeaturedProducts(sortObj:FeaturedProductsSortingInterface):Promise<FeaturedProductApiResponse> {
         const response = await this.apiService.Post<FeaturedProductApiResponse>("/products/featured-products",sortObj);
+        return response;
+    };
+
+    /** 
+     * Note: Get Single Product.
+     * 
+     * This service method using for click on `product` fetched product information with owner and.
+     * similar product ownerproduct full product details using productId.
+     * 
+     * @param {string} productId - Product Document Uniuqe Identifier.
+     * 
+     * @returns {Promise<GetSingleProductApiResponseInterface>} Single fetched product response.
+    */
+    public async GetSingleProduct(productId:string):Promise<GetSingleProductApiResponseInterface> {
+        const response = await this.apiService.Get<GetSingleProductApiResponseInterface>(`/products/single-product?productId=${productId}`);
         return response;
     }
 }

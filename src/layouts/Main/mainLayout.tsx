@@ -10,20 +10,23 @@ const MainLayout = () => {
      * Note: Router get location current page. 
     */
     const router = useLocation();
-    const headerVariants: Record<string, "solid" | "overlay"> = {
-        "/": "overlay",
-        "/profile": "solid",
-        "/product": "solid",
-        "/category": "overlay",
-        "/login": "solid",
-        "/sell": "solid",
-    };
+    const headerVariants: {pattern: RegExp;variant: "solid" | "overlay";}[] = 
+    [
+        { pattern: /^\/$/, variant: "overlay" },
+        { pattern: /^\/profile/, variant: "solid" },
+        { pattern: /^\/product/, variant: "solid" },
+        { pattern: /^\/category/, variant: "overlay" },
+        { pattern: /^\/login/, variant: "solid" },
+        { pattern: /^\/sell/, variant: "solid" },
+        { pattern: /^\/inbox/, variant: "solid" },
+        { pattern: /^\/notifications/, variant: "solid" },
+    ];
     
-    const variant = headerVariants[router.pathname || "overlay"];
-
+    const variant = headerVariants.find( (r) => r.pattern.test(router.pathname));
+    console.log(variant)
     return (
         <>
-            <Header variant={variant} />
+            <Header variant={variant?.variant} />
 
             {/* @note: Chilren components. */}
             <Outlet />

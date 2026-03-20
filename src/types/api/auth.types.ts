@@ -90,7 +90,7 @@ export interface RegisterResponseInterface {
 /** Api Response */
 export interface LoginApiResponse {
   success: boolean;
-  message: string;
+  errrodf: string;
   statusCode: number;
   data: LoginResponseInterface;
 };

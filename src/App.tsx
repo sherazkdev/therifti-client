@@ -13,8 +13,9 @@ const LoginPage = lazy(() => import("./pages/auth/Auth"));
 const Sell = lazy(() => import("./pages/Sellnow/Sell"));
 const SingleCategory = lazy(() => import("./pages/SingleCategory/SingleCategory"));
 const Chat = lazy(() => import("./pages/chat/Chat"));
-const ProductPage = lazy(() => import("./pages/SingleProduct/ProductPage"));
+const ProductPage = lazy(() => import("./pages/SingleProduct/SingleProduct"));
 const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
+const NotificationPage = lazy(() => import("./pages/Notification/Notification"));
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
           <Route  path="/product/:productId"  element={<ProductPage />} />
 
           <Route path="/profile/:userId" element={<ProfilePage />}/>
+          
+          <Route path="/notifications" element={<NotificationPage />}/>
 
           <Route path="*" element={<h1>Not Found</h1>} />
 
