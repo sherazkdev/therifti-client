@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import styles from "./CategoryBar.module.css";
 import MegaMenu from "../MegaMenu/MegaMenu";
-import type { Category } from "../../../types/category";
 import { MapPin, Globe } from "lucide-react";
-import type { CategoryPropsInterface } from "./Category.types";
-
+import type { CategoryDocument } from "../../../types/api";
+import type { CategoryPropsInterface } from "../../../types/components";
+import { useNavigate } from "react-router-dom";
 
 const CategoryBar: React.FC<CategoryPropsInterface> = ({
   categories,
-  onCategoryClick,
   variant = "overlay",
 }) => {
-  const [active, setActive] = useState<Category | null>(null);
+  const [active, setActive] = useState<CategoryDocument | null>(null);
+  const navigate = useNavigate(); // ADD
 
   return (
     <nav
@@ -28,8 +28,9 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
             className={styles.categoryItem}
             onMouseEnter={() => setActive(cat)}
             onClick={() => {
-              onCategoryClick(cat._id, cat.title);
-              setActive(null); 
+              // ✅ URL NAVIGATION
+              navigate(`/catalog?category=${cat._id}`);
+              setActive(null);
             }}
           >
             {cat.title}
@@ -53,9 +54,10 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
       {active && (
         <MegaMenu
           category={active}
-          onCategoryClick={(id) => {
-            onCategoryClick(id, active.title);
-            setActive(null); 
+          onCategoryClick={(_id: string) => {
+            // yahan bhi URL change
+            navigate(`/search?category=${_id}`);
+            setActive(null);
           }}
         />
       )}

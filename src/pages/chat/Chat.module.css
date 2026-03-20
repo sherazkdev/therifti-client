@@ -1,0 +1,25 @@
+.chatLayout {
+    padding: 14px 3%;
+    display: grid;
+    grid-template-columns: 23% 1fr;
+    margin-top: 40px;
+    height: calc(100dvh - 40px);
+    min-height: 0;
+    overflow: hidden;
+    width: 100%;
+}
+
+
+@media (max-width:1500px){
+    .chatLayout{
+        grid-template-columns: 30% 1fr;
+    }
+}
+
+@media (max-width:1080px){
+    .chatLayout{
+        grid-template-columns: 1fr;
+        position:relative;
+    }
+}
+

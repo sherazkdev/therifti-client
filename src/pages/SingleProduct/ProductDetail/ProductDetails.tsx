@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldCheck, Truck } from 'lucide-react'; 
 import styles from './ProductDetails.module.css';
-import type { Product } from './types';
+import type { Product } from '../types';
 
 interface Props {
   product: Product | null;

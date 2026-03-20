@@ -1,0 +1,50 @@
+.backBtn {
+  display: none;
+}
+
+.chatWindow{
+    display:grid;
+    grid-template-rows: auto 1fr auto;
+    width: 100%;
+    border: 1px solid #15191a1f;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    height:87vh;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* mobile */
+
+@media (max-width:1080px){
+
+    .chatWindow{
+        position:absolute;
+        inset:0;
+        margin: 14px auto auto auto;
+        border-radius: 6px;
+        width: 94%;
+        background:white;
+        transform:translateX(110%);
+        transition:0.3s;
+    }
+
+    /* IMPORTANT PART */
+
+    :global(.showChat) .chatWindow{
+        transform:translateX(0);
+    }
+
+    .backBtn{
+        display:block;
+    }
+
+}
+
+.loaderMain {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}

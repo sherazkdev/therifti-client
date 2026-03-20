@@ -1,7 +1,7 @@
 export const AUTH_ERROR_MESSAGES = {
-  EMAIL_EXISTS: "This email is already registered.",
-  INVALID_CREDENTIALS: "Incorrect email or password.",
-  USERNAME_EXISTS: "This username is already taken.",
+  EMAIL_EXISTS: "This email is already registered on Therifti",
+  INVALID_CREDENTIALS: "Invalid login credentials. Please try again",
+  USERNAME_EXISTS: "This username already exists on Therifti",
   TOKEN_EXPIRED: "Your session has expired. Please login again.",
   REFRESH_TOKEN_NOT_FOUND: "Session refresh token missing.",
   OTP_NOT_FOUND: "Verification code not found.",

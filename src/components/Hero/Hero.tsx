@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import styles from "./Hero.module.css";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+/** Types */
+import type { HeroPropsInterface } from "../../types/components";
+
 import bannerImg1 from "../../assets/images/Herobanner/HeroSection.png";
 import bannerImg2 from "../../assets/images/Herobanner/Desktop - 59.png";
 import bannerImg3 from "../../assets/images/Herobanner/Desktop - 60.png";
 import bannerImg4 from "../../assets/images/SingleProduct/Desktop - 59.png";
 
-type HeroProps = {
-  category?: string | null;
-};
 
 const slides = [
   {
@@ -29,7 +29,7 @@ const slides = [
   },
 ];
 
-const Hero: React.FC<HeroProps> = ({ category }) => {
+const Hero: React.FC<HeroPropsInterface> = ({ category }) => {
   const [active, setActive] = useState(0);
 
   // Slider only runs when NO category selected

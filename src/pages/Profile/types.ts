@@ -9,7 +9,7 @@ export interface Product {
   _id: string;
   title: string;
   images: string[];
-  price?: number; // Added for Vinted-style layout
+  price?: number; //
   views: number;
   favorites: number;
 }

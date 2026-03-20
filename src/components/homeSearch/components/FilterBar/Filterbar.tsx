@@ -1,55 +1,26 @@
 import { type FC, useRef } from "react";
 import styles from "../../TopPicks.module.css";
 import { ChevronDown, ChevronLeft, Shirt } from "lucide-react";
-import type { CategoryDocument } from "../../../../types/category/category.types";
+
+/** Hooks */
 import useSizesByCategory from "../../../../hooks/server/size/useSizesByCategory";
 
-export type Drop = "category" | "price" | "size" | "sort" | null;
+/** Note: Types */
+import type { TopPicksFiltersPropsInterface } from "../../../../types/components";
 
-type TopPicksFiltersProps = {
-  open: Drop;
-  toggleOpen: (d: Drop) => void;
-  selectedPath: string;
-  setSelectedPath: (val: string) => void;
-  categoryTree: CategoryDocument[];
-  catStack: string[];
-  setCatStack: (stack: string[]) => void;
-  currentCatNode: CategoryDocument | null;
-  goIntoCategory: (key: string) => void;
-  goBackCategory: () => void;
-  applyCategorySelection: (explicitId?: string) => void;
-  selectedSizes: string[];
-  toggleSize: (size: string) => void;
-  SIZE_OPTIONS: string[];
-  sortValue: string;
-  setSortValue: (val: string) => void;
-  SORT_OPTIONS: string[];
-  priceFrom: string;
-  setPriceFrom: (val: string) => void;
-  priceTo: string;
-  setPriceTo: (val: string) => void;
-  applyNonCategoryFilters: () => void;
-  selectedCatOptions: Record<string, string[]>;
-  toggleOption: (groupKey: string, option: string) => void;
-  loadingCats: boolean;
-  categoryId: string | null;
-};
-
-const FilterBar: FC<TopPicksFiltersProps> = ({
+const FilterBar: FC<TopPicksFiltersPropsInterface> = ({
   open,
   toggleOpen,
   selectedPath,
   setSelectedPath,
   categoryTree,
   catStack,
-  setCatStack,
   currentCatNode,
   goIntoCategory,
   goBackCategory,
   applyCategorySelection,
   selectedSizes,
   toggleSize,
-  SIZE_OPTIONS,
   sortValue,
   setSortValue,
   SORT_OPTIONS,

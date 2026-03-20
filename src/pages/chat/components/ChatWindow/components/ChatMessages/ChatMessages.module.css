@@ -1,0 +1,38 @@
+
+.chatMessages::-webkit-scrollbar {
+    width: 10px;
+}
+.chatMessages {
+    scrollbar-width: thin;
+    scrollbar-color: #909393 transparent;
+}
+.dateGroup {
+
+}
+.dateHeader {
+    display: flex;
+    position: sticky;
+    top: 5px;
+    justify-content: center;
+    align-items: center;
+}
+.dateHeader span {
+    color: #5a6566;
+    font-size: 12px;
+    font-weight: 375;
+    line-height: 16px;
+}
+.chatMessages {
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    gap: 10px;
+    overscroll-behavior: contain;
+    overflow-y: auto;
+}
+
+.messages {
+    width: 100%;
+}

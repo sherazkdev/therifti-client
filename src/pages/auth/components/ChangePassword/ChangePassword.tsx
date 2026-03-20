@@ -2,15 +2,16 @@ import { useForm } from "react-hook-form";
 import styles from "./ChangePassword.module.css";
 
 /** Types */
-import type { ChangePasswordFormInterface, ChangePasswordPropsInterface } from "./ChatPassword.types";
+import type { ChangePasswordFormInterface, ChangePasswordPropsInterface } from "../../../../types/components/index";
 
 /** Hooks */
 import useVerifyForgotAccountResetTokenAndChangePassword from "../../../../hooks/server/auth/useVerifyForgotAccountResetTokenAndChangePassword";
-import type { ApiError } from "../../../../types/api/apiError";
+import type { ApiError } from "../../../../types/api/api.types";
 import { useState } from "react";
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
+import { Info } from "lucide-react";
 
-export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordPropsInterface) {
+export default function ChangePassword({ otpRequest }: ChangePasswordPropsInterface) {
   const {
     register,
     handleSubmit,
@@ -64,7 +65,7 @@ export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordP
       className={styles.card}
       onSubmit={handleSubmit(handleChangePassword)}
     >
-      <h2>Change password</h2>
+      <h2 className={styles.changePassHeader}>Change password</h2>
       {!isPasswordChanges ? (
         <>
           {/* NEW PASSWORD */}
@@ -103,11 +104,17 @@ export default function ChangePassword({ onSuccess,otpRequest }: ChangePasswordP
           )}
 
           <button type="submit" className={resetPasswordMutation.isPending ? styles.submitBtnIsFetching : styles.submitBtn} disabled={resetPasswordMutation.isPending}>
-            {resetPasswordMutation.isPending ? (<div className="spinner"></div>) : "Submit"}
+            {resetPasswordMutation.isPending ? (<div className="loder"></div>) : "Submit"}
           </button>
         </>
       ): (
-        <p>Your password has been changed successfully.</p>
+        <div className={styles.changePassword}>
+
+          <p>
+            <span><Info size={"16px"}/></span>
+            <span>Your password has been changed successfully.</span>
+          </p>
+        </div>
       )}
     </form>
   );

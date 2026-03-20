@@ -9,12 +9,12 @@ import EmailSignIn from "./components/SignIn/SignIn";
 import ChangePassword from "./components/ChangePassword/ChangePassword";
 
 /** Interfaces */
-import type { OtpRequestInterface,AuthFlow,AuthSteps, SocialAuthInterface } from "./Auth.types";
+import type { OtpRequestInterface,AuthFlow,AuthSteps, SocialAuthInterface } from "../../types/components/index";
 import SocialAuth from "./components/SocialAuth/SocialAuth";
 
 /** Contexts*/
-import { AuthContext } from "../../contexts/auth/AuthContext";
-import type { UserDocumentInterface } from "../../types/auth/auth.types";
+import { AuthContext } from "../../contexts/auth/auth.context";
+import type { UserDocumentInterface } from "../../types/api";
 
 const AuthPage = () => {
   const [step, setStep] = useState<AuthSteps>("SOCIAL-AUTH");
@@ -50,7 +50,6 @@ const AuthPage = () => {
       handleSetUser(userDocument as UserDocumentInterface);
       Redirect("/",{replace:true});
     }else if(authFlow === "FORGOT"){
-      alert("Note: Handle Submit otp Submited");
       setOtpRequest( (prev) => ({...prev,resetToken:resetToken as string}))
       setStep("CHANGE-PASSWORD");
     }
@@ -72,10 +71,10 @@ const AuthPage = () => {
   const handleOnSocialAuth = (type:SocialAuthInterface) => {
     if(type === "GOOGLE"){
       // window.open(import.meta.env.VITE_SERVER_URL + "/auth/google","_blank","width=/500px;height=200px");
-      window.location.href = import.meta.env.VITE_SERVER_URL + "/auth/google";
+      window.location.href = import.meta.env.VITE_SERVER_URL + "/api/v1/auth/google";
       window.close();
     }else if(type === "FACEBOOK"){
-      window.location.href = import.meta.env.VITE_SERVER_URL + "/auth/facebook";
+      window.location.href = import.meta.env.VITE_SERVER_URL + "/api/v1/auth/facebook";
     }
   };
 
@@ -96,6 +95,7 @@ const AuthPage = () => {
       // setAuthFlow(null);
     }
   };
+  
   return (
     <div className={styles.page}>
         

@@ -11,15 +11,8 @@ import ItemAttributes from "./components/ItemAttributes/ItemAttributes";
 import PriceInput from "./components/PriceInput/PriceInput";
 
 /* Types */
-import type { FormValues, ProductStatus, ParcelSizeInterface } from "./SellItem.types";
-import type { CategoryDocument } from "../../types/category/category.types";
-import type { MaterialDocument } from "../../types/material/material.types";
-import type { SizeDocument } from "../../types/size/size.types";
-import type { BrandDocument } from "../../types/brand/brand.types";
-
-/* Services */
-import ImageUploadService from "../../services/imageUpload.services";
-
+import type { SellFormValues, ProductStatus, ParcelSizeInterface } from "../../types/components/index";
+import type { CategoryDocument, SizeDocument, MaterialDocument, BrandDocument  } from "../../types/api/index";
 /* Hooks */
 import useCreateProduct from "../../hooks/server/product/useCreateProduct";
 
@@ -28,8 +21,8 @@ import useCreateProduct from "../../hooks/server/product/useCreateProduct";
  * @description Form to create a new product listing with images, attributes and price
  */
 const SellItem = () => {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>();
-  const imageUploadService = new ImageUploadService();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<SellFormValues>();
+
   const productMutation = useCreateProduct();
 
   // ==========================
@@ -47,7 +40,7 @@ const SellItem = () => {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedMaterials, setSelectedMaterials] = useState<MaterialDocument[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<SizeDocument[]>([]);
-  const [parcelSize, setParcelSize] = useState<ParcelSizeInterface[]>([
+  const [parcelSize] = useState<ParcelSizeInterface[]>([
     { info: "For items that’d fit in a large envelope.", parcelSize: "SMALL" },
     { info: "For items that’d fit in a shoebox.", parcelSize: "MEDIUM" },
     { info: "For items that’d fit in a moving box.", parcelSize: "LARGE" },
@@ -72,7 +65,7 @@ const SellItem = () => {
    * @param data - Form data from react-hook-form
    * @param status - Product status (DRAFT / PUBLISHED)
    */
-  const onSubmit = async (data: FormValues, status: ProductStatus) => {
+  const onSubmit = async (data: SellFormValues, status: ProductStatus) => {
     const errors: Record<string, string> = {};
 
     if (!images.length) errors.images = "At least 1 image is required (max 4).";
@@ -83,14 +76,11 @@ const SellItem = () => {
     if (!selectedCondition) errors.condition = "Condition is required";
     if (!selectedColors.length) errors.colors = "Color is required";
 
+
     if (Object.keys(errors).length) {
       setFieldErrors(errors);
       return;
     }
-
-    /** Upload Images */
-    const uploadedImages = await imageUploadService.uploadMultipleImages(images);
-
     const payload = {
       ...data,
       categoryId,
@@ -100,11 +90,9 @@ const SellItem = () => {
       colors: selectedColors,
       condition: selectedCondition,
       status,
-      coverImage: uploadedImages.splice(0, 1)[0],
-      images: uploadedImages,
     };
 
-    productMutation.mutate(payload);
+    productMutation.mutate({images,product:payload});
   };
 
   const submitWithStatus = (status: ProductStatus) =>
@@ -115,97 +103,99 @@ const SellItem = () => {
   // ==========================
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Sell an Item</h2>
+    <>
+      <div className={styles.container}>
+        <h2 className={styles.title}>Sell an Item</h2>
 
-      {/* IMAGE UPLOADER */}
-      <ImageUploader
-        images={images}
-        setImages={setImages}
-        showPhotoTips={showPhotoTips}
-        setShowPhotoTips={setShowPhotoTips}
-      />
-      {fieldErrors.images && <div className={styles.imageErrorOutside}>{fieldErrors.images}</div>}
+        {/* IMAGE UPLOADER */}
+        <ImageUploader
+          images={images}
+          setImages={setImages}
+          showPhotoTips={showPhotoTips}
+          setShowPhotoTips={setShowPhotoTips}
+        />
+        {fieldErrors.images && <div className={styles.imageErrorOutside}>{fieldErrors.images}</div>}
 
-      <form onSubmit={(e) => e.preventDefault()}>
-        {/* TITLE */}
-        <div className={styles.row}>
-          <div className={styles.formGroup} style={{ flex: 1 }}>
-            <label>Title</label>
-            <input placeholder="Enter item title" {...register("title", { required: "Title is required" })} />
-            {errors.title && <span className={styles.error}>{errors.title.message}</span>}
+        <form onSubmit={(e) => e.preventDefault()}>
+          {/* TITLE */}
+          <div className={styles.row}>
+            <div className={styles.formGroup} style={{ flex: 1 }}>
+              <label>Title</label>
+              <input placeholder="Enter item title" {...register("title", { required: "Title is required" })} />
+              {errors.title && <span className={styles.error}>{errors.title.message}</span>}
+            </div>
           </div>
-        </div>
 
-        {/* CATEGORY + PRICE */}
-        <div className={styles.row}>
+          {/* CATEGORY + PRICE */}
+          <div className={styles.row}>
+            <div className={styles.formGroup}>
+              <CategoryDropdown handleCategoryOnChange={handleCategoryChange} />
+              {fieldErrors.category && <span className={styles.error}>{fieldErrors.category}</span>}
+            </div>
+            <PriceInput register={register} errors={errors} setValue={setValue} />
+          </div>
+
+          {/* ATTRIBUTES */}
+          {categoryId && (
+            <ItemAttributes
+              Selectedbrand={selectedBrand}
+              Selectedcolors={selectedColors}
+              Selectedcondition={selectedCondition}
+              Selectedmaterials={selectedMaterials}
+              Selectedsizes={selectedSizes}
+              categoryId={categoryId}
+              handlConditionOnChange={handleConditionChange}
+              handlSizeOnChange={handleSizeChange}
+              handlMaterialOnChange={handleMaterialChange}
+              handleBrandOnChange={handleBrandChange}
+              handleColorOnChange={handleColorChange}
+              brandError={fieldErrors.brand}
+              colorError={fieldErrors.colors}
+              conditionError={fieldErrors.condition}
+              materialError={fieldErrors.materials}
+              sizeError={fieldErrors.sizes}
+            />
+          )}
+
+          {/* DESCRIPTION */}
           <div className={styles.formGroup}>
-            <CategoryDropdown handleCategoryOnChange={handleCategoryChange} />
-            {fieldErrors.category && <span className={styles.error}>{fieldErrors.category}</span>}
+            <label>Description</label>
+            <textarea
+              rows={5}
+              placeholder="Describe your item in detail..."
+              {...register("description", { required: "Description is required" })}
+              className={styles.textarea}
+            />
+            {errors.description && <span className={styles.error}>{errors.description.message}</span>}
           </div>
-          <PriceInput register={register} errors={errors} setValue={setValue} />
-        </div>
 
-        {/* ATTRIBUTES */}
-        {categoryId && (
-          <ItemAttributes
-            Selectedbrand={selectedBrand}
-            Selectedcolors={selectedColors}
-            Selectedcondition={selectedCondition}
-            Selectedmaterials={selectedMaterials}
-            Selectedsizes={selectedSizes}
-            categoryId={categoryId}
-            handlConditionOnChange={handleConditionChange}
-            handlSizeOnChange={handleSizeChange}
-            handlMaterialOnChange={handleMaterialChange}
-            handleBrandOnChange={handleBrandChange}
-            handleColorOnChange={handleColorChange}
-            brandError={fieldErrors.brand}
-            colorError={fieldErrors.colors}
-            conditionError={fieldErrors.condition}
-            materialError={fieldErrors.materials}
-            sizeError={fieldErrors.sizes}
-          />
-        )}
-
-        {/* DESCRIPTION */}
-        <div className={styles.formGroup}>
-          <label>Description</label>
-          <textarea
-            rows={5}
-            placeholder="Describe your item in detail..."
-            {...register("description", { required: "Description is required" })}
-            className={styles.textarea}
-          />
-          {errors.description && <span className={styles.error}>{errors.description.message}</span>}
-        </div>
-
-        {/* PARCEL SIZE */}
-        <div className={styles.formGroup}>
-          <label>Select your Parcel Size</label>
-          <div className={styles.parcelList}>
-            {parcelSize.map((size, index) => (
-              <label key={index} className={styles.parcelRow}>
-                <div className="row">
-                  <span>{size.parcelSize}</span>
-                  <p>{size.info}</p>
-                </div>
-                <input type="radio" value={size.parcelSize} {...register("parcelSize", { required: "Parcel size is required" })} />
-              </label>
-            ))}
+          {/* PARCEL SIZE */}
+          <div className={styles.formGroup}>
+            <label>Select your Parcel Size</label>
+            <div className={styles.parcelList}>
+              {parcelSize.map((size, index) => (
+                <label key={index} className={styles.parcelRow}>
+                  <div className="row">
+                    <span>{size.parcelSize}</span>
+                    <p>{size.info}</p>
+                  </div>
+                  <input type="radio" value={size.parcelSize} {...register("parcelSize", { required: "Parcel size is required" })} />
+                </label>
+              ))}
+            </div>
+            {errors.parcelSize && <span className={styles.error}>{errors.parcelSize.message}</span>}
           </div>
-          {errors.parcelSize && <span className={styles.error}>{errors.parcelSize.message}</span>}
-        </div>
 
-        {/* ACTION BUTTONS */}
-        <div className={styles.actions}>
-          <button type="button" className={styles.draftBtn} onClick={() => submitWithStatus("DRAFT")}>Save Draft</button>
-          <button type="button" className={styles.submitBtn} onClick={() => submitWithStatus("PUBLISHED")}>Upload</button>
-        </div>
-      </form>
+          {/* ACTION BUTTONS */}
+          <div className={styles.actions}>
+            <button disabled={productMutation.isPending} type="button" className={styles.draftBtn} onClick={() => submitWithStatus("DRAFT")}>Save Draft</button>
+            <button disabled={productMutation.isPending} type="button" className={styles.submitBtn} onClick={() => submitWithStatus("PUBLISHED")}>Upload</button>
+          </div>
+        </form>
 
-      {showPhotoTips && <PhotoTipsModal onClose={() => setShowPhotoTips(false)} />}
-    </div>
+        {showPhotoTips && <PhotoTipsModal onClose={() => setShowPhotoTips(false)} />}
+      </div>
+    </>
   );
 };
 

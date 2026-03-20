@@ -7,10 +7,10 @@ import { EyeIcon } from "../../../../components/icons";
 import useLogin from "../../../../hooks/server/auth/useLogin";
 
 /** Types */
-import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "./SignIn.types";
-import type { ApiError } from "../../../../types/api/apiError"; 
+import type { EmailLoginFormInterface, EmailLoginPropsInterface } from "../../../../types/components/index";
+import type { ApiError } from "../../../../types/api/api.types"; 
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
-import { saveRefreshToken,saveAccessToken } from "../../../../services/api/auth/auth";
+import { saveRefreshToken,saveAccessToken } from "../../../../services/auth.services";
 
 export default function SignIn({ onForgot, onSuccess}: EmailLoginPropsInterface) {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +18,7 @@ export default function SignIn({ onForgot, onSuccess}: EmailLoginPropsInterface)
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<EmailLoginFormInterface>();
 
@@ -29,16 +30,19 @@ export default function SignIn({ onForgot, onSuccess}: EmailLoginPropsInterface)
   const handleLogin = async (data: EmailLoginFormInterface) => {
     try {
       loginMutation.mutate(data,{
-        onError(err) {
-          if(err.response && err.response.data){
-            const Error = err.response.data as ApiError || undefined;
-            if(Error){
-              if(Error.message === "VALIDATION_FAILED"){
-                setServerError(Error.message);
+        onError(error) {
+          if(error.response && error.response.data){
+            const err = error.response.data as ApiError || undefined;
+            if(err){
+              if(err.message === "VALIDATION_FAILED"){
+                setServerError(err.message);
                 return;
               }
-              setServerError(AUTH_ERROR_MESSAGES[Error.message]);
-              return;
+              if(err.message === 'EMAIL_NOT_FOUND'){
+                setServerError(AUTH_ERROR_MESSAGES.EMAIL_NOT_FOUND);
+              }else if(err.message === "INVALID_CREDENTIALS"){
+                setServerError(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
+              }
             }
           }
         },

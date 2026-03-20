@@ -3,14 +3,14 @@ import { useState, useRef, useEffect, type FC } from "react";
 import styles from "../../SellItem.module.css";
 
 /** Types */
-import type { MultiSelectDropDownProps } from "./MultiSelectDropDown.types";
+import type { MultiSelectDropDownPropsInterface } from "../../../../types/components/index";
 import DropDownMenu from "./components/DropDownMenu/DropDownMenu";
 import DropDownDisplay from "./components/DropDownDisplay/DropDownDisplay";
 
 /**
  * Generic MultiSelectDropdown with type T
  */
-const MultiSelectDropdown: FC<MultiSelectDropDownProps> = ({
+const MultiSelectDropdown: FC<MultiSelectDropDownPropsInterface> = ({
   label,
   options,
   selected,

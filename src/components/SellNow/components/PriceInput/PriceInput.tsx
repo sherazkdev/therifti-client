@@ -2,9 +2,9 @@ import { useState, type FC } from "react";
 
 /** Styles */
 import styles from "../../SellItem.module.css";
-import type { PriceInputPropInterface } from "./PriceInput.types";
+import type { PriceInputPropsInterface } from "../../../../types/components/index";
 
-const PriceInput: FC<PriceInputPropInterface> = ({errors,register,setValue}) => {
+const PriceInput: FC<PriceInputPropsInterface> = ({errors,register,setValue}) => {
     const [priceDisplay, setPriceDisplay] = useState("");
 
     const sanitizeDecimal = (input: string) => {

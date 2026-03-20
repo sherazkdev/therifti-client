@@ -3,26 +3,19 @@ import styles from "./TopPicks.module.css";
 import ProductCard from "../productcard/ProductCard";
 import { categories } from "../../data/categories";
 import FilterBar from "./components/FilterBar/Filterbar";
-import type { CategoryDocument } from "../../types/category/category.types";
-import type {
-  FeaturedProductsSortingInterface,
-  ProductSort,
-} from "../../services/api/product/product.types";
 
+/** Constants */
+import { SORT_OPTIONS } from "../../constants/constants";
+
+/** Types */
+import type { FeaturedProductsSortingInterface, ProductSort} from "../../types/api/product.types";
+import type { CategoryDocument } from "../../types/api/category.types";
+import type { Drop } from "../../types/components"
+
+/** Hooks */
 import useFeaturedProducts from "../../hooks/server/product/useFeaturedProducts";
 
-type Drop = "category" | "price" | "size" | "sort" | null;
-
-const PAGE_SIZE = 1;
-
-const SORT_OPTIONS: ProductSort[] = [
-  "PRICE_HIGH_TO_LOW",
-  "PRICE_LOW_TO_HIGH",
-  "NEWEST_FIRST",
-  "RELEVANCE",
-];
-
-/* ---------------- HELPERS ---------------- */
+let PAGE_SIZE = 1;
 
 function findNodeByKey(
   nodes: CategoryDocument[],
@@ -122,7 +115,7 @@ const TopPicks = () => {
 
       const payload: FeaturedProductsSortingInterface = {
         page: nextPage,
-        limit: PAGE_SIZE,
+        limit: 1,
         categoryId:
           categoryId !== undefined
             ? categoryId
@@ -152,6 +145,7 @@ const TopPicks = () => {
           setPage(nextPage);
           setLoadingProducts(false);
         },
+        
 
         onError: () => setLoadingProducts(false),
       });

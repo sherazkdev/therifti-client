@@ -1,18 +1,10 @@
 import { useState } from "react";
 import styles from "./ProductCard.module.css";
-import { Heart } from "../../components/icons";
+import { Heart } from "../icons";
 import { ImageOff } from "lucide-react";
 
-type ProductCardProps = {
-  image?: string;
-  brand?: string;
-  meta?: string;
-  price?: number | string;
-  likes?: number | string;
-  condition?: string;
-  parcelSize?: string;
-  isLoading?: boolean;
-};
+/** Types */
+import type { ProductCardPropsInterface } from "../../types/components";
 
 const ProductCard = ({
   image,
@@ -23,7 +15,7 @@ const ProductCard = ({
   condition,
   parcelSize,
   isLoading,
-}: ProductCardProps) => {
+}: ProductCardPropsInterface) => {
   const [imageError, setImageError] = useState(false);
 
   if (isLoading) {

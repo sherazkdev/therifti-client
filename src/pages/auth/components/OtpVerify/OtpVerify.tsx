@@ -4,12 +4,12 @@ import styles from "./OtpVerify.module.css";
 /** Hooks */
 import useVerifyRegisterationOtp from "../../../../hooks/server/auth/useVerifyRegisterationOtp";
 import useVerifyForgotAccountOtp from "../../../../hooks/server/auth/useVerifyForgotAccountOtp";
-import type { ApiError } from "../../../../types/api/apiError";
-import { saveRefreshToken,saveAccessToken } from "../../../../services/api/auth/auth";
+import type { ApiError } from "../../../../types/api/api.types";
+import { saveRefreshToken,saveAccessToken } from "../../../../services/auth.services";
 
 /** @note: AuthProviders */
-import { AuthContext } from "../../../../contexts/auth/AuthContext";
-import type { OtpVerifyPropsInterface } from "./OtpVerify.types";
+import { AuthContext } from "../../../../contexts/auth/auth.context";
+import type { OtpVerifyPropsInterface } from "../../../../types/components/index";
 import { AUTH_ERROR_MESSAGES } from "../../../../constants/errors/auth.errors";
 
 export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsInterface) {
@@ -23,7 +23,7 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
   const isLoading = (type === "SIGNUP" && verifyVerifyRegisterationMutation.isPending) || (type === "FORGOT" && verifyForgotAccountOtpMutation.isPending);
 
   /** Note: Contexts */
-  const {handleSetUser} = useContext(AuthContext);
+  const {} = useContext(AuthContext);
 
   // TIMER
   useEffect(() => {
@@ -91,13 +91,12 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
     inputsRef.current[pasted.length - 1]?.focus();
   };
 
-  const isComplete = otp.every((d) => d !== "");
+  // const isComplete = otp.every((d) => d !== "");
 
 
   // plug in the real API inside handleVerify    on continue this handle 
   const handleVerify = async () => {
     try {
-      const isValid = false; // for testing purppose only;
       const payload = {
         userId:otpRequest.userId as string,
         otp:Object.values(inputsRef.current)
@@ -189,7 +188,7 @@ export default function OtpVerify({ type,onSuccess,otpRequest }: OtpVerifyPropsI
       {error && <p className={styles.errorText}>{error}</p>}
 
       <button type="submit" onClick={handleVerify} className={isLoading ? "submitBtnIsFetching" : styles.submitBtn} disabled={isLoading}>
-        {isLoading ? (<div className="spinner"></div>) : "Continue"}
+        {isLoading ? (<div className="loader"></div>) : "Continue"}
       </button>
 
       {time > 0 ? (

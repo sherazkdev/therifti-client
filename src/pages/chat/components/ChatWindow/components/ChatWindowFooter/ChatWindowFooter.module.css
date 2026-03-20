@@ -1,0 +1,42 @@
+.footer {
+    width: 100%;
+    position: relative;
+    box-shadow: 0px 0px 2px #ccc;
+    height: 100%;
+
+}
+
+.sendMessageInputDev {
+    border:1px solid #15191a1f;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    outline: none;
+}
+
+.sendMessageInputDev input {
+    border: none;
+    width: 100%;
+    padding: 12px;    
+    outline: none;
+    background-color: #f2f2f2;
+    width: 100%;
+    height: 100%;
+}
+
+.sendMessageInputDev button {
+    background-color: transparent;
+    border: none;
+    /* background-color: navy; */
+    right: -5px;
+    bottom: -5px;
+    position: absolute;
+}
+
+.footerMain {
+    display: flex;
+    padding: 10px 20px;
+    gap: 10px;  
+    align-items: center;
+}
