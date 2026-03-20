@@ -7,25 +7,31 @@ export const useListingFilters = () => {
 
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [sort, setSort] = useState<ProductSort | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [limit] = useState<number>(10); // fixed for now
 
-  // ✅ MAIN PAYLOAD BUILDER
+  // MAIN PAYLOAD BUILDER (single source of truth)
   const buildPayload = useCallback(() => {
     return {
       userId: userId!,
-      page: 1,
-      limit: 10,
+      page,
+      limit,
       categoryId: categoryId || undefined,
       sort: sort || undefined,
     };
-  }, [userId, categoryId, sort]);
+  }, [userId, page, limit, categoryId, sort]);
 
-  // ✅ CATEGORY CHANGE
+  //  CATEGORY CHANGE
   const handleCategoryChange = (value: string) => {
     const finalValue = value === "ALL" ? null : value;
+
     setCategoryId(finalValue);
+    setPage(1); //  reset page on filter change
 
     const payload = {
       userId: userId!,
+      page: 1,
+      limit,
       categoryId: finalValue || undefined,
       sort: sort || undefined,
     };
@@ -33,13 +39,17 @@ export const useListingFilters = () => {
     console.log("CATEGORY PAYLOAD", payload);
   };
 
-  // ✅ SORT CHANGE
+  // SORT CHANGE
   const handleSortChange = (value: string) => {
     const finalValue = value as ProductSort;
+
     setSort(finalValue);
+    setPage(1); 
 
     const payload = {
       userId: userId!,
+      page: 1,
+      limit,
       categoryId: categoryId || undefined,
       sort: finalValue,
     };
@@ -47,9 +57,25 @@ export const useListingFilters = () => {
     console.log("SORT PAYLOAD", payload);
   };
 
+  //  PAGINATION (future use)
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+
+    const payload = {
+      userId: userId!,
+      page: newPage,
+      limit,
+      categoryId: categoryId || undefined,
+      sort: sort || undefined,
+    };
+
+    console.log("PAGE PAYLOAD", payload);
+  };
+
   return {
     buildPayload,
     handleCategoryChange,
     handleSortChange,
+    handlePageChange, // future use
   };
 };
