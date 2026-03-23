@@ -1,5 +1,5 @@
 
-import type { GetChatsApiResponse, DeleteChatApiResponse } from "../types/api";
+import type { GetChatsApiResponse, DeleteChatApiResponse, CreateChatApiResponse, CreateChatInterface } from "../types/api";
 
 /** Service */
 import BackendRequestServices from "../services/backendRequest.services";
@@ -35,7 +35,21 @@ class ChatApi {
     public async DeleteChat(chatId:string):Promise<DeleteChatApiResponse> {
         const response = await this.apiServices.Delete<DeleteChatApiResponse>(`/chats/delete-chat/${chatId}`);
         return response;
-    }
+    };
+
+    /**
+     * Note: Create Chat For real time comunicate room.
+     * 
+     * This service method using for real time comunicate chat room is talk any seller or client to.
+     * create a chat room.
+     * @param {CreateChatInterface} chatObj - Created chat information fields.
+     * 
+     * @returns {Promise<CreateChatApiResponse>} Create Chat room response. 
+    */
+    public async CreateChat(chatObj:CreateChatInterface):Promise<CreateChatApiResponse> {
+        const response = await this.apiServices.Post<CreateChatApiResponse>("/chats/get-or-create",chatObj);
+        return response;
+    };
     
 }
 

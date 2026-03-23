@@ -34,7 +34,7 @@ export interface FeaturedProductsSortingInterface {
 
 }
 
-export interface FeaturedProducTResponse {
+export interface ProductResponse {
   _id: string;
   title: string;
   coverImage: string;
@@ -51,7 +51,7 @@ export interface FeaturedProductApiResponse {
   success: boolean;
   statusCode: number;
   message: string;
-  data: FeaturedProducTResponse[];
+  data: ProductResponse[];
 }
 
 /** Note: Product Document */
@@ -99,6 +99,19 @@ export interface SearchProductApiResponse {
   data: SearchProductsInterface[];
 };
 
+/** Note: Onwer Product and Similar Products Interface */
+export interface OwnerProductAndSimilarProductsInterface {
+  _id:string,
+  title:string,
+  coverImage:string,
+  price:number,
+  brand:string,
+  condition:ProductCondition,
+  parcelSize:ProductParcelSize,
+  isLiked:boolean,
+  totalLikes:number
+};
+
 /** Note: Get Single Product Api Response Interface */
 export interface GetSingleProductResponseInterface {
   _id:string,
@@ -121,8 +134,8 @@ export interface GetSingleProductResponseInterface {
   price:string,
   parcelSize:ParcelSizeInterface,
   status:ProductStatus,
-  ownerProducts:ProductDocument[],
-  similarProducts:ProductDocument[],
+  ownerProducts:OwnerProductAndSimilarProductsInterface[],
+  similarProducts:OwnerProductAndSimilarProductsInterface[],
   isFollowed:boolean,
   createdAt:Date,
   isLiked:boolean,

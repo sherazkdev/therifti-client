@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import styles from "./TopPicks.module.css";
-import ProductCard from "../ProductCard/ProductCard";
+import ProductCard from "../productcard/ProductCard";
 import { categories } from "../../data/categories";
 import FilterBar from "./components/FilterBar/Filterbar";
 
@@ -8,7 +8,8 @@ import FilterBar from "./components/FilterBar/Filterbar";
 import { SORT_OPTIONS } from "../../constants/constants";
 
 /** Types */
-import type { FeaturedProductsSortingInterface, ProductSort, CategoryDocument} from "../../types/api/"
+import type { FeaturedProductsSortingInterface, ProductSort} from "../../types/api/product.types";
+import type { CategoryDocument } from "../../types/api/category.types";
 import type { Drop } from "../../types/components"
 
 /** Hooks */
@@ -144,6 +145,7 @@ const TopPicks = () => {
           setPage(nextPage);
           setLoadingProducts(false);
         },
+        
 
         onError: () => setLoadingProducts(false),
       });
@@ -366,6 +368,7 @@ const TopPicks = () => {
         {loadingProducts && page > 1 &&
           Array.from({ length: 1 }).map((_, idx) => (
             <ProductCard
+              
               key={`skel-more-${idx}`}
               isLoading
               brand=""

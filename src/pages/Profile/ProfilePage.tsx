@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./Profile.module.css";
 import type  { UserProfile } from "./types";
 
-// 👇 Yeh raha aapka import
+// Yeh raha aapka import
 import { mockProfileData } from "./mockData"; 
 
 import ProfileHeader from "./ProfileHeader";

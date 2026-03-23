@@ -11,5 +11,5 @@ export interface ProductCardPropsInterface  {
   condition?: string;
   parcelSize?: string;
   isLoading?: boolean;
-  isLiked:boolean
+  isLiked?:boolean
 };

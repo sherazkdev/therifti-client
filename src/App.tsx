@@ -8,6 +8,7 @@ import MainLayout from "./layouts/Main/mainLayout";
 import ProtectRoute from "./utils/ProtectRoute";
 import Loader from "./components/UI/Loader/Loader";
 
+const Catalog = lazy(() => import("./pages/SingleCategory/SingleCategory"));
 const Home = lazy(() => import("./pages/Home/Home"));
 const LoginPage = lazy(() => import("./pages/auth/Auth"));
 const Sell = lazy(() => import("./pages/Sellnow/Sell"));
@@ -31,6 +32,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
 
           <Route path="/category/:categoryId" element={<SingleCategory />} />
+
+           <Route path="/search" element={<Catalog />} />
 
           <Route  path="/product/:productId"  element={<ProductPage />} />
 

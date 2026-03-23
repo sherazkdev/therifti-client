@@ -1,15 +1,14 @@
 import { type FC, type RefObject } from "react";
 import styles from "../Catalog.module.css"; 
 import { ChevronDown, ChevronLeft, Shirt } from "lucide-react";
-import type { CategoryDocument } from "../../../types/api";
-import { CONDITION_OPTIONS } from "../../../data/condition"; 
+import type { CategoryDocument } from "../../../types/api/category.types";
+import { CONDITION_OPTIONS } from "../../../data/condition";
 import { COLOR_OPTIONS } from "../../../data/color"; 
-
+import type {Drop} from "../../../types/components/dropdown.types"
 import useSizesByCategory from "../../../hooks/server/size/useSizesByCategory";
 import useBrandsByCategoryId from "../../../hooks/server/brand/useBrandsByCategory";
 import useMaterialsByCategory from "../../../hooks/server/material/useMaterialsByCategory";
 
-type Drop = "category" | "price" | "size" | "brand" | "material" | "condition" | "color" | "sort" | null;
 
 type SearchFilterBarProps = {
   open: Drop;

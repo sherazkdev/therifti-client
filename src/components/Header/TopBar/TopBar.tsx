@@ -1,12 +1,11 @@
-import { useRef, useState,useContext } from "react";
+import { useRef, useState, useContext } from "react";
 import styles from "./Topbar.module.css";
 import LogoIcon from "../../../assets/icons/pngs/logo.png"; // replace path if needed
 import SearchIcon from "../../../assets/icons/pngs/search.png"; // replace
 import { useNavigate } from "react-router-dom";
-import { MoveRight } from "lucide-react";
-import { ArrowUpRight, Bell, Heart, MessageCircle } from "lucide-react";
+import { MoveRight, ArrowUpRight, Bell, Heart, MessageCircle } from "lucide-react";
 
-/** Note: Auth Contexts */
+/** Auth Context */
 import { AuthContext } from "../../../contexts/auth/auth.context";
 
 const MOCK_SUGGESTIONS = [
@@ -24,21 +23,29 @@ const MOCK_SUGGESTIONS = [
 
 const TopBar = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useContext(AuthContext);
+
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [isLoggedIn] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  /* HANDLE SEARCH (MAIN FUNCTION) */
+  const handleSearch = (value: string) => {
+    if (!value.trim()) return;
+
+    navigate(`/search?q=${encodeURIComponent(value)}`);
+    setOpen(false);
+  };
 
   const filteredSuggestions = MOCK_SUGGESTIONS.filter((item) =>
     item.toLowerCase().includes(query.toLowerCase())
   );
 
-  /** Check Authentication */
-  const {isAuthenticated} = useContext(AuthContext);
-
   return (
     <div className={styles.topBar}>
+      {/* LEFT SIDE */}
       <div className={styles.topLeft}>
         <img
           src={LogoIcon}
@@ -47,6 +54,7 @@ const TopBar = () => {
           onClick={() => navigate("/")}
         />
 
+        {/* SEARCH */}
         <div className={styles.searchWrapper} ref={wrapperRef}>
           <img src={SearchIcon} alt="Search" className={styles.searchIcon} />
 
@@ -58,10 +66,16 @@ const TopBar = () => {
               setQuery(e.target.value);
               setOpen(true);
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch(query);
+              }
+            }}
             onFocus={() => query && setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
           />
 
+          {/* SUGGESTIONS */}
           {open && query && (
             <div className={styles.suggestionBox}>
               {filteredSuggestions.map((item, index) => (
@@ -70,7 +84,7 @@ const TopBar = () => {
                   className={styles.suggestionItem}
                   onClick={() => {
                     setQuery(item);
-                    setOpen(false);
+                    handleSearch(item);
                   }}
                 >
                   <span>{item}</span>
@@ -78,9 +92,10 @@ const TopBar = () => {
                 </div>
               ))}
 
+              {/* SEARCH ALL */}
               <div
                 className={styles.searchAll}
-                onClick={() => navigate(`/search?q=${encodeURIComponent(query)}`)}
+                onClick={() => handleSearch(query)}
               >
                 Search "<strong>{query}</strong>"
               </div>
@@ -89,6 +104,7 @@ const TopBar = () => {
         </div>
       </div>
 
+      {/* RIGHT SIDE */}
       <div className={styles.topRight}>
         {!isAuthenticated ? (
           <>
@@ -111,7 +127,7 @@ const TopBar = () => {
           </>
         ) : (
           <>
-            <button className={styles.iconBtn}>
+            <button className={styles.iconBtn} onClick={ () => navigate("/notifications")}>
               <Bell size={18} />
               <span className={styles.notificationDot}>1</span>
             </button>
@@ -120,7 +136,10 @@ const TopBar = () => {
               <Heart size={18} />
             </button>
 
-            <button className={styles.iconBtn} onClick={ () => navigate("/inbox")}>
+            <button
+              className={styles.iconBtn}
+              onClick={() => navigate("/inbox")}
+            >
               <MessageCircle size={18} />
             </button>
 

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import ProductCard from '../../../../components/ProductCard/ProductCard';
 import styles from './ProductGridSection.module.css';
-import type { ProductDocument } from '../../../../types/api';
+import type { OwnerProductAndSimilarProductsInterface } from '../../../../types/api';
 
 interface Props {
   title: string;
-  products: ProductDocument[];
+  products: OwnerProductAndSimilarProductsInterface[];
   isLoading?: boolean;
   showBundlesUI?: boolean; 
   initialCount?: number; 
@@ -41,16 +41,16 @@ const ProductGridSection: React.FC<Props> = ({ title, products, isLoading, showB
       )}
 
       <div className={styles.grid}>
-        {products.slice(0, visibleCount).map((product:ProductDocument) => (
+        {products.slice(0, visibleCount).map((product) => (
           <ProductCard 
             key={product._id}
             _id={product._id}
             brand={product.brand}
             condition={product.condition}
             coverImage={product.coverImage}
-            likes={12}
+            likes={product.totalLikes}
             isLoading={false}
-            isLiked={false}
+            isLiked={product.isLiked}
             meta={product.title}
             parcelSize={product.parcelSize}
             price={product.price}

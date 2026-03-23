@@ -1,5 +1,5 @@
 import type { GetNotificationApiResponse } from "../../../types/api/index";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 /** Services */
 import NotificationApi from "../../../api/notification.api";
@@ -13,8 +13,9 @@ const backendRequestServices = new BackendRequestServices(BaseURL);
 const notificationApi = new NotificationApi(backendRequestServices);
 
 const useNotifications = () => {
-    return useMutation<GetNotificationApiResponse,AxiosError>({
-        mutationFn: () => notificationApi.GetNotifications(),
+    return useQuery<GetNotificationApiResponse,AxiosError>({
+        queryKey:["notifications"],
+        queryFn: () => notificationApi.GetNotifications(),
     })
 };
 export default useNotifications;

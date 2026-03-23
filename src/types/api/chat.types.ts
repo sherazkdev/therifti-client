@@ -31,4 +31,20 @@ export interface DeleteChatApiResponse {
     success:boolean,
     message:string,
     data:[]
+};
+
+/** Note: Create Chat Interface */
+export interface CreateChatInterface {
+    productRef:string,
+    member:string
+};
+
+/** Note: Create Chat ApiResponse */
+export interface CreateChatApiResponse {
+    statusCode:number,
+    success:boolean,
+    message:string,
+    data:{
+        _id:string
+    }
 }

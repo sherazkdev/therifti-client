@@ -40,5 +40,6 @@ export interface NotificationDocument {
     type:NotificationTypes,
     metaData:NotificationMetaData,
     linkUrl:string,
-    status?:NotifcationStatus
+    createdAt?: string;
+  
 }

@@ -46,27 +46,28 @@
 }
 
 /* ===== Item ===== */
-.item {
+/* inside your css / module */
+.itemButton {
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px 18px;
   border-radius: 12px;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #eee;
-  transition: all 0.2s ease;
   cursor: pointer;
+  width: 100%;
+  text-align: left;
 }
 
-
-.item:hover {
-  background: #f3f4f6;  
+.itemButton:hover {
+  background: #f3f4f6;
 }
 
-
-.item:active {
+.itemButton:active {
   transform: scale(0.995);
 }
+
 
 /* ===== Icon ===== */
 .icon {

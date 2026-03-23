@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import styles from "./Catalog.module.css"; 
-import ProductCard from "../ProductCard/ProductCard";
+import ProductCard from "../productcard/ProductCard";
 import { categories } from "../../data/categories";
-import SearchFilterBar from "./component/SearchFilterBar"; 
-import type { CategoryDocument, ProductSort, SearchProductsInterface } from "../../types/api";
+import SearchFilterBar from "./component/SearchFilterBar";
+import type { CategoryDocument } from "../../types/api/category.types";
+import type { Drop } from "../../types/components/dropdown.types";
+import type {
+  SearchProductsInterface,
+  ProductSort,
+  ProductResponse
+} from "../../types/api/product.types";
 
 import useSearchProducts from "../../hooks/server/product/useSearchProducts"; 
-
-export type Drop = "category" | "price" | "size" | "brand" | "material" | "condition" | "color" | "sort" | null;
 
 const PAGE_SIZE = 1; 
 
@@ -37,27 +42,30 @@ function buildCategoryLabel(tree: CategoryDocument[], stack: string[]) {
   return labels.length ? labels.join(" / ") : ""; 
 }
 
-interface SearchProps {
-  initialCategoryId?: string | null;
-  initialQuery?: string | null;
-  initialBreadcrumb?: string; 
-}
 
-const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcrumb = "" }: SearchProps) => {
+const Catalog = () => {
   const [open, setOpen] = useState<Drop>(null);
   const [categoryTree] = useState<CategoryDocument[]>(categories);
   const panelRef = useRef<HTMLDivElement | null>(null);
 
+  const [searchParams] = useSearchParams();
+  const categoryFromURL = searchParams.get("category");
+
+  
+  // FIX 1: URL se aane wale '+' ko space main convert karna aur extra spaces hatana
+  const rawQuery = searchParams.get("q");
+  const queryFromURL = rawQuery ? rawQuery.replace(/\+/g, ' ').trim() : null;
+
   // Search Specific States
-  const [query, setQuery] = useState<string | null>(initialQuery);
-  const [breadcrumb, setBreadcrumb] = useState<string>(initialBreadcrumb || initialQuery || "All Products");
+  const [query, setQuery] = useState<string | null>(queryFromURL);
+  
+  const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(null);
+  const [breadcrumb, setBreadcrumb] = useState<string>("All Products");
 
   // Category States
   const [catStack, setCatStack] = useState<string[]>([]);
   const [selectedPath] = useState("Category"); 
-  const [appliedCategoryKey, setAppliedCategoryKey] = useState<string | null>(initialCategoryId);
-  
-  //  Temporary state for holding category selection before clicking "Apply"
+ 
   const [pendingCategory, setPendingCategory] = useState<string | null>(null);
 
   // Filter States
@@ -71,7 +79,7 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
   const [sortValue, setSortValue] = useState<ProductSort>("RELEVANCE");
 
   // Pagination & Data States
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<ProductResponse[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -140,10 +148,43 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
     [query, appliedCategoryKey, priceFrom, priceTo, selectedSizes, selectedBrands, selectedMaterials, selectedConditions, selectedColors, sortValue, updateURL, searchProductMutation]
   );
 
-  /* ---------------- INITIAL LOAD ---------------- */
+
+   useEffect(() => {
+    if (categoryFromURL) {
+      setAppliedCategoryKey(categoryFromURL);
+
+      const node = findNodeByKey(categoryTree, categoryFromURL);
+      if (node) {
+        setBreadcrumb(node.title);
+      }
+    } else {
+      setAppliedCategoryKey(null);
+      setBreadcrumb("All Products");
+    }
+  }, [categoryFromURL, categoryTree]);
+
+  /* ---------------- SYNC URL CHANGES & INITIAL LOAD ---------------- */
+  // useEffect(() => {
+  //   setQuery(queryFromURL);
+    
+  //   // FIX 3: Yahan bhi logic reverse kar di hai taake breadcrumb sahi update ho
+  //   setBreadcrumb(queryFromURL || initialBreadcrumb);
+    
+  //   fetchProducts(1, "replace", undefined, sortValue, queryFromURL);
+    
+  // }, [queryFromURL, initialBreadcrumb, sortValue]);
+
   useEffect(() => {
-    fetchProducts(1, "replace", initialCategoryId, sortValue, initialQuery);
-  }, [initialCategoryId, initialQuery]);
+    setQuery(queryFromURL);
+
+    fetchProducts(
+      1,
+      "replace",
+      categoryFromURL,   //  yahan change
+      sortValue,
+      queryFromURL
+    );
+  }, [queryFromURL, categoryFromURL, sortValue]);
 
   /* ---------------- CLICK OUTSIDE ---------------- */
   useEffect(() => {
@@ -152,7 +193,7 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
       if (!panelRef.current.contains(e.target as Node)) {
         setOpen(null);
         setCatStack([]);
-        setPendingCategory(null); // Clear pending if user clicks outside
+        setPendingCategory(null);
       }
     };
     document.addEventListener("mousedown", onDown);
@@ -182,7 +223,6 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
     fetchProducts(1, "replace", undefined, value);
   };
 
-  //  Apply Category abb pending state check karega
   const applyCategorySelection = (explicitId?: string) => {
     let finalLabel = buildCategoryLabel(categoryTree, catStack);
     
@@ -207,7 +247,7 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
     setPage(1);
     setOpen(null);
     setCatStack([]);
-    setPendingCategory(null); // Applied ho gaya toh pending saaf kar do
+    setPendingCategory(null);
     fetchProducts(1, "replace", lastKey, undefined, query); 
   };
 
@@ -266,12 +306,8 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
         goIntoCategory={goIntoCategory}
         goBackCategory={goBackCategory}
         applyCategorySelection={applyCategorySelection}
-        
-        // Nayi state props for holding option before clicking Apply
         pendingCategory={pendingCategory}
         setPendingCategory={setPendingCategory}
-
-        // Dynamic States
         categoryId={appliedCategoryKey}
         selectedSizes={selectedSizes}
         toggleSize={(s) => toggleArrayFilter(setSelectedSizes, s)}
@@ -279,18 +315,14 @@ const Catalog = ({ initialCategoryId = null, initialQuery = null, initialBreadcr
         toggleBrand={(b) => toggleArrayFilter(setSelectedBrands, b)}
         selectedMaterials={selectedMaterials}
         toggleMaterial={(m) => toggleArrayFilter(setSelectedMaterials, m)}
-        
-        // Static States
         selectedConditions={selectedConditions}
         toggleCondition={(c) => toggleArrayFilter(setSelectedConditions, c)}
         selectedColors={selectedColors}
         toggleColor={(c) => toggleArrayFilter(setSelectedColors, c)}
-        
         priceFrom={priceFrom}
         setPriceFrom={setPriceFrom}
         priceTo={priceTo}
         setPriceTo={setPriceTo}
-        
         sortValue={sortValue}
         setSortValue={handleSortChange}
         SORT_OPTIONS={SORT_OPTIONS}

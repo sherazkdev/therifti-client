@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Clock, MapPin, ShieldCheck, Star, Truck } from 'lucide-react'; 
 import styles from './ProductDetails.module.css';
-import type { GetSingleProductResponseInterface } from '../../../../types/api';
+import type { ApiError, CreateChatInterface, GetSingleProductResponseInterface } from '../../../../types/api';
 import type { ProductCondition } from '../../../../types/components';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface Props {
   product: GetSingleProductResponseInterface;
@@ -13,18 +13,97 @@ interface Props {
 
 import userEmptyState from "../../../../assets/icons/user-empty-state.svg";
 
+
+/** Hooks */
+import useFollowSeller from '../../../../hooks/server/follow/useFollowSeller';
+import useUnfollowSeller from '../../../../hooks/server/follow/useUnfollowSeller';
+import useCreateChat from '../../../../hooks/server/chat/useCreateChat';
+
+import { CHAT_ERROR_CODES } from '../../../../constants/errors/chat.errors';
+
 const ProductDetails: React.FC<Props> = ({ product, onAskSeller, isCreatingChat }) => {
+  const [productDetails,setProductDetails] = useState<GetSingleProductResponseInterface>(product)
+
+  const Redirect = useNavigate();
+
+  /** Hooks */
+  const followSellerMutation = useFollowSeller();
+  const unfollowSellerMutation = useUnfollowSeller();
+  const createChatMuatation = useCreateChat(); 
 
   function capitalizeFirst(str:string[]) {
     return str.map( (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase())
   }
+
   const displayProductCondition = (condition:ProductCondition) => {
     if(condition === "GOOD") return "Good";
     if(condition === "NEW_WITHOUT_TAGS") return "New without tags";
     if(condition === "VERY_GOOD") return "Very good";
     if(condition === "NEW_WITH_TAGS") return "New with tags";
     if(condition === "SATISFACTORY") return "Satisfactory";
-  }
+  };
+
+  /** Note: Handle Follow Seller */
+  const handleFollowSeller = async () => {
+    followSellerMutation.mutate(productDetails.owner._id, {
+      onError:(e) => {
+        const err = e.response?.data as ApiError || undefined;
+        if(err){
+          if(err.message === CHAT_ERROR_CODES.ALREADY_EXIST && err.statusCode === 400 && err.success === false){
+
+          }
+        }
+      },
+      onSuccess:(res) => {
+        console.log(res)
+        if(res.statusCode === 200 && res.success === true){
+          setProductDetails( (prevDetails) => ({...prevDetails,isFollowed:true}));
+        }
+      }
+    });
+  };
+  
+  /** Note: Handle Unfollow Seller */
+  const handleUnfollowSeller = async () => {
+    unfollowSellerMutation.mutate(productDetails.owner._id,{
+      onError:(e) => {
+        const err = e.response?.data as ApiError || undefined;
+        if(err){
+          return console.log(err);
+        }
+      },
+      onSuccess:(res) => {
+        if(res.success === true && res.statusCode === 202){
+          setProductDetails( (prevDetails) => ({...prevDetails,isFollowed:false}));
+        }
+      }
+    })
+  };
+
+  /** Note: Handle Ask Seller */
+  const handleAskSeller = async () => {
+
+    /** Note: Create Chat Payload. */
+    const createChatPayload:CreateChatInterface = {
+      productRef:productDetails._id,
+      member:productDetails.owner._id
+    };
+    createChatMuatation.mutate(createChatPayload,{
+      onError:(e) => {
+        const err = e.response?.data as ApiError || undefined;
+        if(err){
+          return console.log(err);
+        }
+      },
+      onSuccess:(res) => {
+        if(res.statusCode === 201 && res.success === true){
+          Redirect(`/inbox/${res.data._id}`);
+        }
+      }
+    })
+
+  };
+
   return (
     <>
     <div className={styles.container}>
@@ -68,10 +147,10 @@ const ProductDetails: React.FC<Props> = ({ product, onAskSeller, isCreatingChat 
         <button className={styles.offerBtn}>Make an offer</button>
         <button 
           className={styles.askBtn} 
-          onClick={onAskSeller}
+          onClick={handleAskSeller}
           disabled={isCreatingChat}
         >
-          {isCreatingChat ? "Creating..." : "Ask Seller"}
+          {createChatMuatation.isPending ? <div className='loader'></div> : "Ask Seller"}
         </button>
       </div>
     </div>
@@ -84,15 +163,15 @@ const ProductDetails: React.FC<Props> = ({ product, onAskSeller, isCreatingChat 
               <div className={styles.sellerCard}>
                   <div className={styles.sellerHeader}>
                     <div className={styles.sellerAvatar}>
-                      {product.owner.avatar ? (
-                        <img src={product.owner.avatar || userEmptyState} onError={ (e) => e.currentTarget.src = userEmptyState} alt={product.owner.fullname} />
+                      {productDetails.owner.avatar ? (
+                        <img src={productDetails.owner.avatar || userEmptyState} onError={ (e) => e.currentTarget.src = userEmptyState} alt={productDetails.owner.fullname} />
                       ) : (
-                        <span className={styles.avatarPlaceholder}>{product.owner.username.charAt(0).toUpperCase()}</span>
+                        <span className={styles.avatarPlaceholder}>{productDetails.owner.username.charAt(0).toUpperCase()}</span>
                       )}
                     </div>
                     <div>
-                      <Link to={`/member/${product.owner._id}`} className={styles.sellerName}>
-                        @{product.owner.username}
+                      <Link to={`/member/${productDetails.owner._id}`} className={styles.sellerName}>
+                        @{productDetails.owner.username}
                       </Link>
                       {/* Real Lucide Stars */}
                       <div className={styles.sellerRating}>
@@ -117,10 +196,10 @@ const ProductDetails: React.FC<Props> = ({ product, onAskSeller, isCreatingChat 
                     
                     <hr className={styles.divider} />
                     
-                    {product.owner.country && 
+                    {productDetails.owner.country && 
                       <div className={styles.statRow}>
                         <MapPin size={16} className={styles.statIcon} />
-                        <span>{product.owner.city}, {product.owner.country}</span>
+                        <span>{productDetails.owner.city}, {productDetails.owner.country}</span>
                       </div>
                     }
                     
@@ -130,7 +209,9 @@ const ProductDetails: React.FC<Props> = ({ product, onAskSeller, isCreatingChat 
                     </div>
                   </div>
 
-                  <button className={styles.followBtn}>Follow</button>
+                  {productDetails.isFollowed && (<button onClick={handleUnfollowSeller} className={styles.isFollowed}>{unfollowSellerMutation.isPending ? <div className='loader'></div> : "Unfollow"}</button>)}
+                  {!productDetails.isFollowed && (<button onClick={handleFollowSeller} className={styles.followBtn}>{followSellerMutation.isPending ? <div className='loader'></div> : "Follow"}</button>)}
+              
               </div>
 
               <div className={styles.buyerNotice}>

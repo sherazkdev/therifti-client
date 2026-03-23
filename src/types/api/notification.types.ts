@@ -1,5 +1,5 @@
 /** Notificatio metaData */
-type NotificationMetaData = {
+export type NotificationMetaData = {
     /** Item Like */
     actorId:string,
     actorName?:string,
@@ -29,12 +29,13 @@ export type NotifcationStatus = typeof NOTIFICATION_STATUS[number];
 
 /** Note: Notification Document. */
 export interface NotificationDocument {
+    _id:string,
     recipient_id:string,
     type:NotificationTypes,
     metaData:NotificationMetaData,
     linkUrl:string,
-    status?:NotifcationStatus
-    createdAt?: string;
+    status:NotifcationStatus
+    createdAt: string;
 };
 
 /** Note: Get Notification Api Response */ 

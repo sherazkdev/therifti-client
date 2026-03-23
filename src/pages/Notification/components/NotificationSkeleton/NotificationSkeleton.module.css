@@ -1,0 +1,82 @@
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background: #f6f7f9;
+  padding: 30px 0;
+}
+
+.notificationContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.itemButton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #eee;
+  width: 100%;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: 50%;
+}
+
+.content {
+  flex: 1;
+}
+
+.time {
+  width: 40px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+/* ===== Skeleton Animation ===== */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeletonPulse {
+  background: #f6f7f8;
+  background-image: linear-gradient(
+    to right,
+    #f6f7f8 0%,
+    #edeef1 20%,
+    #f6f7f8 40%,
+    #f6f7f8 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 1000px 100%;
+  animation: shimmer 1.5s infinite linear forwards;
+}
+
+.skeletonText {
+  height: 14px;
+  border-radius: 4px;
+}
