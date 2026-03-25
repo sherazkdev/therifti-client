@@ -23,6 +23,12 @@
   flex: 1;
 }
 
+#suggestionId {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Logo */
 .logo {
   width: 40px;

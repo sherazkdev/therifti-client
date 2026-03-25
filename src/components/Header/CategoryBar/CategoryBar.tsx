@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 const CategoryBar: React.FC<CategoryPropsInterface> = ({
   categories,
   variant = "overlay",
+  onCategoryClick
 }) => {
   const [active, setActive] = useState<CategoryDocument | null>(null);
   const navigate = useNavigate(); // ADD
@@ -27,11 +28,7 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
             key={cat._id}
             className={styles.categoryItem}
             onMouseEnter={() => setActive(cat)}
-            onClick={() => {
-              // ✅ URL NAVIGATION
-              navigate(`/catalog?category=${cat._id}`);
-              setActive(null);
-            }}
+            onClick={() => onCategoryClick(cat._id)}
           >
             {cat.title}
           </li>
@@ -54,11 +51,7 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
       {active && (
         <MegaMenu
           category={active}
-          onCategoryClick={(_id: string) => {
-            // yahan bhi URL change
-            navigate(`/search?category=${_id}`);
-            setActive(null);
-          }}
+          onCategoryClick={onCategoryClick}
         />
       )}
     </nav>

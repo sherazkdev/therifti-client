@@ -33,7 +33,7 @@ function App() {
 
           <Route path="/category/:categoryId" element={<SingleCategory />} />
 
-           <Route path="/search" element={<Catalog />} />
+          <Route path="catalog" element={<Catalog />} />
 
           <Route  path="/product/:productId"  element={<ProductPage />} />
 

@@ -1,4 +1,4 @@
-import { useRef, useState, useContext } from "react";
+import { useRef, useState, useContext, useEffect } from "react";
 import styles from "./Topbar.module.css";
 import LogoIcon from "../../../assets/icons/pngs/logo.png"; // replace path if needed
 import SearchIcon from "../../../assets/icons/pngs/search.png"; // replace
@@ -7,40 +7,54 @@ import { MoveRight, ArrowUpRight, Bell, Heart, MessageCircle } from "lucide-reac
 
 /** Auth Context */
 import { AuthContext } from "../../../contexts/auth/auth.context";
+import type { GetSuggestionsResponse } from "../../../types/api";
 
-const MOCK_SUGGESTIONS = [
-  "mens clothes",
-  "men’s clothing",
-  "men’s walking boots",
-  "mens fleece jacket",
-  "men’s shorts summer",
-  "mens denim jacket",
-  "men’s canvas jacket",
-  "men’s trucker cap",
-  "men's winter jacket",
-  "mens faux leather jacket",
-];
+import useSuggestions from "../../../hooks/server/product/useSuggestions";
+
 
 const TopBar = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useContext(AuthContext);
 
   const [query, setQuery] = useState("");
+  const [searchSuggestions,setSearchSuggestions] = useState<GetSuggestionsResponse[] | []>([]);
+  const [deBouncedQuery,setDeBouncedQuery] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
+  const suggestionMuatation = useSuggestions();
+
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect( () => {
+    if(query !== ""){
+      const timer = setTimeout( () => setDeBouncedQuery(query),200);
+      return () => clearTimeout(timer);
+    }
+  }, [query]);
+
+  useEffect( () => {
+    if(deBouncedQuery !== null){
+      suggestionMuatation.mutate(deBouncedQuery,{
+        onSuccess:(res) => {
+          if(res.statusCode === 200 && res.success === true){
+            setSearchSuggestions(res.data);
+          }
+        }
+      })
+    }
+  }, [deBouncedQuery])
 
   /* HANDLE SEARCH (MAIN FUNCTION) */
   const handleSearch = (value: string) => {
     if (!value.trim()) return;
 
-    navigate(`/search?q=${encodeURIComponent(value)}`);
+    navigate(`/catalog?q=${encodeURIComponent(value)}`);
     setOpen(false);
   };
 
-  const filteredSuggestions = MOCK_SUGGESTIONS.filter((item) =>
-    item.toLowerCase().includes(query.toLowerCase())
+  const filteredSuggestions = searchSuggestions && searchSuggestions.filter((item) =>
+    item.title.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
@@ -78,19 +92,22 @@ const TopBar = () => {
           {/* SUGGESTIONS */}
           {open && query && (
             <div className={styles.suggestionBox}>
-              {filteredSuggestions.map((item, index) => (
+
+              {suggestionMuatation.isPending && (<div id={styles.suggestionId} className={styles.suggestionItem}><div className="loader"></div></div>)}
+              {!suggestionMuatation.isPending && filteredSuggestions.map((item, index) => (
                 <div
                   key={index}
                   className={styles.suggestionItem}
                   onClick={() => {
-                    setQuery(item);
-                    handleSearch(item);
+                    setQuery(item.title);
+                    handleSearch(item.title);
                   }}
                 >
-                  <span>{item}</span>
+                  <span>{item.title}</span>
                   <ArrowUpRight size={16} className={styles.suggestionArrow} />
                 </div>
               ))}
+
 
               {/* SEARCH ALL */}
               <div

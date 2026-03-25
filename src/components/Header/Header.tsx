@@ -1,6 +1,5 @@
-import { useState } from "react";
 import TopBar from "./TopBar/TopBar";
-import CategoryBar from "./Category/CategoryBar";
+import CategoryBar from "./CategoryBar/CategoryBar";
 import styles from "./TopBar/Topbar.module.css";
 import { categories } from "../../data/categories";
 import type { CategoryDocument } from "../../types/api";
@@ -11,14 +10,11 @@ const Header = ({
   variant = "overlay"
 }: HeaderPropsInterface) => {
 
-  const [selectedParent, setSelectedParent] = useState<string | null>(null);
-
-  const navigate = useNavigate();
+  const Redirect = useNavigate();
 
 
-  const handleCategoryClick = (id: string, Name?: string) => {
-    console.log("Header Payload:", { categoryId: id , itemName: Name || null});
-    navigate(`/category/${id}`);
+  const handleCategoryClick = (categoryId: string) => {
+    Redirect(`/catalog?categoryId=${categoryId}`);
   };
 
   return (

@@ -154,3 +154,17 @@ export interface GetSingleProductApiResponseInterface {
   message: string;
   data: GetSingleProductResponseInterface;
 };
+
+/** Note: Get Suggestions Response */
+export interface GetSuggestionsResponse {
+  _id:string,
+  title:string
+};
+
+/** Note: Get Suggestions ApiResponse */
+export interface GetSuggestionApiResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: GetSuggestionsResponse[]
+};

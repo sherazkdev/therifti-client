@@ -32,11 +32,7 @@ const SingleCategory = () => {
   return (
     <>
       <Hero category={parentName} />
-      <Search 
-        // initialCategoryId="69a7f877bac8df0e8d5fb59a" 
-        // initialBreadcrumb="Home/ Fashion / Women" // Aap yahan dynamically naam bhi bhej sakte hain
-        // initialQuery={"green"}
-      />
+      <Search />
     </>
   );
 };

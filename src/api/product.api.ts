@@ -1,6 +1,6 @@
 import type BackendRequestServices from "../services/backendRequest.services";
 
-import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, GetSingleProductApiResponseInterface, FeaturedProductApiResponse, SearchProductApiResponse, SearchProductsInterface } from "../types/api/index";
+import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, GetSingleProductApiResponseInterface, FeaturedProductApiResponse, SearchProductApiResponse, SearchProductsInterface, GetSuggestionApiResponse } from "../types/api/index";
 
 /** 
  * Note: This Product Api Service Using for get all product, update product, creare product more than.
@@ -71,7 +71,20 @@ class ProductApi implements ProductApiImplmentsInterface {
     public async GetSingleProduct(productId:string):Promise<GetSingleProductApiResponseInterface> {
         const response = await this.apiService.Get<GetSingleProductApiResponseInterface>(`/products/single-product?productId=${productId}`);
         return response;
-    }
+    };
+
+    /**
+     * Note: Get Suggestions.
+     * 
+     * This service method using for get search suggestion to find a product using query parameter.
+     * 
+     * @param {string} q - Search by q parameter variable is required.
+     * @returns {Promise<GetSuggestionApiResponse>} Fetch Suggestions Api response.
+    */
+    public async GetSuggestions(q:string):Promise<GetSuggestionApiResponse>{
+        const response = await this.apiService.Get<GetSuggestionApiResponse>(`/products/get-suggestions/${q}`);
+        return response;
+    };
 }
 
 export default ProductApi;
