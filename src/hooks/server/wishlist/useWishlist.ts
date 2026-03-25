@@ -1,5 +1,5 @@
 import type { GetWishlistsApiResponse } from "../../../types/api/index";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 /** Services */
 import WishlistApi from "../../../api/wishlist.api";
@@ -13,8 +13,9 @@ const backendRequestServices = new BackendRequestServices(BaseURL);
 const wishlistApi = new WishlistApi(backendRequestServices);
 
 const useWishlist = () => {
-    return useMutation<GetWishlistsApiResponse,AxiosError>({
-        mutationFn: () => wishlistApi.GetWishlists(),
+    return useQuery<GetWishlistsApiResponse,AxiosError>({
+        queryKey:["wishlists"],
+        queryFn: () => wishlistApi.GetWishlists(),
     })
 };
 export default useWishlist;

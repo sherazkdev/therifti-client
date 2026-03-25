@@ -16,6 +16,7 @@ const MainLayout = () => {
         { pattern: /^\/profile/, variant: "solid" },
         { pattern: /^\/product/, variant: "solid" },
         { pattern: /^\/category/, variant: "overlay" },
+        { pattern: /^\/favourites/, variant: "solid" },
         { pattern: /^\/login/, variant: "solid" },
         { pattern: /^\/sell/, variant: "solid" },
         { pattern: /^\/inbox/, variant: "solid" },
@@ -23,7 +24,6 @@ const MainLayout = () => {
     ];
     
     const variant = headerVariants.find( (r) => r.pattern.test(router.pathname));
-    console.log(variant)
     return (
         <>
             <Header variant={variant?.variant} />

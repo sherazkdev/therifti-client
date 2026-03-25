@@ -16,6 +16,7 @@ const SingleCategory = lazy(() => import("./pages/SingleCategory/SingleCategory"
 const Chat = lazy(() => import("./pages/chat/Chat"));
 const ProductPage = lazy(() => import("./pages/SingleProduct/SingleProduct"));
 const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
+const FavouritePage = lazy( () => import("./pages/favourite/favourite"));
 const NotificationPage = lazy(() => import("./pages/Notification/Notification"));
 
 function App() {
@@ -52,6 +53,15 @@ function App() {
                 </ProtectRoute>
               }
            />
+
+          <Route 
+            path="/favourites" 
+              element={
+                <ProtectRoute>
+                  <FavouritePage />
+                </ProtectRoute>
+              } 
+          />
 
           <Route 
             path="/inbox" 

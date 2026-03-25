@@ -149,7 +149,7 @@ const TopBar = () => {
               <span className={styles.notificationDot}>1</span>
             </button>
 
-            <button className={styles.iconBtn}>
+            <button onClick={ () => navigate("/favourites")} className={styles.iconBtn}>
               <Heart size={18} />
             </button>
 

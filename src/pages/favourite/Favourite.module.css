@@ -1,0 +1,22 @@
+.wrapper {
+    padding: 28px 3%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+};
+
+/* Product grid */
+.grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    gap: 24px !important;
+    margin-top: 4px !important;
+}
+
+.mainHeader {
+    font-weight: 580;
+    font-size: 22px;
+    line-height: 28px;
+    color: #15191a;
+}

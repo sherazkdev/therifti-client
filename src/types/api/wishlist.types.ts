@@ -8,8 +8,12 @@ export interface WishlistDocument {
         coverImage:string,
         title:string,
         condition:ProductCondition,
-        price:number
-    }
+        price:number,
+        parcelSize:string,
+        brand:string
+    },
+    totalLikes:number,
+    isLiked:boolean
 };
 
 /** Note: Get Wishlists Api Response */
