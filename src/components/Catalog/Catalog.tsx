@@ -51,7 +51,7 @@ const Catalog = () => {
   const panelRef = useRef<HTMLDivElement | null>(null);
 
   const [searchParams] = useSearchParams();
-  const categoryFromURL = searchParams.get("category");
+  const categoryFromURL = searchParams.get("categoryId");
 
   
   // FIX 1: URL se aane wale '+' ko space main convert karna aur extra spaces hatana
@@ -346,7 +346,7 @@ const Catalog = () => {
           <ProductCard
             key={`${p._id}-${index}`}
             _id={p._id}
-            image={p.coverImage}
+            coverImage={p.coverImage}
             brand={p.brand}
             meta={p.title}
             price={p.price}

@@ -28,7 +28,7 @@
   font-weight: 500;
 }
 
-.productSection {
+.topContainer {
   display: flex;
   gap: 30px;
   margin-bottom: 60px;

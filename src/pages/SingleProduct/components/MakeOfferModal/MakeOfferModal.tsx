@@ -80,7 +80,7 @@ const MakeOfferModal: React.FC<Props> = ({ isOpen, onClose, product }) => {
         offerSource: selection,
       },
       {
-        onSuccess: (res) => {
+        onSuccess: (res:any) => {
           if (res?.success) {
             onClose();
           } else {

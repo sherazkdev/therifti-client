@@ -12,11 +12,10 @@ const Catalog = lazy(() => import("./pages/SingleCategory/SingleCategory"));
 const Home = lazy(() => import("./pages/Home/Home"));
 const LoginPage = lazy(() => import("./pages/auth/Auth"));
 const Sell = lazy(() => import("./pages/Sellnow/Sell"));
-const SingleCategory = lazy(() => import("./pages/SingleCategory/SingleCategory"));
 const Chat = lazy(() => import("./pages/chat/Chat"));
 const ProductPage = lazy(() => import("./pages/SingleProduct/SingleProduct"));
 const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
-const FavouritePage = lazy( () => import("./pages/favourite/favourite"));
+const FavouritePage = lazy( () => import("./pages/favourite/Favourite"));
 const NotificationPage = lazy(() => import("./pages/Notification/Notification"));
 
 function App() {
@@ -31,8 +30,6 @@ function App() {
           <Route path="/" element={<Home />} />
 
           <Route path="/login" element={<LoginPage />} />
-
-          <Route path="/category/:categoryId" element={<SingleCategory />} />
 
           <Route path="catalog" element={<Catalog />} />
 
