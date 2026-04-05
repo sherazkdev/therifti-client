@@ -28,26 +28,30 @@
   font-weight: 500;
 }
 
-.topContainer {
+.productSection {
   display: flex;
-  gap: 40px;
+  gap: 30px;
   margin-bottom: 60px;
 }
 
+/* Figma: gallery ~62%, product sidebar ~38% */
 .leftCol {
-  flex: 2;
-  min-width: 320px;
+  flex: 0 0 62%;
+  max-width: 70%;
+  min-width: 70%;
 }
 
 .rightCol {
-  flex: 1;
-  min-width: 320px;
+  flex: 1 1 38%;
+  min-width: 30%;
+  margin-left: auto;
 }
 
 .memberSection {
   display: flex;
   gap: 40px;
-  margin-bottom: 60px;
+
+  margin-top: 60px;
   align-items: flex-start;
 }
 
@@ -262,16 +266,35 @@
   }
 }
 
-@media (max-width: 850px) {
-  .topContainer, .memberSection {
+@media (max-width: 1024px) {
+  .topContainer {
     flex-direction: column;
-    align-items: center; /* Center the image gallery on mobile */
+    align-items: stretch;
   }
-  .leftCol, .rightCol, .memberLeft, .memberRight {
+
+  .leftCol,
+  .rightCol {
+    flex: 1 1 100%;
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 850px) {
+  .topContainer,
+  .memberSection {
+    flex-direction: column;
+    align-items: center;
+  }
+  .leftCol,
+  .rightCol,
+  .memberLeft,
+  .memberRight {
     width: 100%;
     min-width: unset;
   }
   .memberRight {
-    order: 2; /* Keep seller info below member items on mobile */
+    order: 2;
   }
 }

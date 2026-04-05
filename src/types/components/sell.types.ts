@@ -45,13 +45,19 @@ export interface CategoryDropDownPropsInterface  {
   handleCategoryOnChange:(category:CategoryDocument) => void
 };
 
+/** Note: Listing image uploader — uploads to cloud immediately; parent reads URLs for submit */
+export interface ListingImagesState {
+  readyUrls: string[];
+  uploading: boolean;
+  hasErrorSlot: boolean;
+}
+
 /** Note: Image Uploader Props Interface */
 export interface ImageUploaderPropsInterface {
-    images:File[],
-    showPhotoTips:boolean,
-    setShowPhotoTips:Dispatch<SetStateAction<boolean>>,
-    setImages:Dispatch<SetStateAction<File[]>>
-};
+  showPhotoTips: boolean;
+  setShowPhotoTips: Dispatch<SetStateAction<boolean>>;
+  onListingImagesStateChange: (state: ListingImagesState) => void;
+}
 
 /** Note: Item Attributes Props Interface */
 export interface ItemAttributesPropsInterface {

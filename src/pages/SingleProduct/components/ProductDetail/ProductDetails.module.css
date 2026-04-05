@@ -1,14 +1,314 @@
-.container {
+/* ——— Figma single-product sidebar ——— */
+.sidebarStack {
   display: flex;
   flex-direction: column;
+  gap: 20px;
   width: 100%;
-  /* Added Border and Padding for the framed look */
-  padding: 24px;
-  border: 1px solid #eaeaea;
-  border-radius: 6px;
-  background-color: #fff;
+  max-width: 440px;
 }
 
+@media (max-width: 1024px) {
+  .sidebarStack {
+    max-width: none;
+  }
+}
+
+.statusBar {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 6px;
+  letter-spacing: 0.02em;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 20px 20px 24px;
+}
+
+.quickLine {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 4px 0;
+}
+
+.brandLine {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 12px 0;
+}
+
+.titleFigma {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 16px 0;
+  color: #111;
+}
+
+.priceBlock {
+  margin-bottom: 14px;
+}
+
+.priceRowFigma {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.priceMain {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111;
+}
+
+.priceSecondary {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.protectionLink {
+  font-size: 14px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.protectionLink:hover {
+  text-decoration: underline;
+}
+
+.postagePill {
+  background: #ff2d2d;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  cursor: default;
+  font-family: inherit;
+}
+
+.infoTable {
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.infoRowFigma {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.infoLabel {
+  font-size: 14px;
+  color: #5a6566;
+  font-weight: 500;
+}
+
+.infoValueWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: right;
+}
+
+.infoValue {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  max-width: 200px;
+}
+
+.infoIconBtn {
+  border: none;
+  background: transparent;
+  padding: 4px;
+  color: #999;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.infoIconBtn:hover {
+  color: #111;
+  background: #f5f5f5;
+}
+
+.postageBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.postageLabel {
+  color: #555;
+}
+
+.postageAmount {
+  color: #111;
+}
+
+.checkoutPromoFigma {
+  background: #f5f5f5;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+}
+
+.checkoutPromoFigma p {
+  margin: 0 0 4px 0;
+  color: #111;
+}
+
+.promoIcon {
+  color: #777;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.outlineBtn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 6px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.outlineBtn:hover {
+  background: #fafafa;
+}
+
+.outlineBtnDanger {
+  width: 100%;
+  padding: 14px;
+  border-radius: 6px;
+  border: 1px solid #b42318;
+  background: #fff;
+  color: #b42318;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.outlineBtnDanger:hover {
+  background: #fff1f1;
+}
+
+.buyerProtectionBoxFigma {
+  background: #f9f9f9;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.buyerProtectionBoxFigma h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.buyerProtectionBoxFigma p {
+  margin: 10px 0 0 0;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.buyerProtectionBoxFigma a {
+  color: #111;
+  font-weight: 500;
+}
+
+.protectionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.protectionShield {
+  color: #007782;
+  flex-shrink: 0;
+}
+
+.sellerCardFigma {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+
+.sellerCardFigma:hover {
+  background: #fafafa;
+}
+
+.sellerCardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.sellerNameFigma {
+  font-weight: 600;
+  font-size: 16px;
+  color: #111;
+  display: block;
+}
+
+.sellerChevron {
+  color: #999;
+  flex-shrink: 0;
+}
+
+.sellerMetaCard {
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 16px 18px;
+  background: #fff;
+}
+
+/* legacy helpers still used */
 .title {
   font-size: 22px;
   font-weight: 580;
@@ -40,6 +340,33 @@
   font-size: 24px;
   font-weight: 700;
   color: #111;
+}
+
+.priceSub {
+  font-size: 14px;
+  color: #555;
+  margin: -6px 0 14px 0;
+}
+
+.descriptionBlock {
+  margin: 4px 0 18px;
+  padding-top: 16px;
+  border-top: 1px solid #eaeaea;
+}
+
+.descriptionHeading {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: #111;
+}
+
+.descriptionText {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #444;
+  margin: 0;
+  white-space: pre-wrap;
 }
 
 .protectionBanner {
@@ -138,11 +465,11 @@
   border: none; 
 }
 
-/* 2. Make an offer - Teal Theme from screenshot */
-.offerBtn { 
-  background: #fff; 
- color: #111; 
-  border: 1px solid #ccc; 
+/* 2. Make an offer — teal outline (reference UI) */
+.offerBtn {
+  background: #fff;
+  color: #007782;
+  border: 2px solid #007782;
 }
 
 /* 3. Ask Seller - Neutral Theme */
@@ -182,7 +509,7 @@
 .leftCol,
 .memberLeft {
   flex: 2;
-  min-width: 320px;
+  min-width: 1000px;
 }
 
 .rightCol {

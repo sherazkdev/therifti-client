@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import styles from "./SellItem.module.css";
 
@@ -11,7 +12,12 @@ import ItemAttributes from "./components/ItemAttributes/ItemAttributes";
 import PriceInput from "./components/PriceInput/PriceInput";
 
 /* Types */
-import type { SellFormValues, ProductStatus, ParcelSizeInterface } from "../../types/components/index";
+import type {
+  SellFormValues,
+  ProductStatus,
+  ParcelSizeInterface,
+  ListingImagesState,
+} from "../../types/components/index";
 import type { CategoryDocument, SizeDocument, MaterialDocument, BrandDocument  } from "../../types/api/index";
 /* Hooks */
 import useCreateProduct from "../../hooks/server/product/useCreateProduct";
@@ -21,6 +27,7 @@ import useCreateProduct from "../../hooks/server/product/useCreateProduct";
  * @description Form to create a new product listing with images, attributes and price
  */
 const SellItem = () => {
+  const navigate = useNavigate();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<SellFormValues>();
 
   const productMutation = useCreateProduct();
@@ -29,9 +36,27 @@ const SellItem = () => {
   // ======= STATE ============
   // ==========================
 
-  // Images
-  const [images, setImages] = useState<File[]>([]);
+  // Images (uploaded to cloud immediately via ImageUploader)
+  const [listingImages, setListingImages] = useState<ListingImagesState>({
+    readyUrls: [],
+    uploading: false,
+    hasErrorSlot: false,
+  });
   const [showPhotoTips, setShowPhotoTips] = useState(false);
+
+  const handleListingImagesStateChange = useCallback((state: ListingImagesState) => {
+    setListingImages((prev) => {
+      if (
+        prev.uploading === state.uploading &&
+        prev.hasErrorSlot === state.hasErrorSlot &&
+        prev.readyUrls.length === state.readyUrls.length &&
+        prev.readyUrls.every((u, i) => u === state.readyUrls[i])
+      ) {
+        return prev;
+      }
+      return state;
+    });
+  }, []);
 
   // Category / Brand / Attributes
   const [categoryId, setCategoryId] = useState<string | null>(null);
@@ -68,7 +93,13 @@ const SellItem = () => {
   const onSubmit = async (data: SellFormValues, status: ProductStatus) => {
     const errors: Record<string, string> = {};
 
-    if (!images.length) errors.images = "At least 1 image is required (max 4).";
+    if (listingImages.uploading) {
+      errors.images = "Please wait for your images to finish uploading.";
+    } else if (listingImages.hasErrorSlot) {
+      errors.images = "Remove images that failed to upload before continuing.";
+    } else if (!listingImages.readyUrls.length) {
+      errors.images = "At least 1 image is required (max 4).";
+    }
     if (!categoryId) errors.category = "Category is required";
     if (!selectedBrand) errors.brand = "Brand is required";
     if (!selectedSizes.length) errors.sizes = "Size is required";
@@ -92,7 +123,16 @@ const SellItem = () => {
       status,
     };
 
-    productMutation.mutate({images,product:payload});
+    productMutation.mutate(
+      { imageUrls: listingImages.readyUrls, product: payload },
+      {
+        onSuccess: (res) => {
+          if (res?.success) {
+            navigate("/");
+          }
+        },
+      }
+    );
   };
 
   const submitWithStatus = (status: ProductStatus) =>
@@ -104,17 +144,20 @@ const SellItem = () => {
 
   return (
     <>
-      {productMutation.isPending && (<div className={styles.loaderMain}> <div className="mediumLoader"></div> </div>)}
+      {productMutation.isPending && (
+        <div className={styles.loaderMain}>
+          <div className="mediumLoader"></div>
+        </div>
+      )}
 
       <div className={styles.container}>
         <h2 className={styles.title}>Sell an Item</h2>
 
         {/* IMAGE UPLOADER */}
         <ImageUploader
-          images={images}
-          setImages={setImages}
           showPhotoTips={showPhotoTips}
           setShowPhotoTips={setShowPhotoTips}
+          onListingImagesStateChange={handleListingImagesStateChange}
         />
         {fieldErrors.images && <div className={styles.imageErrorOutside}>{fieldErrors.images}</div>}
 
@@ -190,8 +233,22 @@ const SellItem = () => {
 
           {/* ACTION BUTTONS */}
           <div className={styles.actions}>
-            <button disabled={productMutation.isPending} type="button" className={styles.draftBtn} onClick={() => submitWithStatus("DRAFT")}>Save Draft</button>
-            <button disabled={productMutation.isPending} type="button" className={styles.submitBtn} onClick={() => submitWithStatus("PUBLISHED")}>Upload</button>
+            <button
+              disabled={productMutation.isPending || listingImages.uploading}
+              type="button"
+              className={styles.draftBtn}
+              onClick={() => submitWithStatus("DRAFT")}
+            >
+              Save Draft
+            </button>
+            <button
+              disabled={productMutation.isPending || listingImages.uploading}
+              type="button"
+              className={styles.submitBtn}
+              onClick={() => submitWithStatus("PUBLISHED")}
+            >
+              Upload
+            </button>
           </div>
         </form>
 

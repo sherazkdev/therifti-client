@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import ProductCard from '../../../../components/ProductCard/ProductCard';
+import { Link } from 'react-router-dom';
+import ProductCard from '../../../../components/productcard/ProductCard';
 import styles from './ProductGridSection.module.css';
 import type { OwnerProductAndSimilarProductsInterface } from '../../../../types/api';
 
@@ -7,11 +8,19 @@ interface Props {
   title: string;
   products: OwnerProductAndSimilarProductsInterface[];
   isLoading?: boolean;
-  showBundlesUI?: boolean; 
-  initialCount?: number; 
+  showBundlesUI?: boolean;
+  initialCount?: number;
+  viewAllHref?: string;
 }
 
-const ProductGridSection: React.FC<Props> = ({ title, products, isLoading, showBundlesUI, initialCount = 4 }) => {
+const ProductGridSection: React.FC<Props> = ({
+  title,
+  products,
+  isLoading,
+  showBundlesUI,
+  initialCount = 4,
+  viewAllHref,
+}) => {
   const [visibleCount, setVisibleCount] = useState(initialCount);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const handleSeeMore = () => { 
@@ -27,7 +36,11 @@ const ProductGridSection: React.FC<Props> = ({ title, products, isLoading, showB
     <section className={styles.sectionWrapper}>
       <div className={styles.header}>
         <h2 className={styles.title}>{title}</h2>
-        {/* Removed the View All button from here! */}
+        {viewAllHref ? (
+          <Link to={viewAllHref} className={styles.viewAll}>
+            View All
+          </Link>
+        ) : null}
       </div>
 
       {showBundlesUI && (

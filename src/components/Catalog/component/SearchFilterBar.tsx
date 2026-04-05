@@ -1,6 +1,7 @@
 import { type FC, type RefObject } from "react";
 import styles from "../Catalog.module.css"; 
-import { ChevronDown, ChevronLeft, Shirt } from "lucide-react";
+import { ChevronDown, ChevronLeft } from "lucide-react";
+import CategoryIcon from "../../CategoryIcon/CategoryIcon";
 import type { CategoryDocument } from "../../../types/api/category.types";
 import { CONDITION_OPTIONS } from "../../../data/condition";
 import { COLOR_OPTIONS } from "../../../data/color"; 
@@ -109,7 +110,9 @@ const SearchFilterBar: FC<SearchFilterBarProps> = ({
                       else applyCategorySelection(c._id); 
                     }}>
                     <span className={styles.menuLeft}>
-                      <span className={styles.iconBox}><Shirt size={16} /></span>
+                      <span className={styles.iconBox}>
+                        <CategoryIcon category={c} size={16} />
+                      </span>
                       <span className={styles.menuLabel}>{c.title}</span>
                     </span>
                     <span className={styles.menuRight}>{c.children?.length ? "›" : ""}</span>
@@ -136,7 +139,9 @@ const SearchFilterBar: FC<SearchFilterBarProps> = ({
                         {children.map((child: any) => (
                            <button key={child._id} className={styles.menuItem} type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); goIntoCategory(child._id); }}>
                              <span className={styles.menuLeft}>
-                                <span className={styles.iconBox}><Shirt size={16} /></span>
+                                <span className={styles.iconBox}>
+                                  <CategoryIcon category={child} size={16} />
+                                </span>
                                 <span className={styles.menuLabel}>{child.title}</span>
                              </span>
                              <span className={styles.menuRight}>›</span>

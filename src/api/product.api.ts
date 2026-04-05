@@ -1,6 +1,6 @@
 import type BackendRequestServices from "../services/backendRequest.services";
 
-import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, GetSingleProductApiResponseInterface, FeaturedProductApiResponse, SearchProductApiResponse, SearchProductsInterface, GetSuggestionApiResponse } from "../types/api/index";
+import type { ProductApiImplmentsInterface, CreateProductApiResponse, FeaturedProductsSortingInterface, GetSingleProductApiResponseInterface, FeaturedProductApiResponse, SearchProductApiResponse, SearchProductsInterface, GetSuggestionApiResponse, SendOfferPayload, SendOfferApiResponse } from "../types/api/index";
 
 /** 
  * Note: This Product Api Service Using for get all product, update product, creare product more than.
@@ -85,6 +85,15 @@ class ProductApi implements ProductApiImplmentsInterface {
         const response = await this.apiService.Get<GetSuggestionApiResponse>(`/products/get-suggestions/${q}`);
         return response;
     };
+
+    /**
+     * Submit a buyer offer (preset discount or custom amount).
+     * Adjust path if your backend uses a different route.
+     */
+    public async SendOffer(payload: SendOfferPayload): Promise<SendOfferApiResponse> {
+        const response = await this.apiService.Post<SendOfferApiResponse>("/products/send-offer", payload);
+        return response;
+    }
 }
 
 export default ProductApi;

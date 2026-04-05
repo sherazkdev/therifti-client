@@ -16,6 +16,18 @@
   margin: 0;
 }
 
+.viewAll {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.viewAll:hover {
+  color: #555;
+}
+
 
 
 .bundleBanner {

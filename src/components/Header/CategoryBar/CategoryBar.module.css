@@ -50,6 +50,12 @@
   white-space: nowrap;
 }
 
+.categoryItemInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .categoryItem:hover {
   opacity: 1;
 }

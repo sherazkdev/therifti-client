@@ -11,6 +11,7 @@ import type { CategoryDocument } from "../../../../types/api/index";
 import styles from "./CategoryDropdown.module.css";
 import { ChevronDown, ChevronLeft, ChevronRight, TextSelect } from "lucide-react";
 import { useUI } from "../../../../contexts/ui/ui.context";
+import CategoryIcon from "../../../CategoryIcon/CategoryIcon";
 
 const CategoryDropdown: FC<CategoryDropDownPropsInterface> = ({handleCategoryOnChange}) => {
 
@@ -135,7 +136,9 @@ const CategoryDropdown: FC<CategoryDropDownPropsInterface> = ({handleCategoryOnC
               onClick={() => handleSelect(item)}
             >
               <div className={styles.left}>
-                <span className={styles.iconBox}>⬚</span>
+                <span className={styles.iconBox}>
+                  <CategoryIcon category={item} size={16} />
+                </span>
                 {item.title}
               </div>
 

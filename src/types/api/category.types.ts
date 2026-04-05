@@ -4,7 +4,8 @@ export interface CategoryDocument {
   _id: string,
   title: string,
   image: string,
-  icon?: any,
+  /** Lucide React export name, e.g. "Shirt" — see DynamicIcon */
+  icon?: string | null,
   children?: CategoryDocument[]
 };
 

@@ -4,7 +4,7 @@ import MegaMenu from "../MegaMenu/MegaMenu";
 import { MapPin, Globe } from "lucide-react";
 import type { CategoryDocument } from "../../../types/api";
 import type { CategoryPropsInterface } from "../../../types/components";
-import { useNavigate } from "react-router-dom";
+import CategoryIcon from "../../CategoryIcon/CategoryIcon";
 
 const CategoryBar: React.FC<CategoryPropsInterface> = ({
   categories,
@@ -12,7 +12,6 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
   onCategoryClick
 }) => {
   const [active, setActive] = useState<CategoryDocument | null>(null);
-  const navigate = useNavigate(); // ADD
 
   return (
     <nav
@@ -30,7 +29,10 @@ const CategoryBar: React.FC<CategoryPropsInterface> = ({
             onMouseEnter={() => setActive(cat)}
             onClick={() => onCategoryClick(cat._id)}
           >
-            {cat.title}
+            <span className={styles.categoryItemInner}>
+              <CategoryIcon category={cat} size={18} />
+              {cat.title}
+            </span>
           </li>
         ))}
       </ul>

@@ -3,7 +3,7 @@ import styles from "./MegaMenu.module.css";
 import * as Icons from "lucide-react";
 import { type CategoryDocument } from "../../../types/api";
 import type { MegaMenuPropsInterface } from "../../../types/components";
-import DynamicIcon from "../../DynamicIcon/DynamicIcon";
+import CategoryIcon from "../../CategoryIcon/CategoryIcon";
 
 const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
   const [activeChild, setActiveChild] = useState<CategoryDocument | null>(
@@ -37,7 +37,7 @@ const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
               onClick={() => onCategoryClick(child._id)}   
             >
               <div className={styles.leftItem}>
-                <DynamicIcon iconName={child.icon} />
+                <CategoryIcon category={child} size={18} />
                 <span>{child.title}</span>
               </div>
               <Icons.ChevronRight size={16} />

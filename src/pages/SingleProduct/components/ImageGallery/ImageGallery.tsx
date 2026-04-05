@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Heart, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import styles from './ImageGallery.module.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { Heart, ChevronLeft, ChevronRight, X } from "lucide-react";
+import styles from "./ImageGallery.module.css";
 
 interface Props {
   images: string[];
@@ -8,44 +8,98 @@ interface Props {
   isLiked?: boolean;
   onToggleLike?: () => void;
   isLoading?: boolean;
-  coverImage:string
+  coverImage: string;
 }
 
-const ImageGallery: React.FC<Props> = ({ images, likesCount = 0, isLiked = false, onToggleLike, coverImage}) => {
-  const [mainImage, setMainImage] = useState<string>(coverImage);
+function buildGalleryUrls(coverImage: string | undefined, images: string[] | undefined): string[] {
+  const out: string[] = [];
+  const add = (u: string | undefined) => {
+    const s = typeof u === "string" ? u.trim() : "";
+    if (s && !out.includes(s)) out.push(s);
+  };
+  add(coverImage);
+  for (const u of images ?? []) add(u);
+  return out;
+}
+
+const ImageGallery: React.FC<Props> = ({
+  images,
+  likesCount = 0,
+  isLiked = false,
+  onToggleLike,
+  coverImage,
+}) => {
+  const galleryUrls = useMemo(
+    () => buildGalleryUrls(coverImage, images),
+    [coverImage, images]
+  );
+
+  const [mainImage, setMainImage] = useState<string>(() => galleryUrls[0] ?? "");
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // --- THE REAL CONTENT ---
+  useEffect(() => {
+    if (!galleryUrls.length) {
+      setMainImage("");
+      return;
+    }
+    setMainImage((prev) => (prev && galleryUrls.includes(prev) ? prev : galleryUrls[0]));
+  }, [galleryUrls]);
+
+  const openLightbox = () => {
+    const idx = galleryUrls.indexOf(mainImage);
+    setCurrentIndex(idx >= 0 ? idx : 0);
+    setIsLightboxOpen(true);
+  };
+
+  const slidePrev = () => {
+    if (!galleryUrls.length) return;
+    setCurrentIndex((i) => (i === 0 ? galleryUrls.length - 1 : i - 1));
+  };
+
+  const slideNext = () => {
+    if (!galleryUrls.length) return;
+    setCurrentIndex((i) => (i === galleryUrls.length - 1 ? 0 : i + 1));
+  };
+
+  const safeIndex = galleryUrls.length ? currentIndex % galleryUrls.length : 0;
+  const lightboxSrc = galleryUrls[safeIndex];
+
+  if (!galleryUrls.length) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.mainImageWrapper}>
+          <div className={styles.noImage}>No images</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className={styles.container}>
-        {/* Left: Thumbnails */}
         <div className={styles.thumbnailList}>
-          {images.map((img, idx) => (
+          {galleryUrls.map((img, idx) => (
             <button
-              key={idx}
-              className={`${styles.thumbnailBtn} ${mainImage === img ? styles.active : ''}`}
+              key={`${img}-${idx}`}
+              type="button"
+              className={`${styles.thumbnailBtn} ${mainImage === img ? styles.active : ""}`}
               onClick={() => setMainImage(img)}
             >
-              <img src={img} alt={`Thumbnail ${idx}`} className={styles.thumbnailImg} />
+              <img src={img} alt="" className={styles.thumbnailImg} />
             </button>
           ))}
         </div>
 
-        {/* Right: Main Image */}
-        <div className={styles.mainImageWrapper} onClick={() => {
-          setCurrentIndex(images.indexOf(mainImage as string));
-          setIsLightboxOpen(true);
-        }}>
-          <img src={mainImage as string} alt="Main Product" className={styles.mainImage} />
-          
-          {/* Floating Like Button */}
-          <button 
-            className={styles.likeBtn} 
+        <div className={styles.mainImageWrapper} onClick={openLightbox}>
+          <img src={mainImage} alt="" className={styles.mainImage} />
+
+          <button
+            type="button"
+            className={styles.likeBtn}
             onClick={(e) => {
-              e.stopPropagation(); // Prevents opening the lightbox when clicking "Like"
-              if (onToggleLike) onToggleLike();
+              e.stopPropagation();
+              onToggleLike?.();
             }}
           >
             <Heart size={16} fill={isLiked ? "black" : "none"} color={isLiked ? "black" : "gray"} />
@@ -54,21 +108,20 @@ const ImageGallery: React.FC<Props> = ({ images, likesCount = 0, isLiked = false
         </div>
       </div>
 
-      {/* Fullscreen Lightbox Modal */}
-      {isLightboxOpen && (
+      {isLightboxOpen && lightboxSrc && (
         <div className={styles.lightboxOverlay} onClick={() => setIsLightboxOpen(false)}>
           <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closeBtn} onClick={() => setIsLightboxOpen(false)}>
+            <button type="button" className={styles.closeBtn} onClick={() => setIsLightboxOpen(false)}>
               <X size={24} color="white" />
             </button>
-            
-            <button className={`${styles.navBtn} ${styles.left}`} onClick={() => setCurrentIndex(currentIndex === 0 ? images.length - 1 : currentIndex - 1)}>
+
+            <button type="button" className={`${styles.navBtn} ${styles.left}`} onClick={slidePrev}>
               <ChevronLeft size={32} color="white" />
             </button>
 
-            <img src={images[currentIndex]} alt={`Gallery ${currentIndex}`} className={styles.lightboxImg} />
+            <img src={lightboxSrc} alt="" className={styles.lightboxImg} />
 
-            <button className={`${styles.navBtn} ${styles.right}`} onClick={() => setCurrentIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1)}>
+            <button type="button" className={`${styles.navBtn} ${styles.right}`} onClick={slideNext}>
               <ChevronRight size={32} color="white" />
             </button>
           </div>

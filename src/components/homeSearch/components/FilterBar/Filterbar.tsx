@@ -1,6 +1,7 @@
 import { type FC, useRef } from "react";
 import styles from "../../TopPicks.module.css";
-import { ChevronDown, ChevronLeft, Shirt } from "lucide-react";
+import { ChevronDown, ChevronLeft } from "lucide-react";
+import CategoryIcon from "../../../CategoryIcon/CategoryIcon";
 
 /** Hooks */
 import useSizesByCategory from "../../../../hooks/server/size/useSizesByCategory";
@@ -95,7 +96,7 @@ const FilterBar: FC<TopPicksFiltersPropsInterface> = ({
                   >
                     <span className={styles.menuLeft}>
                       <span className={styles.iconBox}>
-                        <Shirt size={16} />
+                        <CategoryIcon category={c} size={16} />
                       </span>
                       <span className={styles.menuLabel}>{c.title}</span>
                     </span>
@@ -169,7 +170,7 @@ const FilterBar: FC<TopPicksFiltersPropsInterface> = ({
 
                             <span className={styles.menuLeft}>
                               <span className={styles.iconBox}>
-                                <Shirt size={16} />
+                                <CategoryIcon category={child} size={16} />
                               </span>
                               <span className={styles.menuLabel}>{child.title}</span>
                             </span>

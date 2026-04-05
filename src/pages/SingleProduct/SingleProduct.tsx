@@ -24,48 +24,57 @@ const ProductPage: React.FC = () => {
     }
   },[params])
 
-  useEffect( () => {
-    if(data?.success === true && data){
-      console.log(data.data)
+  useEffect(() => {
+    if (data?.success === true && data) {
       setSingleProduct(data.data);
     }
-  },[data])
+  }, [data]);
 
   return (
       <>
       {isPending ? <SingleProductSkeleton /> : singleProduct && (
         <div className={styles.pageWrapper}>
           <nav className={styles.breadcrumb}>
-            <Link to='/'>Home</Link> / 
-            {singleProduct?.categoryTree.map( (tree) => (
-              <>
-                <Link key={tree._id} to={`/category/${tree._id}`}> {tree.title} </Link> / 
-              </>
+            <Link to="/">Home</Link>
+            {" / "}
+            {singleProduct?.categoryTree.map((tree) => (
+              <span key={tree._id}>
+                <Link to={`/category/${tree._id}`}>{tree.title}</Link>
+                {" / "}
+              </span>
             ))}
-            <span> {singleProduct?.title}</span>
+            <span>{singleProduct?.title}</span>
           </nav>
 
           <div className={styles.topContainer}>
+            
             <div className={styles.leftCol}>
               <ImageGallery coverImage={singleProduct?.coverImage as string} images={singleProduct?.images as []} likesCount={singleProduct?.totalLikes} />
+              
+              <section className={styles.memberSection}>
+                  <div className={styles.memberLeft}>
+                    
+                  {singleProduct && singleProduct.ownerProducts && (
+                    <ProductGridSection title={`Member's items (${singleProduct?.ownerProducts?.length})`} products={singleProduct && singleProduct?.ownerProducts} showBundlesUI={true}  />
+                  )}
+              </div>
+              </section>
             </div>
+            
             <div className={styles.rightCol}>
               <ProductDetails product={singleProduct as GetSingleProductResponseInterface} />
             </div>
           </div>
 
-          <section className={styles.memberSection}>
-            <div className={styles.memberLeft}>
-              
-            {singleProduct && singleProduct.ownerProducts && (
-              <ProductGridSection title={`Member's items (${singleProduct?.ownerProducts?.length})`} products={singleProduct && singleProduct?.ownerProducts} showBundlesUI={true}  />
-            )}
-            </div>
-          </section>
-
           <div className={styles.recommendedSection}>
             {singleProduct && singleProduct.similarProducts && (
-              <ProductGridSection title="Recommended Products" products={singleProduct.similarProducts} isLoading={isPending} initialCount={10}/>
+              <ProductGridSection
+                title="Recommended Products"
+                products={singleProduct.similarProducts}
+                isLoading={isPending}
+                initialCount={8}
+                viewAllHref="/catalog"
+              />
             )}
           </div>
         </div>
