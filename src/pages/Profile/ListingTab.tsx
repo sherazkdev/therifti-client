@@ -2,19 +2,20 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Shirt } from "lucide-react";
 import styles from "./ListingTab.module.css";
-import { categories } from "../../data/categories";
 import { useListingFilters } from "../../hooks/server/ProfileFilter/useListingFilters";
 import type { CategoryDocument } from "../../types/api/category.types";
 import type { Product } from "./types";
 import type { ProductSort } from "../../types/api/product.types";
 import type { Drop } from "../../types/components/listingDrop";  
 import { SORT_OPTIONS } from "../../data/sort";
+import { useUI } from "../../contexts/ui/ui.context";
 
 interface Props {
   products: Product[];
 }
 
 const ListingTab: React.FC<Props> = ({ products }) => {
+  const {categories} = useUI();
   const { buildPayload, handleCategoryChange, handleSortChange } =  useListingFilters();
 
   const [open, setOpen] = useState<Drop>(null);

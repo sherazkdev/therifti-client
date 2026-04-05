@@ -7,6 +7,7 @@ import "./styles/globals.css";
 import { AuthProvider } from "./contexts/auth/auth.provider";
 
 import SocketProvider from "./contexts/sockets/socket.provider";
+import { UIProvider } from "./contexts/ui/ui.provider";
 
 /** Note: Created Client. */
 const queryClient = new QueryClient();
@@ -17,7 +18,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter>
         <AuthProvider>
           <SocketProvider>
-            <App />
+            <UIProvider>
+              <App />
+            </UIProvider>
           </SocketProvider>
         </AuthProvider>
       </BrowserRouter>

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import styles from "./MegaMenu.module.css";
-import { ChevronRight, LayoutGrid } from "lucide-react";
+import * as Icons from "lucide-react";
 import { type CategoryDocument } from "../../../types/api";
 import type { MegaMenuPropsInterface } from "../../../types/components";
+import DynamicIcon from "../../DynamicIcon/DynamicIcon";
 
 const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
   const [activeChild, setActiveChild] = useState<CategoryDocument | null>(
@@ -20,13 +21,12 @@ const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
           onMouseEnter={() => setActiveChild(null)}
           onClick={() => onCategoryClick(category._id)}
         >
-          <LayoutGrid size={18} />
+          <Icons.LayoutGrid size={18} />
           <span>See all</span>
         </div>
 
         {/* SECOND LEVEL */}
         {category.children?.map((child) => {
-          const Icon = child.icon;
 
           return (
             <div
@@ -37,10 +37,10 @@ const MegaMenu = ({ category, onCategoryClick }: MegaMenuPropsInterface) => {
               onClick={() => onCategoryClick(child._id)}   
             >
               <div className={styles.leftItem}>
-                {Icon && <Icon size={18} />}
+                <DynamicIcon iconName={child.icon} />
                 <span>{child.title}</span>
               </div>
-              <ChevronRight size={16} />
+              <Icons.ChevronRight size={16} />
             </div>
           );
         })}

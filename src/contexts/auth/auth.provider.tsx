@@ -5,7 +5,6 @@ import { AuthContext } from "./auth.context";
 import type { UserDocumentInterface } from "../../types/api";
 import useUser from "../../hooks/server/auth/useUser";
 import { AxiosError } from "axios";
-import Loader from "../../components/UI/Loader/Loader";
 
 export const AuthProvider = ({ children }:{children:ReactNode}) => {
   const [user, setUser] = useState<UserDocumentInterface | null>(null);
@@ -18,7 +17,7 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
   };
 
   /** Note: Check User is Authenticated */
-  const { data, refetch, isLoading} = useUser();
+  const { data, refetch} = useUser();
 
   useEffect( () => {
     const handleFetchAuthenticatedUser = async ():Promise<void> => {

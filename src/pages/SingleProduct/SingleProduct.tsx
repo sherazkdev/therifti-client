@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Star, Truck, MapPin, Clock } from 'lucide-react'; // <-- Premium Icons imported here
 import ImageGallery from './components/ImageGallery/ImageGallery';
 import ProductDetails from "./components/ProductDetail/ProductDetails"
 import ProductGridSection from './components/ProductGrid/ProductGridSection';
@@ -15,8 +14,7 @@ import SingleProductSkeleton from './components/SingleProductSkeleton/SingleProd
 const ProductPage: React.FC = () => {
 
   const [singleProduct, setSingleProduct] = useState<GetSingleProductResponseInterface | null>(null);
-  let isPending = false;
-  const { data, mutate} = useSingleProduct();
+  const { data, mutate, isPending} = useSingleProduct();
   const params = useParams();
 
   useEffect( () => {

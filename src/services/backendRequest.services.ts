@@ -76,7 +76,7 @@ class BackendRequestServices {
     public async Get<T>(url: string, params?: any): Promise<T> {
         const response: AxiosResponse<T> = await this.api.get(url, { params });
         return response.data;
-    }
+    };
 
     /**
      * Note: Sends a POST request to the specified URL with a request body.

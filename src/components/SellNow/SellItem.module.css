@@ -6,6 +6,18 @@
    - CKEditor global styles included
 ================================== */
 
+.loaderMain {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  inset: 0;
+  z-index: 9999;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
 /* ================================
    LAYOUT
 ================================== */
@@ -13,6 +25,7 @@
   max-width: 1240px;
   margin: 40px auto;
   padding: 0 32px;
+  position: relative;
 }
 
 .title {

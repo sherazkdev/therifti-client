@@ -1,17 +1,19 @@
 import TopBar from "./TopBar/TopBar";
 import CategoryBar from "./CategoryBar/CategoryBar";
 import styles from "./TopBar/Topbar.module.css";
-import { categories } from "../../data/categories";
+
 import type { CategoryDocument } from "../../types/api";
 import { useNavigate } from "react-router-dom";
 import type { HeaderPropsInterface } from "../../types/components/header.types";
+
+import { useUI } from "../../contexts/ui/ui.context";
 
 const Header = ({
   variant = "overlay"
 }: HeaderPropsInterface) => {
 
   const Redirect = useNavigate();
-
+  const {categories} = useUI();
 
   const handleCategoryClick = (categoryId: string) => {
     Redirect(`/catalog?categoryId=${categoryId}`);

@@ -104,6 +104,8 @@ const SellItem = () => {
 
   return (
     <>
+      {productMutation.isPending && (<div className={styles.loaderMain}> <div className="mediumLoader"></div> </div>)}
+
       <div className={styles.container}>
         <h2 className={styles.title}>Sell an Item</h2>
 

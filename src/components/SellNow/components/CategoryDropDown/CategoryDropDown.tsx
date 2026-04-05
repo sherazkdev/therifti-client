@@ -5,13 +5,16 @@ import type {CategoryDropDownPropsInterface} from "../../../../types/components/
 import type { CategoryDocument } from "../../../../types/api/index";
 
 /** Categories dummy data */
-import { categories } from "../../../../data/categories";
+
 
 /** Styles */
 import styles from "./CategoryDropdown.module.css";
 import { ChevronDown, ChevronLeft, ChevronRight, TextSelect } from "lucide-react";
+import { useUI } from "../../../../contexts/ui/ui.context";
 
 const CategoryDropdown: FC<CategoryDropDownPropsInterface> = ({handleCategoryOnChange}) => {
+
+  const {categories} = useUI();
   
   const ref = useRef<HTMLDivElement>(null);
 

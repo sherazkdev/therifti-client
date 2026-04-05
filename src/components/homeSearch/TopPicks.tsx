@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import styles from "./TopPicks.module.css";
 import ProductCard from "../productcard/ProductCard";
-import { categories } from "../../data/categories";
+import { useUI } from "../../contexts/ui/ui.context";
 import FilterBar from "./components/FilterBar/Filterbar";
 
 /** Constants */
@@ -40,6 +40,7 @@ function buildCategoryLabel(tree: CategoryDocument[], stack: string[]) {
 }
 
 const TopPicks = () => {
+  const {categories} = useUI();
   const [open, setOpen] = useState<Drop>(null);
   const [categoryTree] = useState<CategoryDocument[]>(categories);
 

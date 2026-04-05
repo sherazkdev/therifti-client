@@ -17,11 +17,11 @@ class FollowApi {
      * It allows the current user to follow a specific seller 
      * to receive updates or communications related to that seller.
      *
-     * @param  {string} followerId - The ID of the seller to follow
+     * @param  {string} followingId - The ID of the seller to follow
      * @returns {Promise<FollowSellerApiResponse>} A confirmation that the follow action was successful.
     */
-    public async FollowSeller(followerId:string):Promise<FollowSellerApiResponse>{
-        const response = await this.backendRequestServices.Post<FollowSellerApiResponse>("/follows/follow-seller",{followerId});
+    public async FollowSeller(followingId:string):Promise<FollowSellerApiResponse>{
+        const response = await this.backendRequestServices.Post<FollowSellerApiResponse>("/follows/follow-seller",{followingId});
         return response;
     };
 
@@ -32,11 +32,11 @@ class FollowApi {
      * It allows the current user to stop following a specific seller
      * and stop receiving updates or communications from that seller.
      *
-     * @param  {string} followerId - The ID of the seller to unfollow
+     * @param  {string} followingId - The ID of the seller to unfollow
      * @returns {Promise<UnfollowSellerApiResponse>} A confirmation that the unfollow action was successful.
     */
-    public async UnfollowSeller(followerId: string):Promise<UnfollowSellerApiResponse> {
-        const response = await this.backendRequestServices.Delete<UnfollowSellerApiResponse>(`/follows/unfollow-seller/${followerId}`);
+    public async UnfollowSeller(followingId: string):Promise<UnfollowSellerApiResponse> {
+        const response = await this.backendRequestServices.Delete<UnfollowSellerApiResponse>(`/follows/unfollow-seller/${followingId}`);
         return response;
     };
 

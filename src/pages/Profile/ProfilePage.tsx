@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Profile.module.css";
 import type  { UserProfile } from "./types";
 
@@ -8,10 +8,16 @@ import { mockProfileData } from "./mockData";
 import ProfileHeader from "./ProfileHeader";
 import ListingTab from "./ListingTab";
 import ReviewsTab from "./ReviewsTab";
+import { useParams } from "react-router-dom";
 
 const ProfilePage: React.FC = () => {
+
+  const {userId} = useParams();
+
+  useEffect( () => {},[userId])
+
   //  State mein ab humne mock data pass kar diya hai
-  const [profile, setProfile] = useState<UserProfile>(mockProfileData);
+  const [profile, _y] = useState<UserProfile>(mockProfileData);
   const [activeTab, setActiveTab] = useState<"listing" | "reviews">("listing");
 
   // Since data is hardcoded, loading spinner ki zaroorat nahi

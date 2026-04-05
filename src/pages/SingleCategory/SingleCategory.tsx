@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
-import { categories } from "../../data/categories";
+import { useUI } from "../../contexts/ui/ui.context";
 import Hero from "../../components/Hero/Hero";
-import Search from "../../components/Catalog/Catalog.tsx";
+import { Search } from "lucide-react";
 
 const SingleCategory = () => {
+  const {categories} = useUI();
   const { categoryId } = useParams();
 
   let parentName: string | null = null;

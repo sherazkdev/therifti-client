@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import styles from "./Catalog.module.css"; 
 import ProductCard from "../productcard/ProductCard";
-import { categories } from "../../data/categories";
 import SearchFilterBar from "./component/SearchFilterBar";
 import type { CategoryDocument } from "../../types/api/category.types";
 import type { Drop } from "../../types/components/dropdown.types";
@@ -13,6 +12,7 @@ import type {
 } from "../../types/api/product.types";
 
 import useSearchProducts from "../../hooks/server/product/useSearchProducts"; 
+import { useUI } from "../../contexts/ui/ui.context";
 
 const PAGE_SIZE = 1; 
 
@@ -44,6 +44,8 @@ function buildCategoryLabel(tree: CategoryDocument[], stack: string[]) {
 
 
 const Catalog = () => {
+  
+  const {categories} = useUI();
   const [open, setOpen] = useState<Drop>(null);
   const [categoryTree] = useState<CategoryDocument[]>(categories);
   const panelRef = useRef<HTMLDivElement | null>(null);

@@ -1,56 +1,101 @@
-import React from 'react';
-import ProductCardSkeleton from '../../../../components/Skeletons/ProductCardSkeleton/ProductCardSkeleton';
-
-/** Styles */
 import styles from "./SingleProductSkeleton.module.css";
 
-const SingleProductSkeleton:React.FC = () => {
+const SingleProductSkeleton = () => {
+  return (
+    <div className={styles.pageWrapper}>
+      
+      {/* breadcrumb */}
+      <div className={`${styles.skeletonPulse} ${styles.breadcrumb}`} />
 
-    return (
-        <div id="singleProductSkeleton">
-            
-            <div className={styles.topContainer}>
-                {/* Image Gallery Skeleton */}
-                <div className={styles.container}>
-                    {/* Fake Thumbnails */}
-                    <div className={styles.thumbnailListSkeleton}>
-                        <div className={`${styles.skeletonPulse} ${styles.skeletonThumb}`} />
-                        <div className={`${styles.skeletonPulse} ${styles.skeletonThumb}`} />
-                        <div className={`${styles.skeletonPulse} ${styles.skeletonThumb}`} />
-                    </div>
-                    
-                    {/* Fake Main Image (Holds the 3/4 aspect ratio!) */}
-                    <div className={`${styles.mainImageSkeleton} ${styles.skeletonPulse}`} />
-                </div>
+      {/* TOP */}
+      <div className={styles.topContainer}>
 
-                {/* Product Details Skeletons */}
-                <div className={styles.productDetailContainer}>
-                    <div className={`${styles.skeletonPulse} ${styles.skelTitle}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelSubtitle}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelPrice}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelBanner}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelBadge}`} />
-                    
-                    <div className={styles.skelGrid}>
-                    <div className={`${styles.skeletonPulse} ${styles.skelRow}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelRow}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelRow}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelRow}`} />
-                    </div>
+        {/* LEFT IMAGE */}
+        <div className={styles.leftCol}>
 
-                    <div className={`${styles.skeletonPulse} ${styles.skelBox}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelPromo}`} />
-                    
-                    <div className={styles.skelButtons}>
-                    <div className={`${styles.skeletonPulse} ${styles.skelBtn}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelBtn}`} />
-                    <div className={`${styles.skeletonPulse} ${styles.skelBtn}`} />
-                    </div>
-                </div>
+          <div className={styles.gallery}>
+
+            <div className={styles.thumbList}>
+              {[1,2,3].map(i => (
+                <div key={i} className={`${styles.skeletonPulse} ${styles.thumb}`} />
+              ))}
             </div>
 
+            <div className={`${styles.skeletonPulse} ${styles.mainImg}`} />
+
+          </div>
+
         </div>
-    )
-}
+
+
+        {/* RIGHT DETAILS */}
+        <div className={styles.rightCol}>
+
+          <div className={`${styles.skeletonPulse} ${styles.title}`} />
+          <div className={`${styles.skeletonPulse} ${styles.row}`} />
+          <div className={`${styles.skeletonPulse} ${styles.price}`} />
+
+          <div className={`${styles.skeletonPulse} ${styles.box}`} />
+
+          <div className={styles.infoGrid}>
+            {[1,2,3,4].map(i => (
+              <div key={i} className={`${styles.skeletonPulse} ${styles.row}`} />
+            ))}
+          </div>
+
+          <div className={`${styles.skeletonPulse} ${styles.btn}`} />
+          <div className={`${styles.skeletonPulse} ${styles.btn}`} />
+          <div className={`${styles.skeletonPulse} ${styles.btn}`} />
+
+        </div>
+
+      </div>
+
+
+      {/* SELLER CARD */}
+      <div className={styles.sellerCard}>
+
+        <div className={`${styles.skeletonPulse} ${styles.avatar}`} />
+
+        <div className={styles.sellerText}>
+          <div className={`${styles.skeletonPulse} ${styles.row}`} />
+          <div className={`${styles.skeletonPulse} ${styles.rowSmall}`} />
+        </div>
+
+        <div className={`${styles.skeletonPulse} ${styles.followBtn}`} />
+
+      </div>
+
+
+      {/* MEMBER ITEMS */}
+      <div className={styles.section}>
+
+        <div className={`${styles.skeletonPulse} ${styles.sectionTitle}`} />
+
+        <div className={styles.grid}>
+          {[1,2,3,4].map(i => (
+            <div key={i} className={`${styles.skeletonPulse} ${styles.card}`} />
+          ))}
+        </div>
+
+      </div>
+
+
+      {/* RECOMMENDED */}
+      <div className={styles.section}>
+
+        <div className={`${styles.skeletonPulse} ${styles.sectionTitle}`} />
+
+        <div className={styles.grid}>
+          {[1,2,3,4].map(i => (
+            <div key={i} className={`${styles.skeletonPulse} ${styles.card}`} />
+          ))}
+        </div>
+
+      </div>
+
+    </div>
+  );
+};
 
 export default SingleProductSkeleton;
