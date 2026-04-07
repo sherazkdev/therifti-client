@@ -118,6 +118,17 @@ class BackendRequestServices {
         const response: AxiosResponse<T> = await this.api.delete(url);
         return response.data;
     }
+
+    // Note: Sends a GET request to an external URL without using the base API.
+    public async ExternalGet<T>(url: string): Promise<T> {
+        const response: AxiosResponse<T> = await axios.get(url);
+        return response.data;
+    }
+    // Note: Sends a POST request to an external URL without using the base API.
+    public async ExternalPost<T>(url: string, body?: any): Promise<T> {
+        const response: AxiosResponse<T> = await axios.post(url, body);
+        return response.data;
+    }
 }
 
 export default BackendRequestServices;
