@@ -36,8 +36,8 @@ const CoverzationDetails:React.FC<CoverzationDetailsPropsInterface> = ({handleTo
                 <li id='product-ref' className={styles.productRefLi}>
                     <Link to={"/"} className={styles.productRef}>
                         <div className={styles.productRefImage}>
-                            <img src={selectedChat?.productRef.coverImage} loading='lazy' />
-                            <span>{selectedChat?.productRef.title}</span>
+                            <img src={selectedChat?.product.coverImage} loading='lazy' />
+                            <span>{selectedChat?.product.title}</span>
                         </div>
                         
                         <div className={styles.angleRightSection}>

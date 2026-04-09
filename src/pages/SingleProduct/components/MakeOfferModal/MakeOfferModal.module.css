@@ -138,7 +138,7 @@
 .presetPrice {
   display: block;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 580;
   color: #111;
   margin-bottom: 4px;
 }
@@ -153,7 +153,7 @@
 .presetSub {
   display: block;
   font-size: 12px;
-  color: #2563eb;
+  color: #007782;
   margin-top: 2px;
 }
 

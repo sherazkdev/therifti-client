@@ -11,11 +11,13 @@ import { PlusIcon, SendHorizontalIcon } from 'lucide-react';
 import { useForm } from "react-hook-form";
 
 const ChatWindowFooter:React.FC<ChatWindowFooterPropsInterface> = ({handleSendMessage}) => {
-    const { register, handleSubmit,getValues} = useForm<SendMessageFormInterface>();
+    const { register, handleSubmit,reset,setFocus} = useForm<SendMessageFormInterface>();
 
     /** Note: Handle On Submit Form Data. */
     const handleOnSubmitFormData = (data:SendMessageFormInterface) =>{
         handleSendMessage(data.content);
+        reset();
+        setFocus("content");
     }
     return (
         <footer className={styles.footer}>

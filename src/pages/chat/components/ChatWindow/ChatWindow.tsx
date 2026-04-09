@@ -87,7 +87,7 @@ const ChatWindow:FC<ChatWindowPropsInterface> = ({onBack,selectedChat, handleSet
                         {!isLoading && chatMessages  && (
                             <>
                                 <ChatWindowTopHeader handleDeleteChat={handleDeleteChat} onBack={onBack} selectedChat={selectedChat} handleToggleWindowSection={handleToggleWindowSection} />
-                                <ChatMessages chatMessages={chatMessages}/>
+                                <ChatMessages chatMessages={chatMessages} selectedChat={selectedChat} />
                                 <ChatWindowFooter handleSendMessage={handleSendMessage} />
                             </>
                         )}

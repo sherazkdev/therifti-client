@@ -5,10 +5,11 @@ import styles from "./ChatMessages.module.css";
 import type { ChatMessagePropsInterface, GroupedChatMessagesInterface } from './ChatMessages.types';
 import MessageBubble from './components/MessageBubble/MessageBubble';
 import type { MessageDocumentInterface } from '../../../../../../types/api';
+import OfferMessageBubble from './components/OfferMessageBubble/OfferMessageBubble';
 
 /** Types */
 
-const ChatMessages:React.FC<ChatMessagePropsInterface>  = ({chatMessages}) => {
+const ChatMessages:React.FC<ChatMessagePropsInterface>  = ({chatMessages, selectedChat}) => {
     const [groupedChatMessages,setGroupedChatMessages] = useState<GroupedChatMessagesInterface[] | null>(null);
     const messagesRef = useRef<HTMLDivElement | null>(null);
 
@@ -60,8 +61,8 @@ const ChatMessages:React.FC<ChatMessagePropsInterface>  = ({chatMessages}) => {
         if (messagesRef.current) {
             messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
         }
-    },[groupedChatMessages])
-
+    },[groupedChatMessages]);
+    
     return (
         <div id='chat-messages' className={styles.chatMessages} ref={messagesRef}>
             
@@ -73,7 +74,10 @@ const ChatMessages:React.FC<ChatMessagePropsInterface>  = ({chatMessages}) => {
                     </div>
                     <div id="messages" className={styles.messages}>
                         {grouped.messages.map( (message,i) => (
-                            <MessageBubble message={message} key={message?._id || i}/>
+                            <>
+                                {message.type === "OFFER" && (<OfferMessageBubble selectedChat={selectedChat} message={message} key={message?._id +  i} />)}
+                                {message.type === "TEXT" && (<MessageBubble message={message} key={message?._id + i}/>)}
+                            </>
                         ))}
                     </div>
                 </div>

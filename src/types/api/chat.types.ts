@@ -9,8 +9,12 @@ export interface ChatDocumentInterface {
         fullname:string,
         avatar:null | string
     },
-    productRef:{
+    product:{
         _id:string,
+        price:number,
+        owner:{
+            _id:string
+        }
         coverImage:string,
         title:string
     }

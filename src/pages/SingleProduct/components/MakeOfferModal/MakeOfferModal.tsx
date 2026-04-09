@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { X } from "lucide-react";
 import type { GetSingleProductResponseInterface } from "../../../../types/api";
-import useSendOffer from "../../../../hooks/server/product/useSendOffer";
+import useSendOffer from "../../../../hooks/server/message/useSendOffer";
 import styles from "./MakeOfferModal.module.css";
+import { useNavigate } from "react-router-dom";
 
 /** Matches typical buyer-protection line (~9.7% on subtotal in reference UI). */
 const BUYER_PROTECTION_RATE = 0.097;
@@ -10,7 +11,15 @@ const BUYER_PROTECTION_RATE = 0.097;
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  product: GetSingleProductResponseInterface;
+  product: {
+    _id:string,
+    owner:{
+      _id:string,
+    };
+    title:string,
+    coverImage:string
+    price:number
+  };
 };
 
 function parsePrice(price: string | number): number {
@@ -29,6 +38,9 @@ const MakeOfferModal: React.FC<Props> = ({ isOpen, onClose, product }) => {
   const [selection, setSelection] = useState<"10" | "15" | "20" | "custom">("10");
   const [customInput, setCustomInput] = useState("");
   const [error, setError] = useState("");
+
+  /** Note: For redirection */
+  const Redirect = useNavigate();
 
   const presetAmounts = useMemo(() => {
     return {
@@ -70,24 +82,24 @@ const MakeOfferModal: React.FC<Props> = ({ isOpen, onClose, product }) => {
       setError("Your offer should be below the listing price.");
       return;
     }
+    const sendOfferPayload = {
+      receiverId: product.owner._id,
+      productId: product._id,
+      offeredPrice
+    };
 
-    sendOfferMutation.mutate(
+    sendOfferMutation.mutate(sendOfferPayload,
       {
-        productId: product._id,
-        offeredPrice,
-        originalPrice: basePrice,
-        discountPercent: selection === "custom" ? null : discountPercent,
-        offerSource: selection,
-      },
-      {
-        onSuccess: (res:any) => {
+        onSuccess: (res) => {
           if (res?.success) {
             onClose();
+            Redirect(`/inbox/${res.data.chatId}`,{replace:false});
           } else {
             setError(res?.message ?? "Could not send offer.");
           }
         },
         onError: (e) => {
+          console.log(e);
           const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message;
           setError(typeof msg === "string" ? msg : "Could not send offer. Try again.");
         },
@@ -95,7 +107,7 @@ const MakeOfferModal: React.FC<Props> = ({ isOpen, onClose, product }) => {
     );
   };
 
-  const coverSrc = product.coverImage || product.images?.[0] || "";
+  const coverSrc = product.coverImage;
 
   return (
     <div className={styles.overlay} role="presentation" onClick={onClose}>

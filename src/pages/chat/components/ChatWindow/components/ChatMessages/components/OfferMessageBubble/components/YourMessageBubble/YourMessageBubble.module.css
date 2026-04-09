@@ -1,0 +1,71 @@
+/* Main Bubble Container */
+    .YourMessageBubble {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 10px;
+  }
+  
+  /* Individual Message Container */
+  .youMessage {
+    border: 1px solid #15191a1f;
+    padding: 5px 10px;
+    background-color: #edf2f2;
+    max-width: 370px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    position: relative;
+  }
+  .buyNowBtn {
+    border: none;
+    background-color: #15191a;
+    color: #ffffff;
+    border-radius: 6px;
+    font-family: 500;
+    font-size: 16px;
+    line-height: 22px;
+  }
+  /* Tail Out Icon Section */
+  .youMessage > div:first-child {
+    position: absolute;
+    /* background-color: red; */
+    right: -10px;
+    top: -3px;
+  }
+  
+  /* Content Section inside Message Bubble */
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 14px;
+  }
+  
+  /* Offer Section: Container for offered and original prices */
+  .offerSection {
+    display: flex;
+    gap: 5px;
+  }
+  
+  /* Offered Price */
+  .offeredPrice {
+    font-weight: 500;
+    font-size: 16px;
+    color: #15191a;
+  }
+  
+  /* Original Price */
+  .orginalPrice {
+    text-decoration: line-through;
+    font-weight: 500;
+    font-size: 16px;
+    color: #5a6566;
+  }
+  
+  /* Status Text */
+  .status {
+    color:#15191a;
+    font-size: 16px;
+    font-weight: 375;
+    line-height: 22px;
+  }

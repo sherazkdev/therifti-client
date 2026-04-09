@@ -1,0 +1,106 @@
+.myMessageArtice{
+    display: flex;
+    justify-content: end;
+    margin-bottom: 15px;
+}
+.mymessage {
+    border:1px solid #15191a1f;
+    padding: 5px 10px;
+    background-color: #edf2f2;
+    max-width: 370px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    position: relative;
+}
+
+.yourtailOutIcon {
+    position: absolute;
+    top: -1px;
+    right: -10px;
+}
+/* 
+.yourMessage {
+    color:#15191a;
+    font-size: 16px;
+    font-weight: 375;
+    line-height: 22px;
+} */
+.yourOfferSection {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.offerTopSection {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-items: center;
+}
+.yourOfferSection .offerTopSection .oldPrice {
+    color: #5a6566;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 22px;
+    text-decoration: line-through;
+};
+span.offeredPrice {
+    font-size: 18px;
+    font-weight: 500;
+    color: #15191a;
+}
+.offerTopSection .offerStatus{
+    color:#15191a;
+    font-size: 16px;
+    font-weight: 375;
+    line-height: 22px;
+}
+.senderMessageArtice {
+    display: flex;
+    justify-content: start;
+    align-items: start;
+    max-width: 370px;
+    margin-bottom: 15px;
+    gap: 8px;
+}
+
+.avatar {
+    width: 32px;
+    border-radius: 200px;
+    object-fit: cover;
+}
+.avatar img {
+    width: 32px;
+    border-radius: 200px;
+    object-fit: cover;
+}
+
+.sendermessage {
+    border:1px solid #15191a1f;
+    padding: 7px 10px;
+    background-color: #edf2f2;
+
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    position: relative;
+}
+
+
+.sendertailOutIcon {
+    position: absolute;
+    top: 0px;
+    left: -8px;
+}
+
+
+.topSectionSender {
+    display: flex;
+    gap: 5px;
+};
+
+.topSectionSender div.offeredPrice{
+    font-size: 18px;
+    font-weight: 500;
+    color: blue;
+}

@@ -47,7 +47,10 @@ export interface CategoryDropDownPropsInterface  {
 
 /** Note: Listing image uploader — uploads to cloud immediately; parent reads URLs for submit */
 export interface ListingImagesState {
-  readyUrls: string[];
+  readyUrls: {
+    publicId:string,
+    secureUrl:string
+  }[];
   uploading: boolean;
   hasErrorSlot: boolean;
 }

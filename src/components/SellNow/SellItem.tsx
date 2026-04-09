@@ -19,6 +19,7 @@ import type {
   ListingImagesState,
 } from "../../types/components/index";
 import type { CategoryDocument, SizeDocument, MaterialDocument, BrandDocument  } from "../../types/api/index";
+
 /* Hooks */
 import useCreateProduct from "../../hooks/server/product/useCreateProduct";
 
@@ -122,7 +123,6 @@ const SellItem = () => {
       condition: selectedCondition,
       status,
     };
-
     productMutation.mutate(
       { imageUrls: listingImages.readyUrls, product: payload },
       {

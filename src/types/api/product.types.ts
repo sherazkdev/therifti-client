@@ -149,24 +149,6 @@ export interface GetSingleProductResponseInterface {
   /** Populated when API returns materials for the listing */
   materials?: MaterialDocument[] | string[],
 };
-
-/** Payload for creating an offer on a product */
-export interface SendOfferPayload {
-  productId: string;
-  offeredPrice: number;
-  originalPrice: number;
-  /** Preset discount when not custom; null for custom offers */
-  discountPercent: number | null;
-  offerSource: "10" | "15" | "20" | "custom";
-}
-
-export interface SendOfferApiResponse {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data?: unknown;
-}
-
 /** Note: Get Single Product Api Response */
 export interface GetSingleProductApiResponseInterface {
   success: boolean;

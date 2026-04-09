@@ -20,7 +20,12 @@ const ImageUploader: FC<ImageUploaderPropsInterface> = ({ setShowPhotoTips, onLi
     });
 
   const readyUrls = useMemo(
-    () => slots.filter((s) => s.state === "ready" && s.secureUrl).map((s) => s.secureUrl!),
+    () => slots.filter((s) => s.state === "ready" && s.secureUrl && s.publicId).map((s) => {
+      return {
+        secureUrl: s.secureUrl as string,
+        publicId: s.publicId as string
+      }
+    }),
     [slots]
   );
   const hasErrorSlot = useMemo(() => slots.some((s) => s.state === "error"), [slots]);

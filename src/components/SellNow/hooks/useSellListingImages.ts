@@ -11,6 +11,7 @@ export type SellListingImageSlot = {
   rotation: number;
   state: "uploading" | "ready" | "error";
   secureUrl?: string;
+  publicId?:string;
   deleteToken?: string;
   errorMessage?: string;
 };
@@ -167,6 +168,7 @@ export function useSellListingImages({
                     secureUrl: result.secureUrl,
                     deleteToken: result.deleteToken,
                     localPreviewUrl: result.secureUrl,
+                    publicId:result.publicId,
                     errorMessage: undefined,
                   }
                 : row

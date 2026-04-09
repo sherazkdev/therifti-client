@@ -20,7 +20,7 @@ const Chat = () => {
     const [chats,setChats] = useState<ChatDocumentInterface[] | null>(null);
     const [chatMessages,setChatMessages] = useState<MessageDocumentInterface[] | null>(null);
 
-    const {joinChatRoom,leaveChatRoom,newMessage,getOnlineUsers} = useEvents();
+    const {joinChatRoom,leaveChatRoom,newMessage} = useEvents();
     const messageMutation = useSendMessage();
     const {user} = useContext(AuthContext);
 
@@ -46,7 +46,7 @@ const Chat = () => {
         if(newMessage !== null){
             setChatMessages( (prevMessages) => {
                 const matchedIndex = prevMessages?.findIndex( (m) => (
-                    m.chatId === newMessage.chatId && m.status === "PENDING" && m.sender?._id === newMessage.sender?._id
+                    m.chatId === newMessage.chatId && m.status === "ENABLED" && m.sender?._id === newMessage.sender?._id && m.seen === "SENT"
                 ));
                 /** Note: Replace Matched Index message */
                 const updated = [...prevMessages || []];
@@ -80,8 +80,11 @@ const Chat = () => {
                     avatar:user?.avatar as string,
                     fullname:user?.fullname as string
                 },
-                status:"PENDING",
-                createdAt:new Date()
+                type:"TEXT",
+                seen:"SENT",
+                status:"ENABLED",
+                createdAt:new Date(),
+
             };
             setChatMessages( (prevChatMessages) => [...prevChatMessages || [],uiMessageDoc])
         } catch (e) {

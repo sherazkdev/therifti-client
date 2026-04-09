@@ -20,7 +20,7 @@ export type IconPropsInterface = {
   strokeWidth?: number;
   className?: string;
   style?:any,
-  onClick: () => void
+  onClick?: () => void
 };
 
 const Wrapper = ({

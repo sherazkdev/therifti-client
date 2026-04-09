@@ -1,5 +1,12 @@
 /** Message Status */
-export const MESSAGE_STATUS = ["SENT","DELIVERD","SEEN","PENDING"] as const
+export const MESSAGE_STATUS = ["DELETED","ENABLED"] as const;
+
+export const OFFER_STATUS = ["PENDING","ACCEPTED","CANCELLED"] as const;
+export const SEEN_STATUS = ["SENT","SEEN"] as const;
+export const TYPE_STATUS = ["TEXT","OFFER","FILE"] as const;
+export type offerStatus = typeof OFFER_STATUS[number];
+export type SeenStatus = typeof SEEN_STATUS[number];
+export type TypeStatus = typeof TYPE_STATUS[number];
 export type MessageStatus = typeof MESSAGE_STATUS[number];
 
 /** Note: Message Document */
@@ -11,7 +18,14 @@ export interface MessageDocumentInterface {
         fullname?:string,
         avatar?:string
     }
-    content:string,
+    content:string | null,
+    offer?:{
+        previousOfferId:string | null
+        offeredPrice:number,
+        status:offerStatus,
+    },
+    type:TypeStatus,
+    seen:SeenStatus,
     status:MessageStatus,
     createdAt:Date
 };
@@ -38,3 +52,36 @@ export interface SendMessageApiResponse {
     message:string,
     data:[]
 };
+
+
+/** Payload for creating an offer on a product */
+export interface SendOfferInterface {
+    productId: string;
+    offeredPrice: number;
+    receiverId:string;
+}
+  
+export interface SendOfferApiResponse {
+    success: boolean;
+    statusCode: number;
+    message: string;
+    data: {
+        chatId:string
+    };
+};
+
+export interface AcceptOfferApiResponse {
+    success: boolean;
+    statusCode: number;
+    message: string;
+    data: []
+};
+
+
+export interface CancelOfferApiResponse {
+    success: boolean;
+    statusCode: number;
+    message: string;
+    data: []
+};
+  

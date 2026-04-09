@@ -19,18 +19,16 @@ const productApi = new ProductApi(backendRequestServices);
 /** Note: Product Document Type */
 
 interface CreateProductPropReactStackInterface {
-    imageUrls: string[];
+    imageUrls: any[];
     product: any;
 }
 
 const useCreateProduct = () => {
     return useMutation<CreateProductApiResponse,AxiosError,CreateProductPropReactStackInterface>({
         mutationFn: async ({ imageUrls, product }: CreateProductPropReactStackInterface) => {
-            const [coverImage, ...rest] = imageUrls;
             const productPayload = {
                 ...product,
-                coverImage,
-                images: rest,
+                images: imageUrls,
             };
             const response = await productApi.CreateProduct(productPayload);
             return response;

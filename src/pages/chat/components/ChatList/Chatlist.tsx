@@ -39,6 +39,7 @@ const Chatlist:React.FC<ChatListPropsInterface> = ({onSelect,selectedChat,chats,
     useEffect( () => {
         /** Note: Fetched Chats FC */
         if(data && data?.data.length > 0){
+            console.log(data.data)
             setChats(data?.data);
         }
     },[data]);
