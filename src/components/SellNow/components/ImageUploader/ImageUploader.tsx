@@ -9,7 +9,12 @@ import { useSellListingImages } from "../../hooks/useSellListingImages";
 const MAX_IMAGES = 4;
 const MAX_FILE_SIZE = 9 * 1024 * 1024;
 
-const ImageUploader: FC<ImageUploaderPropsInterface> = ({ setShowPhotoTips, onListingImagesStateChange }) => {
+const ImageUploader: FC<ImageUploaderPropsInterface> = ({
+  setShowPhotoTips,
+  onListingImagesStateChange,
+  initialRemoteImages,
+  onExistingImageRemoved,
+}) => {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [dragging, setDragging] = useState(false);
 
@@ -17,6 +22,8 @@ const ImageUploader: FC<ImageUploaderPropsInterface> = ({ setShowPhotoTips, onLi
     useSellListingImages({
       maxImages: MAX_IMAGES,
       maxFileSizeBytes: MAX_FILE_SIZE,
+      initialRemoteImages,
+      onExistingImageRemoved,
     });
 
   const readyUrls = useMemo(

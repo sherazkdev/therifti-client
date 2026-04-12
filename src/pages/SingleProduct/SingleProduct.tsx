@@ -1,73 +1,97 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import ImageGallery from './components/ImageGallery/ImageGallery';
-import ProductDetails from "./components/ProductDetail/ProductDetails"
-import ProductGridSection from './components/ProductGrid/ProductGridSection';
-import styles from './SingleProduct.module.css';
+import React, { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import ImageGallery from "./components/ImageGallery/ImageGallery";
+import ProductDetails from "./components/ProductDetail/ProductDetails";
+import ProductGridSection from "./components/ProductGrid/ProductGridSection";
+import styles from "./SingleProduct.module.css";
 
 /** Note: Hooks */
-import useSingleProduct from '../../hooks/server/product/useSingleProduct';
+import useSingleProduct from "../../hooks/server/product/useSingleProduct";
 
-import type { GetSingleProductResponseInterface } from '../../types/api';
-import SingleProductSkeleton from './components/SingleProductSkeleton/SingleProductSkeleton';
+import type { ProductDocument } from "../../types/api";
+import SingleProductSkeleton from "./components/SingleProductSkeleton/SingleProductSkeleton";
+import { ContentFallback } from "../../components/ContentFallback/ContentFallback";
 
 const ProductPage: React.FC = () => {
-
-  const [singleProduct, setSingleProduct] = useState<GetSingleProductResponseInterface | null>(null);
-  const { data, mutate, isPending} = useSingleProduct();
+  const [singleProduct, setSingleProduct] = useState<ProductDocument | null>(null);
+  const { data, mutate, isPending, isError } = useSingleProduct();
   const params = useParams();
-
-  useEffect( () => {
-    /** Note: Check Param in productId is in exist. */
-    if(params?.productId){
-      mutate(params.productId);
-    }
-  },[params])
+  const navigate = useNavigate();
+  const productId = params?.productId;
 
   useEffect(() => {
-    if (data?.success === true && data) {
-      setSingleProduct(data.data);
+    if (productId) {
+      mutate(productId);
     }
-  }, [data]);
+  }, [productId, mutate]);
+
+  useEffect(() => {
+    if (!productId) {
+      setSingleProduct(null);
+      return;
+    }
+    if (isError) {
+      setSingleProduct(null);
+      return;
+    }
+    if (!data) return;
+    if (data.success === true && data.data && data.data._id === productId) {
+      setSingleProduct(data.data);
+    } else if (data.success === false) {
+      setSingleProduct(null);
+    }
+  }, [data, isError, productId]);
+
+  const isLoading =
+    isPending || (!!productId && data === undefined && !isError);
+  const showNotFound =
+    !isLoading && (!productId || !singleProduct);
 
   return (
-      <>
-      {isPending ? <SingleProductSkeleton /> : singleProduct && (
+    <>
+      {isLoading && <SingleProductSkeleton />}
+      {!isLoading && singleProduct && (
         <div className={styles.pageWrapper}>
           <nav className={styles.breadcrumb}>
             <Link to="/">Home</Link>
             {" / "}
-            {singleProduct?.categoryTree.map((tree) => (
+            {singleProduct.categoryTree?.map((tree) => (
               <span key={tree._id}>
                 <Link to={`/category/${tree._id}`}>{tree.title}</Link>
                 {" / "}
               </span>
             ))}
-            <span>{singleProduct?.title}</span>
+            <span>{singleProduct.title}</span>
           </nav>
 
           <div className={styles.topContainer}>
-            
             <div className={styles.leftCol}>
-              <ImageGallery coverImage={singleProduct?.coverImage as string} images={singleProduct?.images as []} likesCount={singleProduct?.totalLikes} />
-              
+              <ImageGallery
+                coverImage={singleProduct.coverImage}
+                images={singleProduct.images}
+                likesCount={singleProduct.totalLikes}
+              />
+
               <section className={styles.memberSection}>
-                  <div className={styles.memberLeft}>
-                    
-                  {singleProduct && singleProduct.ownerProducts && (
-                    <ProductGridSection title={`Member's items (${singleProduct?.ownerProducts?.length})`} products={singleProduct && singleProduct?.ownerProducts} showBundlesUI={true}  />
+                <div className={styles.memberLeft}>
+                  {singleProduct.ownerProducts && (
+                    <ProductGridSection
+                      title={`Member's items (${singleProduct.ownerProducts.length})`}
+                      products={singleProduct.ownerProducts}
+                      showBundlesUI={true}
+                    />
                   )}
-              </div>
+                </div>
               </section>
             </div>
-            
+
             <div className={styles.rightCol}>
-              <ProductDetails product={singleProduct as GetSingleProductResponseInterface} />
+              <ProductDetails product={singleProduct} />
             </div>
           </div>
 
           <div className={styles.recommendedSection}>
-            {singleProduct && singleProduct.similarProducts && (
+            {singleProduct.similarProducts && (
               <ProductGridSection
                 title="Recommended Products"
                 products={singleProduct.similarProducts}
@@ -79,7 +103,17 @@ const ProductPage: React.FC = () => {
           </div>
         </div>
       )}
-      </>
+      {!isLoading && showNotFound && (
+        <div className={styles.pageWrapper}>
+          <ContentFallback
+            title="Product Not Found"
+            description="The product you are looking for does not exist or has been removed."
+            secondaryAction={{ label: "Go Back", onClick: () => navigate(-1) }}
+            primaryAction={{ label: "Browse Products", to: "/catalog" }}
+          />
+        </div>
+      )}
+    </>
   );
 };
 

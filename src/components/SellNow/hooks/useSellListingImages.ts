@@ -4,6 +4,8 @@ import ImageUploadService from "../../../services/upload.services";
 
 const uploadService = new ImageUploadService();
 
+export type ListingImageSource = "upload" | "existing";
+
 export type SellListingImageSlot = {
   id: string;
   fileKey: string;
@@ -11,17 +13,46 @@ export type SellListingImageSlot = {
   rotation: number;
   state: "uploading" | "ready" | "error";
   secureUrl?: string;
-  publicId?:string;
+  publicId?: string;
   deleteToken?: string;
   errorMessage?: string;
+  /** Set for images loaded from the server (no delete_token). */
+  source?: ListingImageSource;
+  /** DB media `_id` when `source === "existing"` */
+  mediaId?: string;
+};
+
+export type InitialRemoteListingImage = {
+  secureUrl: string;
+  publicId: string;
+  /** Product media document `_id` when editing an existing listing */
+  mediaId?: string;
 };
 
 type UseSellListingImagesOptions = {
   maxImages: number;
   maxFileSizeBytes: number;
-  onReadyUrlsChange?: (urls: string[]) => void;
+  /** Pre-filled listing images (e.g. edit product). */
+  initialRemoteImages?: InitialRemoteListingImage[];
+  /** Called when user removes a server image — parent tracks for submit; do not delete remotely here. */
+  onExistingImageRemoved?: (ref: { publicId: string; mediaId?: string }) => void;
+  onReadyUrlsChange?: (urls: { secureUrl: string; publicId: string }[]) => void;
   onUploadingChange?: (uploading: boolean) => void;
 };
+
+function buildInitialRemoteSlots(images: InitialRemoteListingImage[]): SellListingImageSlot[] {
+  return images.map((img, i) => ({
+    id: `existing-${img.publicId}-${i}`,
+    fileKey: `existing-${img.publicId}`,
+    localPreviewUrl: img.secureUrl,
+    rotation: 0,
+    state: "ready" as const,
+    secureUrl: img.secureUrl,
+    publicId: img.publicId,
+    mediaId: img.mediaId,
+    source: "existing" as const,
+  }));
+}
 
 type UploadJob = { slot: SellListingImageSlot; file: File };
 
@@ -96,10 +127,14 @@ function computeAdditions(
 export function useSellListingImages({
   maxImages,
   maxFileSizeBytes,
+  initialRemoteImages,
+  onExistingImageRemoved,
   onReadyUrlsChange,
   onUploadingChange,
 }: UseSellListingImagesOptions) {
-  const [slots, setSlots] = useState<SellListingImageSlot[]>([]);
+  const [slots, setSlots] = useState<SellListingImageSlot[]>(() =>
+    initialRemoteImages?.length ? buildInitialRemoteSlots(initialRemoteImages) : []
+  );
   const [imageError, setImageError] = useState("");
   const abortBySlotId = useRef(new Map<string, AbortController>());
   const slotsRef = useRef(slots);
@@ -107,7 +142,9 @@ export function useSellListingImages({
 
   const emitReadyUrls = useCallback(
     (next: SellListingImageSlot[]) => {
-      const urls = next.filter((s) => s.state === "ready" && s.secureUrl).map((s) => s.secureUrl!);
+      const urls = next
+        .filter((s) => s.state === "ready" && s.secureUrl && s.publicId)
+        .map((s) => ({ secureUrl: s.secureUrl!, publicId: s.publicId! }));
       onReadyUrlsChange?.(urls);
     },
     [onReadyUrlsChange]
@@ -203,6 +240,8 @@ export function useSellListingImages({
 
   const removeAt = useCallback(
     (index: number) => {
+      let existingRemoved: { publicId: string; mediaId?: string } | null = null;
+
       setSlots((prev) => {
         const slot = prev[index];
         if (!slot) return prev;
@@ -212,7 +251,14 @@ export function useSellListingImages({
         abortBySlotId.current.delete(slot.id);
 
         if (slot.state === "ready") {
-          void uploadService.tryDeleteByToken(slot.deleteToken);
+          if (slot.source === "existing" && slot.publicId) {
+            existingRemoved = {
+              publicId: slot.publicId,
+              mediaId: slot.mediaId,
+            };
+          } else {
+            void uploadService.tryDeleteByToken(slot.deleteToken);
+          }
         }
 
         if (slot.localPreviewUrl.startsWith("blob:")) {
@@ -223,8 +269,13 @@ export function useSellListingImages({
         emitReadyUrls(next);
         return next;
       });
+
+      if (existingRemoved) {
+        const removedRef = existingRemoved;
+        queueMicrotask(() => onExistingImageRemoved?.(removedRef));
+      }
     },
-    [emitReadyUrls]
+    [emitReadyUrls, onExistingImageRemoved]
   );
 
   const setMain = useCallback(

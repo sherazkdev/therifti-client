@@ -42,7 +42,9 @@ export type ProductStatus = typeof PRODUCT_STATUS[number];
 
 /** Note: Category Drop Down Props Interface */
 export interface CategoryDropDownPropsInterface  {
-  handleCategoryOnChange:(category:CategoryDocument) => void
+  handleCategoryOnChange:(category:CategoryDocument) => void;
+  /** Pre-select full path when editing a listing */
+  initialCategoryPath?: CategoryDocument[] | null;
 };
 
 /** Note: Listing image uploader — uploads to cloud immediately; parent reads URLs for submit */
@@ -60,6 +62,10 @@ export interface ImageUploaderPropsInterface {
   showPhotoTips: boolean;
   setShowPhotoTips: Dispatch<SetStateAction<boolean>>;
   onListingImagesStateChange: (state: ListingImagesState) => void;
+  /** Edit flow: images already on the listing (optional `mediaId` = DB `_id` for submit). */
+  initialRemoteImages?: { secureUrl: string; publicId: string; mediaId?: string }[];
+  /** Called when user removes a server image — update parent state only; no delete API here. */
+  onExistingImageRemoved?: (ref: { publicId: string; mediaId?: string }) => void;
 }
 
 /** Note: Item Attributes Props Interface */
@@ -110,4 +116,5 @@ export interface PriceInputPropsInterface  {
   register: UseFormRegister<PriceInputFormValues>;
   errors: FieldErrors<PriceInputFormValues>;
   setValue: UseFormSetValue<PriceInputFormValues>;
+  defaultPrice?: number | null;
 };
