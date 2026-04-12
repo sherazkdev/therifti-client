@@ -1,12 +1,12 @@
 import styles from "./SettingsSidebar.module.css";
-import type { SettingsTabType } from "../../SettingsPage";
+import type { SettingsTabType } from "../../types";
 
 interface Props {
   activeTab: SettingsTabType;
   setActiveTab: (tab: SettingsTabType) => void;
 }
 
-const sidebarItems = [
+const sidebarItems: { label: string; value: SettingsTabType }[] = [
   { label: "Profile details", value: "PROFILE" },
   { label: "Account settings", value: "ACCOUNT" },
   { label: "Postage", value: "POSTAGE" },
@@ -29,7 +29,7 @@ export default function SettingsSidebar({
           className={`${styles.sidebarItem} ${
             activeTab === item.value ? styles.active : ""
           }`}
-          onClick={() => setActiveTab(item.value as SettingsTabType)}
+          onClick={() => setActiveTab(item.value)}
         >
           {item.label}
         </button>

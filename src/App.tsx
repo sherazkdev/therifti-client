@@ -12,6 +12,7 @@ const Catalog = lazy(() => import("./pages/SingleCategory/SingleCategory"));
 const Home = lazy(() => import("./pages/Home/Home"));
 const LoginPage = lazy(() => import("./pages/auth/Auth"));
 const Sell = lazy(() => import("./pages/Sellnow/Sell"));
+const EditProductPage = lazy(() => import("./product/EditProductPage"));
 const Chat = lazy(() => import("./pages/chat/Chat"));
 const ProductPage = lazy(() => import("./pages/SingleProduct/SingleProduct"));
 const ProfilePage = lazy(() => import("./pages/Profile/ProfilePage"));
@@ -42,12 +43,7 @@ function App() {
 
           <Route path="*" element={<h1>Not Found</h1>} />
 
-          <Route
-            path="/settings"
-            element={
-                <SettingsPage />
-            }
-          />
+          <Route path="/settings/*" element={<SettingsPage />} />
 
           {/* Secure Routes */}
           <Route 
@@ -58,6 +54,15 @@ function App() {
                 </ProtectRoute>
               }
            />
+
+          <Route
+            path="/product/:productId/edit"
+            element={
+              <ProtectRoute>
+                <EditProductPage />
+              </ProtectRoute>
+            }
+          />
 
           <Route 
             path="/favourites" 

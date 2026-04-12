@@ -1,57 +1,65 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
 import styles from "./Setings.module.css";
+import type { SettingsTabType } from "./types";
 
 import SettingsSidebar from "./components/Sidebar/SettingsSidebar";
 import ProfileDetails from "./components/ProfileDetails/ProfileDetails";
+import AccountSettingsView from "./components/AccountSettings/AccountSettingsView";
+import PostageView from "./components/Postage/PostageView";
+import PaymentsView from "./components/Payments/PaymentsView";
+import BundleDiscountsView from "./components/BundleDiscounts/BundleDiscountsView";
+import NotificationsView from "./components/Notifications/NotificationsView";
+import PrivacySettingsView from "./components/Privacy/PrivacySettingsView";
+import SecurityView from "./components/Security/SecurityView";
 
-export type SettingsTabType =
-  | "PROFILE"
-  | "ACCOUNT"
-  | "POSTAGE"
-  | "PAYMENTS"
-  | "BUNDLE"
-  | "NOTIFICATIONS"
-  | "PRIVACY"
-  | "SECURITY";
+const tabToPath: Record<SettingsTabType, string> = {
+  PROFILE: "profile",
+  ACCOUNT: "account",
+  POSTAGE: "postage",
+  PAYMENTS: "payments",
+  BUNDLE: "bundle",
+  NOTIFICATIONS: "notifications",
+  PRIVACY: "privacy",
+  SECURITY: "security",
+};
+
+const pathToTab = (segment: string | undefined): SettingsTabType => {
+  const key = segment?.toLowerCase();
+  const map: Record<string, SettingsTabType> = {
+    profile: "PROFILE",
+    account: "ACCOUNT",
+    postage: "POSTAGE",
+    payments: "PAYMENTS",
+    bundle: "BUNDLE",
+    notifications: "NOTIFICATIONS",
+    privacy: "PRIVACY",
+    security: "SECURITY",
+  };
+  return key && map[key] ? map[key] : "ACCOUNT";
+};
 
 export default function SettingsPage() {
-  // 1. URL se initial tab check karne ka function
-  const getInitialTab = (): SettingsTabType => {
-    const pathName = window.location.pathname.split("/").pop()?.toUpperCase();
-    
-    const validTabs = [
-      "PROFILE",
-      "ACCOUNT",
-      "POSTAGE",
-      "PAYMENTS",
-      "BUNDLE",
-      "NOTIFICATIONS",
-      "PRIVACY",
-      "SECURITY",
-    ];
-    
-    if (pathName && validTabs.includes(pathName)) {
-      return pathName as SettingsTabType;
-    }
-    return "PROFILE"; // Default tab
-  };
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<SettingsTabType>(getInitialTab);
+  const activeTab = useMemo(() => {
+    const parts = location.pathname.split("/").filter(Boolean);
+    const last = parts[parts.length - 1];
+    if (parts[0] !== "settings") return "ACCOUNT";
+    if (last === "settings") return "ACCOUNT";
+    return pathToTab(last);
+  }, [location.pathname]);
 
-  // 2. Agar user browser ka Back/Forward button use kare toh state update ho
   useEffect(() => {
-    const handlePopState = () => {
-      setActiveTab(getInitialTab());
-    };
+    if (location.pathname === "/settings" || location.pathname === "/settings/") {
+      navigate("/settings/account", { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
-  // 3. Custom function jo state aur URL dono change kare
   const handleTabChange = (tab: SettingsTabType) => {
-    setActiveTab(tab);
-    window.history.pushState(null, "", `/settings/${tab.toLowerCase()}`);
+    navigate(`/settings/${tabToPath[tab]}`);
   };
 
   const renderContent = () => {
@@ -59,19 +67,19 @@ export default function SettingsPage() {
       case "PROFILE":
         return <ProfileDetails />;
       case "ACCOUNT":
-        return <div>Account Settings Component</div>;
+        return <AccountSettingsView />;
       case "POSTAGE":
-        return <div>Postage Component</div>;
+        return <PostageView />;
       case "PAYMENTS":
-        return <div>Payments Component</div>;
+        return <PaymentsView />;
       case "BUNDLE":
-        return <div>Bundle Discounts Component</div>;
+        return <BundleDiscountsView />;
       case "NOTIFICATIONS":
-        return <div>Notifications Component</div>;
+        return <NotificationsView />;
       case "PRIVACY":
-        return <div>Privacy Settings Component</div>;
+        return <PrivacySettingsView />;
       case "SECURITY":
-        return <div>Security Component</div>;
+        return <SecurityView />;
       default:
         return null;
     }
@@ -79,11 +87,7 @@ export default function SettingsPage() {
 
   return (
     <div className={styles.page}>
-      <SettingsSidebar
-        activeTab={activeTab}
-        setActiveTab={handleTabChange}
-      />
-
+      <SettingsSidebar activeTab={activeTab} setActiveTab={handleTabChange} />
       <div className={styles.content}>{renderContent()}</div>
     </div>
   );
