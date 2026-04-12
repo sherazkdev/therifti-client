@@ -1,143 +1,152 @@
 /* Sender's Message Container */
 .senderMessageBubble {
-    display: flex;
-    justify-content: start; /* Align left for sender's message */
-    margin-bottom: 10px;
-    padding: 10px;
-  }
-  .senderMessage{
-    display: flex;
-    justify-content: start;
-    gap: 20px;
-  }
-  /* Left Section (Avatar) */
-  .leftSection img{
-    width: 40px;
-    height: 40px;
-    object-fit: cover;
-    border-radius: 200px
+  display: flex;
+  justify-content: start;
+  margin-bottom: 10px;
+}
+
+.senderMessage {
+  display: flex;
+  gap: 8px;
+}
+
+/* Left Section (Avatar) */
+.leftSection img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Right Section (Message Bubble) */
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* ✅ main spacing fix */
+
+  border: 1px solid #15191a1f;
+  padding: 6px 10px;
+  background-color: #edf2f2;
+  border-top-right-radius: 6px;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+}
+
+/* Status Text */
+.status {
+  font-size: 14px;
+  color: #15191a;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+/* Tail Icon */
+.tailinIcon {
+  position: absolute;
+  left: -11px;
+  top: -2px;
+}
+
+/* Offer Section */
+.offer {
+  display: flex;
+  gap: 6px;
+}
+
+/* Prices */
+.offeredPrice {
+  font-weight: 500;
+  font-size: 16px;
+  color: #15191a;
+}
+
+.orginalPrice {
+  text-decoration: line-through;
+  font-weight: 500;
+  font-size: 16px;
+  color: #5a6566;
+}
+
+/* Top Section (Accept Button) */
+.topSection {
+  display: flex;
+}
+
+.topSection button {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: #15191a;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.topSection button:hover {
+  opacity: 0.85;
+}
+
+/* Last Section (Buttons) */
+.lastSection {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap; /* ✅ responsive rows */
+}
+
+.lastSection button {
+  flex: 1; /* ✅ auto width */
+  min-width: 120px;
+
+  padding: 6px 10px;
+  background: transparent;
+  color: #15191a;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.lastSection button:hover {
+  background-color: #f1f1f1;
+}
+
+/* Cancel Offer Button (Full Width Primary) */
+.cancelledOfferBtn {
+  width: 100%;
+  padding: 8px 12px;
+
+  background-color: #15191a;
+  color: #fff;
+
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cancelledOfferBtn:hover {
+  opacity: 0.85;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .senderMessageBubble {
+    flex-direction: column;
   }
 
-  
-  /* Right Section (Message, Buttons) */
   .rightSection {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 0px 5px 5px 5px;
-    border: 1px solid #15191a1f;
-    padding: 5px 10px;
-    background-color: #edf2f2;
-    border-top-right-radius: 6px;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    max-width: 400px;
-    position: relative;
-    width: 100%;
+    max-width: 100%;
   }
-  .status {
-    font-size: 16px;
-    color: #15191a;
-    font-weight: 375;
-    line-height: 22px;
-  }
-  /* TailIn Icon */
-  .tailinIcon {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 5px;
-  }
-  
-  /* Top Section (Accept Button) */
-  .topSection {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 5px;
-  }
-  
-  .topSection button {
-    background-color: #15191a;
-    color: #ffffff;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    border: none;
-    font-size: 16px;
-    font-weight: 500;
-    width: 100%;
-    font-size: 14px;
-  }
-  
-  .topSection button:hover {
-    opacity: 0.8;
-  }
-  
-  /* Last Section (Decline and Offer Price Buttons) */
-  .lastSection {
-    display: flex;
-    justify-content: space-between;
-    gap: 5px;
-  }
-  
+
   .lastSection button {
-    background-color: transparent;
-    color: #15191a;
-    padding: 5px 15px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    font-weight: 500;
-    border-radius: 4px;
-    width: 130px;
-    cursor: pointer;
-    font-size: 14px;
+    width: 100%;
   }
-  
-  /* Offer Section: Container for offered and original prices */
-  .offer {
-    display: flex;
-    margin-bottom: 4px;
-    gap: 5px;
-  }
-  .tailinIcon {
-    position: absolute;
-    left: -11px;
-    top: -.5px;
-    /* background: red; */
-  }
-  
-  /* Offered Price */
-  .offeredPrice {
-    font-weight: 500;
-    font-size: 16px;
-    color: #15191a;
-  }
-  
-  /* Original Price */
-  .orginalPrice {
-    text-decoration: line-through;
-    font-weight: 500;
-    font-size: 16px;
-    color: #5a6566;
-  }
-  
-  #last-section button:hover {
-    background-color: #d25d46; /* Darker red on hover */
-  }
-  
-  /* Responsive for smaller screens */
-  @media (max-width: 480px) {
-    .senderMessageBubble {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-  
-    .right-section {
-      width: 100%;
-    }
-  
-    #last-section button {
-      width: 100%;
-      margin-bottom: 5px;
-    }
-  }
+}

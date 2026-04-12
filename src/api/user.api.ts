@@ -1,3 +1,17 @@
+import BackendRequestServices from "../services/backendRequest.services";
+import type { UpdateUserProfileApiResponse, UpdateUserProfileInterface } from "../types/api/user.types";
 
-import { type ForgotAccountApiResponse, type ForgotAccountInterface, type LoggedInUserApiResponse, type LoginAccountInterface, type LoginApiResponse, type RefreshAccessTokenApiResponse, type RegisterAccountInterface, type RegisterApiResponse, type VerifyForgotAccountOtpApiResponse, type VerifyForgotAccountResetTokenAndChangePasswordInterface, type VerifyForgotAccountResetTokenApiResponse,  type VerifyOtpForgotAccountVerificationInterface, type VerifyRegisterationAccountOtpApiResponse, type VerifyRegisterationAccountOtpInterface } from "../types/api/index";
-import type BackendRequestServices from "../services/backendRequest.services";
+class UserApi {
+    private apiServices: BackendRequestServices;
+
+    constructor(apiServices: BackendRequestServices){
+        this.apiServices = apiServices;
+    };
+
+    public async UpdateUserProfile(profileObj:UpdateUserProfileInterface):Promise<UpdateUserProfileApiResponse> {
+        const response = await this.apiServices.Post<UpdateUserProfileApiResponse>("/users/update-profile",profileObj);
+        return response;
+    };
+}
+
+export default UserApi;

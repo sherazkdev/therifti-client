@@ -3,6 +3,7 @@ import type { YourMessageBubblePropsInterface } from "./YourMessageBubble.types"
 import { TailOutIcon } from "../../../../../../../../../../assets/icons/svgs/svg";
 import styles from "./YourMessageBubble.module.css";
 
+
 const YourMessageBubble: React.FC<YourMessageBubblePropsInterface> = ({ message }) => {
   return (
     <article className={styles.YourMessageBubble}>

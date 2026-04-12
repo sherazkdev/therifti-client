@@ -7,53 +7,69 @@ import styles from "./ProfileDetails.module.css";
 import useGetCountries from "../../../../hooks/server/settings/useGetCountries";
 import useGetCities from "../../../../hooks/server/settings/useGetCities";
 import type { ProfileDetailsFormInterface } from "../../../../types/components/ProfileSetting.types";
+import { useAuth } from "../../../../contexts/auth/auth.context";
 
 
 export default function ProfileDetails() {
   const {
     register,
     handleSubmit,
+    reset,
     watch,
     setValue,
     formState: { errors },
   } = useForm<ProfileDetailsFormInterface>();
+  const {user} = useAuth();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(user?.avatar || null);
 
   const selectedCountry = watch("country");
 
   const countriesQuery = useGetCountries();
   const citiesMutation = useGetCities();
 
-  const allowedImageTypes = [
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "image/webp",
- ];
+  const allowedImageTypes = ["image/png","image/jpeg","image/jpg","image/webp"];
 
- const [imageError, setImageError] = useState<string | null>(null);
-
+  const [imageError, setImageError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (selectedCountry) {
-      setValue("city", "");
+    if (!user || countriesQuery.isLoading) return;
+  
+    reset({
+      username: user.username || "",
+      about: user.about || "",
+      country: user.address?.country || "",
+      city: user.address?.city || "",
+      area: user.address?.area || ""
+    });
+  }, [user, countriesQuery.isLoading]);
 
-      citiesMutation.mutate({
-        country: selectedCountry,
-      });
+  useEffect(() => {
+    if (user?.address?.country) {
+      setValue("country", user.address.country);
     }
-  }, [selectedCountry, setValue]);
+  }, [user]);
+
+  useEffect(() => {
+    const country = selectedCountry || user?.address?.country;
+
+    if (!country) return;
+
+    setValue("city", "");
+
+    citiesMutation.mutate({
+      country,
+    });
+  }, [selectedCountry]);
 
   const handleChoosePhoto = () => {
     fileInputRef.current?.click();
   };
 
 
-// Handle image selection and validation
   const handleSelectImage = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -85,33 +101,24 @@ export default function ProfileDetails() {
     setValue("image", file, { shouldValidate: true });
   };
 
+  const handleUpdateProfile = (data: ProfileDetailsFormInterface) => {
+    // 1. Manually check the image since it's not in the 'register'
+    if (!selectedImage) {
+      setImageError("Profile image is required");
+      return; // Stop the function here
+    }
 
+    // 2. Check if there's an existing type error (like wrong file format)
+    if (imageError) return;
 
-// Handle form submission
-const handleUpdateProfile = (data: ProfileDetailsFormInterface) => {
-  // 1. Manually check the image since it's not in the 'register'
-  if (!selectedImage) {
-    setImageError("Profile image is required");
-    return; // Stop the function here
-  }
+    // 3. If everything is fine, proceed
+    const payload = {
+      ...data,
+      image: selectedImage,
+    };
 
-  // 2. Check if there's an existing type error (like wrong file format)
-  if (imageError) return;
-
-  // 3. If everything is fine, proceed
-  const payload = {
-    ...data,
-    image: selectedImage,
+    console.log("Success:", payload);
   };
-
-  console.log("Success:", payload);
-};
-
- const isButtonDisabled =
-  !selectedImage ||
-  !!imageError ||
-  countriesQuery.isLoading ||
-  citiesMutation.isPending;
 
   return (
     <div className={styles.wrapper}>
@@ -241,7 +248,7 @@ const handleUpdateProfile = (data: ProfileDetailsFormInterface) => {
               </option>
 
               {citiesMutation.data?.data?.map((city) => (
-                <option key={city} value={city}>
+                <option key={city} value={city} selected={city === user?.address?.city && true}>
                   {city}
                 </option>
               ))}

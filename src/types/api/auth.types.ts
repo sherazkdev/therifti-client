@@ -11,7 +11,7 @@ export interface UserDocumentInterface {
   avatar: string | null;
   password?: string | null;
   about: string | null;
-  phoneNumber: {
+  phoneNumber?: {
     countryCode: string | null;
     nationalNumber: string | null;
   };
@@ -21,6 +21,15 @@ export interface UserDocumentInterface {
   lastSeen: Date;
   type: string;
   status: string;
+  address?:{
+    _id:string;
+    userId:string;
+    country?:string;
+    city?:string;
+    area?:string;
+    streetAddress?:string;
+    isDefault:boolean
+  }
 };
 
 

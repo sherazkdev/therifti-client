@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }:{children:ReactNode}) => {
 
   useEffect( () => {
     if(data && data.data){
+      console.log(data)
       handleSetUser(data.data);
     }
   },[data]);

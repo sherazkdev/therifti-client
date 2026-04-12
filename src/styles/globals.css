@@ -11,21 +11,21 @@
 
 @font-face {
   font-family: 'V_INTER';
-  src: url('../fonts/V_Inter_Regular.woff2') format('woff2');
+  src: url('/fonts/V_Inter_Regular.woff2') format('woff2');
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'V_INTER';
-  src: url('../fonts/V_Inter_Medium.woff2') format('woff2');
+  src: url('/fonts/V_Inter_Medium.woff2') format('woff2');
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'V_INTER';
-  src: url('../fonts/V_Inter_Semibold_580.woff2') format('woff2');
+  src: url('/fonts/V_Inter_Semibold_580.woff2') format('woff2');
   font-weight: 580;
   font-display: swap;
 }

@@ -10,7 +10,7 @@ import type { MessageBubblePropsInterface } from './MessageBubble.types';
 import { AuthContext } from '../../../../../../../../contexts/auth/auth.context';
 
 import userEmtyState from "../../../../../../../../assets/icons/user-empty-state.svg";
-import { TailOutIcon } from '../../../../../../../../assets/icons/svgs/svg';
+import { TailInIcon, TailOutIcon } from '../../../../../../../../assets/icons/svgs/svg';
 
 const MessageBubble:React.FC<MessageBubblePropsInterface> = ({message}) => {
     const {user} = useContext(AuthContext);
@@ -35,7 +35,7 @@ const MessageBubble:React.FC<MessageBubblePropsInterface> = ({message}) => {
                         </div>
                         <div id="message" className={styles.sendermessage}>
                             <span className={styles.sendertailOutIcon}>
-                                <TailOutIcon />
+                                <TailInIcon />
                             </span>
                             <div id="content" className={styles.senderMessage}>{message.content}</div>
                         </div>

@@ -21,12 +21,13 @@ const MainLayout = () => {
         { pattern: /^\/sell/, variant: "solid" },
         { pattern: /^\/inbox/, variant: "solid" },
         { pattern: /^\/notifications/, variant: "solid" },
+        { pattern: /^\/settings/, variant: "solid" },
     ];
     
     const variant = headerVariants.find( (r) => r.pattern.test(router.pathname));
     return (
         <>
-            <Header variant={variant?.variant} />
+            <Header variant={variant?.variant || "overlay"} />
 
             {/* @note: Chilren components. */}
             <Outlet />

@@ -13,8 +13,9 @@ const GoogleAuth = () => {
     window.google.accounts.id.prompt((notification: any) => {
         console.log("Prompt status:", notification);
       });
+      console.log(import.meta.env.VITE_GOOGLE_CLIENT_ID)
     window.google.accounts.id.initialize({
-      client_id: "299471675904-4kqi3q36bkjgglb87v00lm37ujpcafi0.apps.googleusercontent.com",
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
       callback: handleCredentialResponse,
     });
     window.google.accounts.id.prompt();
